@@ -23,7 +23,7 @@ This repository contains a collection of C and C++ programming problems and proj
    - Student Database System
    - Inventory Management System
 
-4. [Concurrency](#concurrency)
+<!-- 4. [Concurrency](#concurrency)
    - Producer-Consumer Problem
    - Thread Pool Implementation
 
@@ -31,7 +31,7 @@ This repository contains a collection of C and C++ programming problems and proj
    - Tic-Tac-Toe Game
    - Sudoku Solver
    - Maze Solver
-   - Chat Application (using sockets)
+   - Chat Application (using sockets) -->
 
 ## How to Use
 
