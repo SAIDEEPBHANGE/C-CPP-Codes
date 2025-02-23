@@ -5,6 +5,7 @@ This repository contains a collection of C and C++ programming problems and proj
 ## Table of Contents
 
 1. [Data Structures](#data-structures)
+
    - Linked List Implementation
    - Stack Implementation
    - Queue Implementation
@@ -18,12 +19,12 @@ This repository contains a collection of C and C++ programming problems and proj
    - Fibonacci Sequence
    - Longest Common Subsequence (LCS)
 
-3. [Object-Oriented Programming (OOP)](#object-oriented-programming-oop)
+<!-- 3. [Object-Oriented Programming (OOP)](#object-oriented-programming-oop)
    - Bank Management System
    - Student Database System
    - Inventory Management System
 
-<!-- 4. [Concurrency](#concurrency)
+4. [Concurrency](#concurrency)
    - Producer-Consumer Problem
    - Thread Pool Implementation
 
@@ -39,3 +40,4 @@ Clone the repository to your local machine:
 
 ```bash
 git clone https://github.com/SAIDEEPBHANGE/C-CPP-Codes.git
+```
