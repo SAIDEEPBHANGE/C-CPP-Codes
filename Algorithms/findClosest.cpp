@@ -23,6 +23,10 @@ public:
         else if (dy < dx) return 2;
         return 0;
     }
+    int findClosestOneLine(int x, int y, int z) {
+        int steps = abs(z - x) - abs(z - y);
+        return (steps >= 0) ? (steps == 0) ? 0 : 2 : 1;
+    }
 };
 int main() {
     Solution sol;
