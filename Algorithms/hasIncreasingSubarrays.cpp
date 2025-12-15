@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 // Function to check if an array is strictly increasing
 bool isStrictlyIncreasing(const vector<int>& nums, int start, int k) {
     for (int i = start; i < start + k - 1; i++) {
@@ -10,7 +9,6 @@ bool isStrictlyIncreasing(const vector<int>& nums, int start, int k) {
     }
     return true; // Strictly increasing
 }
-
 // Function to check if two adjacent subarrays of length k are strictly increasing
 bool hasIncreasingSubarrays(const vector<int>& nums, int k) {
     int n = nums.size();
@@ -21,7 +19,6 @@ bool hasIncreasingSubarrays(const vector<int>& nums, int k) {
     }
     return false;
 }
-
 int main() {
     // Test cases (vector of pairs)
     vector<pair<vector<int>, int>> testCases = {
@@ -31,12 +28,10 @@ int main() {
         {{1, 2, 3, 4, 5, 6}, 3}, // Expected: true
         {{1, 2, 3, 5, 4, 6, 7}, 2} // Expected: false
     };
-
     // Run test cases
     for (const auto& testCase : testCases) {
         const auto& nums = testCase.first;
         int k = testCase.second;
-
         cout << "Array: ";
         for (int num : nums) {
             cout << num << " ";
@@ -44,6 +39,5 @@ int main() {
         cout << "\nk = " << k << "\n";
         cout << "Result: " << (hasIncreasingSubarrays(nums, k) ? "true" : "false") << "\n\n";
     }
-
     return 0;
 }

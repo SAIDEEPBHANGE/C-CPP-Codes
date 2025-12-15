@@ -2,9 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
-
 using namespace std;
-
 class Solution {
 public:
     long long repairCars(vector<int>& r, int c) {
@@ -26,17 +24,12 @@ public:
         return low;
     }
 };
-
 int main() {
     Solution solution;
-    
     // Example usage:
     vector<int> r = {4, 2, 3};  // Repair rates of the machines
     int c = 10;                 // Number of cars to repair
-    
     long long result = solution.repairCars(r, c);
-    
     cout << "Minimum time to repair " << c << " cars: " << result << endl;
-
     return 0;
 }

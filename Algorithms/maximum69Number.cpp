@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 private:
     // Recursive helper
@@ -15,7 +14,6 @@ private:
         }
         res = res * 10 + digit;
     }
-
 public:
     // Recursive method
     int maximum69NumberRecursive(int num) {
@@ -24,7 +22,6 @@ public:
         fromStart(num, result, changed);
         return result;
     }
-
     // Iterative method
     int maximum69NumberIterative(int num) {
         string s = to_string(num);
@@ -37,12 +34,9 @@ public:
         return stoi(s);
     }
 };
-
 int main() {
     vector<int> testCases = {9669, 9996, 9999, 6969, 6699};
-
     Solution sol;
-
     cout << "Test Results:\n";
     for (int num : testCases) {
         int resultRecursive = sol.maximum69NumberRecursive(num);
@@ -50,6 +44,5 @@ int main() {
         cout << "Input: " << num << " | Recursive: " << resultRecursive
              << " | Iterative: " << resultIterative << "\n";
     }
-
     return 0;
 }

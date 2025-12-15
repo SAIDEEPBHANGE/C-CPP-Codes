@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     vector<int> sumZero(int n) {
@@ -15,7 +14,6 @@ public:
         return Result;
     }
 };
-
 // Utility function to print a vector
 void printVector(const vector<int>& vec) {
     cout << "[ ";
@@ -24,22 +22,17 @@ void printVector(const vector<int>& vec) {
     }
     cout << "]";
 }
-
 int main() {
     Solution sol;
-
     // Test cases
     vector<int> testCases = {1, 2, 3, 4, 5, 10};
-
     for (int n : testCases) {
         vector<int> result = sol.sumZero(n);
         cout << "n = " << n << " --> ";
         printVector(result);
-
         // Optional: verify sum == 0
         int sum = accumulate(result.begin(), result.end(), 0);
         cout << " | Sum = " << sum << endl;
     }
-
     return 0;
 }

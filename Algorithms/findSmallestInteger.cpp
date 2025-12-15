@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     int findSmallestInteger(vector<int>& nums, int value) {
@@ -20,10 +19,8 @@ public:
         }
     }
 };
-
 int main() {
     Solution sol;
-
     // Test cases: vector of pairs {nums, value}
     vector<pair<vector<int>, int>> testCases = {
         {{1, 2, 3, 4, 5}, 3},
@@ -34,13 +31,11 @@ int main() {
         {{1, 3, 5, 7, 9}, 2},
         {{-5, -10, -15}, 5}
     };
-
     for (size_t i = 0; i < testCases.size(); ++i) {
         vector<int> nums = testCases[i].first;
         int value = testCases[i].second;
         int result = sol.findSmallestInteger(nums, value);
         cout << "Test Case " << i + 1 << ": Result = " << result << endl;
     }
-
     return 0;
 }

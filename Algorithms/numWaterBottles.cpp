@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 // 🔹 Your Original Version
 class SolutionOriginal {
 public:
@@ -14,7 +13,6 @@ public:
         return Result;
     }
 };
-
 // 🔹 Optimized Version
 class SolutionOptimized {
 public:
@@ -28,11 +26,9 @@ public:
         return totalDrank;
     }
 };
-
 int main() {
     SolutionOriginal original;
     SolutionOptimized optimized;
-
     // 🔹 Test cases: {numBottles, numExchange}
     vector<pair<int, int>> testCases = {
         {9, 3},
@@ -44,20 +40,16 @@ int main() {
         {20, 5},
         {50, 7}
     };
-
     cout << "Comparing Original vs Optimized Solutions:\n";
     cout << "------------------------------------------\n";
-
     for (auto& [numBottles, numExchange] : testCases) {
         int resultOriginal = original.numWaterBottles(numBottles, numExchange);
         int resultOptimized = optimized.numWaterBottles(numBottles, numExchange);
-
         cout << "numBottles = " << numBottles
              << ", numExchange = " << numExchange
              << " | Original = " << resultOriginal
              << ", Optimized = " << resultOptimized
              << "\n";
     }
-
     return 0;
 }

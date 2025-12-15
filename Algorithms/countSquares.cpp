@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     int countSquares(vector<vector<int>>& matrix) {
@@ -23,10 +22,8 @@ public:
         return res;
     }
 };
-
 int main() {
     Solution sol;
-
     vector<vector<vector<int>>> testCases = {
         {{0,1,1,1},{1,1,1,1},{0,1,1,1}},
         {{1,0,1},{1,1,0},{1,1,0}},
@@ -35,12 +32,10 @@ int main() {
         {{1}},
         {{0}}
     };
-
     for (int i = 0; i < testCases.size(); ++i) {
         cout << "Test case " << i+1 << ": ";
         int result = sol.countSquares(testCases[i]);
         cout << "Total square submatrices with all ones = " << result << endl;
     }
-
     return 0;
 }

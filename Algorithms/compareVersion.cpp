@@ -3,9 +3,7 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-
 using namespace std;
-
 class Solution {
 private:
     vector<int> splitVersion(string version) {
@@ -17,7 +15,6 @@ private:
         }
         return parts;
     }
-
 public:
     int compareVersion(string version1, string version2) {
         vector<int> v1 = splitVersion(version1);
@@ -34,10 +31,8 @@ public:
         return 0;
     }
 };
-
 int main() {
     Solution solution;
-    
     // Test cases
     vector<pair<string, string>> testCases = {
         {"1.0.1", "1.0.2"},
@@ -50,13 +45,11 @@ int main() {
         {"2.0.0", "2.0"},
         {"0.1", "1.0.0"}
     };
-    
     // Testing
     for (const auto& testCase : testCases) {
         string version1 = testCase.first;
         string version2 = testCase.second;
         int result = solution.compareVersion(version1, version2);
-        
         cout << "Comparing " << version1 << " and " << version2 << ": ";
         if (result == 0) {
             cout << "Equal\n";
@@ -66,6 +59,5 @@ int main() {
             cout << version1 << " > " << version2 << "\n";
         }
     }
-    
     return 0;
 }

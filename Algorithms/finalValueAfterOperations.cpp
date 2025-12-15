@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     int finalValueAfterOperations(vector<string>& operations) {
@@ -15,7 +14,6 @@ public:
         return X;
     }
 };
-
 int main() {
     // Test cases
     vector<vector<string>> testCases = {
@@ -23,9 +21,7 @@ int main() {
         {"++X", "++X", "X++"},
         {"X++", "++X", "--X", "X--"}
     };
-
     Solution sol;
-
     for (auto& operations : testCases) {
         cout << "Operations: ";
         for (const string& op : operations) {
@@ -33,6 +29,5 @@ int main() {
         }
         cout << "\nFinal value of X: " << sol.finalValueAfterOperations(operations) << endl;
     }
-
     return 0;
 }

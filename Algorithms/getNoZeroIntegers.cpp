@@ -1,16 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
-
 using namespace std;
-
 class Solution {
 private:
     bool CheckZero(int i) {
         string str = to_string(i);
         return str.find('0') != string::npos;
     }
-
 public:
     vector<int> getNoZeroIntegers(int n) {
         vector<int> Result;
@@ -24,12 +21,10 @@ public:
         return Result;
     }
 };
-
 // Test function
 void runTests() {
     Solution sol;
     vector<int> testCases = {2, 11, 100, 101, 69, 2000};
-
     for (int n : testCases) {
         vector<int> result = sol.getNoZeroIntegers(n);
         cout << "n = " << n << " => ";
@@ -40,7 +35,6 @@ void runTests() {
         }
     }
 }
-
 int main() {
     runTests();
     return 0;

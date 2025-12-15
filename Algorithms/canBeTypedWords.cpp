@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 private:
     // First implementation using find and stringstream
@@ -12,7 +11,6 @@ private:
         }
         return true;
     }
-
 public:
     // Version 1: Brute force check using find
     int canBeTypedWords_v1(string text, string brokenLetters) {
@@ -26,14 +24,12 @@ public:
         }
         return Result;
     }
-
     // Version 2: Optimized using boolean array
     int canBeTypedWords_v2(string text, string brokenLetters) {
         bool broken[26] = {false};
         for (char ch : brokenLetters) {
             broken[ch - 'a'] = true;
         }
-
         stringstream ss(text);
         string word;
         int result = 0;
@@ -52,7 +48,6 @@ public:
         return result;
     }
 };
-
 int main() {
     vector<pair<string, string>> testCases = {
         {"hello world", "ad"},          // Output: 1
@@ -63,21 +58,17 @@ int main() {
         {"abc abc abc", "abc"},         // Output: 0
         {"abc abc abc", "z"},           // Output: 3
     };
-
     Solution sol;
     for (int i = 0; i < testCases.size(); ++i) {
         string text = testCases[i].first;
         string broken = testCases[i].second;
-
         int res1 = sol.canBeTypedWords_v1(text, broken);
         int res2 = sol.canBeTypedWords_v2(text, broken);
-
         cout << "Test Case " << i + 1 << ":\n";
         cout << "Text: \"" << text << "\", Broken Letters: \"" << broken << "\"\n";
         cout << "Result v1: " << res1 << ", Result v2: " << res2 << "\n";
         cout << (res1 == res2 ? "✅ Match\n" : "❌ Mismatch\n");
         cout << "----------------------\n";
     }
-
     return 0;
 }

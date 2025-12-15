@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 private:
     // Approach 1
@@ -19,7 +18,6 @@ private:
         sort(Consonents.begin(), Consonents.end());
         return Vowels[25] + Consonents[25];
     }
-
     // Approach 2
     int approach2(string s) {
         vector<int> letters(26, 0);
@@ -37,12 +35,10 @@ private:
         }
         return maxFreqVow + maxFreqCons;
     }
-
     // Approach 3
     bool isVowel(int i) {
         return i == 0 || i == 4 || i == 8 || i == 14 || i == 20; // a, e, i, o, u
     }
-
     int approach3(string s) {
         vector<int> letters(26, 0);
         int maxFreqVow = 0, maxFreqCons = 0;
@@ -58,7 +54,6 @@ private:
         }
         return maxFreqVow + maxFreqCons;
     }
-
     // Approach 4
     int approach4(string s) {
         vector<int> freq(26, 0);
@@ -74,7 +69,6 @@ private:
         }
         return maxVowelFreq + maxConsFreq;
     }
-
 public:
     void testCases() {
         vector<string> testCases = {
@@ -87,7 +81,6 @@ public:
             "b",               // single consonant
             ""                 // empty string
         };
-
         for (string s : testCases) {
             cout << "Input: \"" << s << "\"\n";
             cout << "Approach 1 Result: " << approach1(s) << endl;
@@ -98,7 +91,6 @@ public:
         }
     }
 };
-
 int main() {
     Solution sol;
     sol.testCases();

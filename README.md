@@ -5,30 +5,25 @@ This repository contains a collection of C and C++ programming problems and proj
 ## Table of Contents
 
 1. [Data Structures](#data-structures)
-
    - Linked List Implementation
    - Stack Implementation
    - Queue Implementation
    - Binary Search Tree (BST)
    - Graph Implementation (BFS/DFS)
-
 2. [Algorithms](#algorithms)
    - Sorting Algorithms (Bubble Sort, Merge Sort, Quick Sort, Heap Sort)
    - Binary Search
    - Knapsack Problem
    - Fibonacci Sequence
    - Longest Common Subsequence (LCS)
-
-<!-- 3. [Object-Oriented Programming (OOP)](#object-oriented-programming-oop)
+   <!-- 3. [Object-Oriented Programming (OOP)](#object-oriented-programming-oop)
    - Bank Management System
    - Student Database System
    - Inventory Management System
-
-4. [Concurrency](#concurrency)
+3. [Concurrency](#concurrency)
    - Producer-Consumer Problem
    - Thread Pool Implementation
-
-5. [Other Fun Projects](#other-fun-projects)
+4. [Other Fun Projects](#other-fun-projects)
    - Tic-Tac-Toe Game
    - Sudoku Solver
    - Maze Solver

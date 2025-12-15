@@ -5,35 +5,28 @@
 #include <tuple>
 #include <algorithm>
 #include <iterator>
-
 using namespace std;
-
 class Task {
 public:
     int UserId;
     int taskId;
     int priority;
-
     Task(int uId, int tId, int p) : UserId(uId), taskId(tId), priority(p) {}
 };
-
 class TaskManager {
 public:
     // Using a vector of Task* for the first method
     vector<Task*> tasks;
-
     // Constructor that initializes tasks from a 2D vector input
     TaskManager(vector<vector<int>>& tasksInput) {
         for (auto& i : tasksInput) {
             tasks.push_back(new Task(i[0], i[1], i[2]));
         }
     }
-
     // Add a new task
     void add(int userId, int taskId, int priority) {
         tasks.push_back(new Task(userId, taskId, priority));
     }
-
     // Edit the priority of an existing task by taskId
     void edit(int taskId, int newPriority) {
         for (auto& task : tasks) {
@@ -43,7 +36,6 @@ public:
             }
         }
     }
-
     // Remove a task by taskId
     void rmv(int taskId) {
         auto it = remove_if(tasks.begin(), tasks.end(), [taskId](Task* task) {
@@ -54,20 +46,16 @@ public:
             tasks.erase(it);
         }
     }
-
     // Get the task with the highest priority
     int execTop() {
         if (tasks.empty())
             return -1;
-
         auto topTask =
             *max_element(tasks.begin(), tasks.end(), [](Task* a, Task* b) {
                 return a->priority < b->priority;
             });
-
         return topTask->taskId;
     }
-
     // Destructor to clean up dynamically allocated memory
     ~TaskManager() {
         for (auto task : tasks) {
@@ -75,13 +63,11 @@ public:
         }
     }
 };
-
 // Second approach using priority queue and unordered_map
 class TaskManagerPQ {
 public:
     priority_queue<tuple<int, int, int>> pq;  // max-heap based on priority
     unordered_map<int, tuple<int, int>> taskMap;  // stores taskId -> (priority, userId)
-
     // Constructor that initializes tasks from a 2D vector input
     TaskManagerPQ(vector<vector<int>>& tasks) {
         for (const auto& task : tasks) {
@@ -92,25 +78,21 @@ public:
             taskMap[taskId] = {priority, userId};
         }
     }
-
     // Add a new task
     void add(int userId, int taskId, int priority) {
         pq.push({priority, taskId, userId});
         taskMap[taskId] = {priority, userId};
     }
-
     // Edit the priority of an existing task by taskId
     void edit(int taskId, int newPriority) {
         auto [oldPriority, userId] = taskMap[taskId];
         pq.push({newPriority, taskId, userId});
         taskMap[taskId] = {newPriority, userId};
     }
-
     // Remove a task by taskId
     void rmv(int taskId) {
         taskMap.erase(taskId);
     }
-
     // Get the task with the highest priority
     int execTop() {
         while (!pq.empty()) {
@@ -124,7 +106,6 @@ public:
         return -1;
     }
 };
-
 // Test case to demonstrate both TaskManager and TaskManagerPQ
 int main() {
     vector<vector<int>> tasksInput = {{1, 101, 3}, {2, 102, 5}, {3, 103, 1}, {4, 104, 2}};

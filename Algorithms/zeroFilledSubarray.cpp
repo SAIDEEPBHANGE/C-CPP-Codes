@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     long long zeroFilledSubarray(vector<int>& nums) {
@@ -14,10 +13,8 @@ public:
         return res;
     }
 };
-
 int main() {
     Solution sol;
-
     // Vector of test cases
     vector<vector<int>> testCases = {
         {0, 0, 0},              // Expected: 6 ([0], [0], [0], [0,0], [0,0], [0,0,0])
@@ -29,7 +26,6 @@ int main() {
         {0, 0, 1, 0, 0, 0},     // Expected: 10 ([0],[0],[0,0],[0],[0,0],[0,0,0])
         {0, 0, 0, 0, 0}         // Expected: 15
     };
-
     // Run and print each test case
     for (size_t i = 0; i < testCases.size(); ++i) {
         vector<int>& nums = testCases[i];
@@ -37,6 +33,5 @@ int main() {
         for (int n : nums) cout << n << " ";
         cout << "\nResult: " << sol.zeroFilledSubarray(nums) << "\n\n";
     }
-
     return 0;
 }

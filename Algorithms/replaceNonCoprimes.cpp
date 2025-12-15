@@ -1,10 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 private:
     using ll = long long;
-
     // Euclidean algorithm for GCD
     ll GCD(ll a, ll b) {
         while (b != 0) {
@@ -14,7 +12,6 @@ private:
         }
         return a;
     }
-
 public:
     // Method 1: Brute-force style (reset loop on merge)
     vector<int> replaceNonCoprimesBrute(vector<int>& nums) {
@@ -34,7 +31,6 @@ public:
         }
         return nums;
     }
-
     // Method 2: Stack-based (more efficient)
     vector<int> replaceNonCoprimesStack(vector<int>& nums) {
         vector<ll> stack;
@@ -57,13 +53,11 @@ public:
         return result;
     }
 };
-
 // Helper to print vector
 void printVector(const vector<int>& v) {
     for (int x : v) cout << x << " ";
     cout << endl;
 }
-
 // Test driver
 int main() {
     Solution sol;
@@ -78,18 +72,15 @@ int main() {
         {6, 9, 15},
         {2, 4, 8, 16}
     };
-
     cout << "Using Brute-force method:\n";
     for (auto test : testCases) {
         vector<int> result = sol.replaceNonCoprimesBrute(test);
         printVector(result);
     }
-
     cout << "\nUsing Stack-based method:\n";
     for (auto test : testCases) {
         vector<int> result = sol.replaceNonCoprimesStack(test);
         printVector(result);
     }
-
     return 0;
 }

@@ -1,39 +1,31 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 private:
     // For optimized solution
     bool rows[9][9] = {}, cols[9][9] = {}, boxes[9][9] = {};
     vector<pair<int, int>> emptyCells;
-
     // Helper for box index
     inline int getBoxIndex(int i, int j) {
         return (i / 3) * 3 + (j / 3);
     }
-
     // Optimized O(1) check version
     bool solveOptimized(vector<vector<char>>& board, int pos) {
         if (pos == emptyCells.size()) return true;
-
         int i = emptyCells[pos].first;
         int j = emptyCells[pos].second;
         int boxIdx = getBoxIndex(i, j);
-
         for (int d = 0; d < 9; d++) {
             if (!rows[i][d] && !cols[j][d] && !boxes[boxIdx][d]) {
                 board[i][j] = d + '1';
                 rows[i][d] = cols[j][d] = boxes[boxIdx][d] = true;
-
                 if (solveOptimized(board, pos + 1)) return true;
-
                 board[i][j] = '.';
                 rows[i][d] = cols[j][d] = boxes[boxIdx][d] = false;
             }
         }
         return false;
     }
-
     // Naive version with full check
     bool isValidNaive(vector<vector<char>>& b, int i, int j, char d) {
         for (int k = 0; k < 9; k++) {
@@ -49,7 +41,6 @@ private:
         }
         return true;
     }
-
     bool solveNaive(vector<vector<char>>& b) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
@@ -67,10 +58,8 @@ private:
         }
         return true;
     }
-
 public:
     enum Mode { NAIVE, OPTIMIZED };
-
     void solveSudoku(vector<vector<char>>& board, Mode mode = OPTIMIZED) {
         if (mode == NAIVE) {
             solveNaive(board);
@@ -80,7 +69,6 @@ public:
             memset(rows, 0, sizeof(rows));
             memset(cols, 0, sizeof(cols));
             memset(boxes, 0, sizeof(boxes));
-
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 9; j++) {
                     if (board[i][j] == '.') {
@@ -94,7 +82,6 @@ public:
             solveOptimized(board, 0);
         }
     }
-
     // Helper for printing the board
     void printBoard(const vector<vector<char>>& board) {
         for (int i = 0; i < 9; ++i) {
@@ -106,7 +93,6 @@ public:
         cout << "\n";
     }
 };
-
 int main() {
     vector<vector<vector<char>>> testCases = {
         {
@@ -132,19 +118,14 @@ int main() {
             {'.','.','.','2','7','5','9','.','.'}
         }
     };
-
     Solution solver;
-
     for (int i = 0; i < testCases.size(); i++) {
         cout << "Original Board #" << i + 1 << ":\n";
         solver.printBoard(testCases[i]);
-
         // Solve with optimized version
         solver.solveSudoku(testCases[i], Solution::OPTIMIZED);
-
         cout << "Solved Board #" << i + 1 << ":\n";
         solver.printBoard(testCases[i]);
     }
-
     return 0;
 }

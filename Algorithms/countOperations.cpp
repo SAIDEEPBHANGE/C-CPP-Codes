@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     int countOperations(int num1, int num2) {
@@ -14,7 +13,6 @@ public:
         }
         return cnt;
     }
-
     // Alternative version (simpler but slower)
     /*
     int countOperations(int num1, int num2) {
@@ -32,10 +30,8 @@ public:
     }
     */
 };
-
 int main() {
     Solution sol;
-    
     // Vector of test cases
     vector<pair<int, int>> testCases = {
         {2, 3},
@@ -46,12 +42,10 @@ int main() {
         {18, 12},
         {100, 1}
     };
-    
     cout << "Testing countOperations:\n";
     for (auto &[num1, num2] : testCases) {
         cout << "countOperations(" << num1 << ", " << num2 << ") = "
              << sol.countOperations(num1, num2) << "\n";
     }
-    
     return 0;
 }

@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     vector<int> getSneakyNumbers(vector<int>& n) {
@@ -17,10 +16,8 @@ public:
         return ans;
     }
 };
-
 int main() {
     Solution sol;
-
     // Vector of test cases
     vector<vector<int>> testCases = {
         {1, 2, 3, 2, 4, 5, 1},     // duplicates: 1, 2
@@ -29,7 +26,6 @@ int main() {
         {1, 2, 3, 4, 5},            // no duplicates
         {7, 8, 8, 9, 10, 10, 10}    // duplicates: 8, 10
     };
-
     for (int i = 0; i < testCases.size(); i++) {
         cout << "Test case " << i + 1 << ": ";
         vector<int> result = sol.getSneakyNumbers(testCases[i]);
@@ -41,6 +37,5 @@ int main() {
         }
         cout << endl;
     }
-
     return 0;
 }

@@ -23,7 +23,6 @@ public:
         n = heights[0].size();
         vector<vector<bool>> pacific(m, vector<bool>(n, false));
         vector<vector<bool>> atlantic(m, vector<bool>(n, false));
-
         // DFS from Pacific Ocean (top row and left column)
         for (int i = 0; i < m; ++i) {
             dfs(i, 0, heights, pacific);
@@ -33,7 +32,6 @@ public:
             dfs(0, j, heights, pacific);
             dfs(m - 1, j, heights, atlantic);
         }
-
         // Collect cells that can flow to both oceans
         vector<vector<int>> result;
         for (int i = 0; i < m; ++i) {
@@ -43,7 +41,6 @@ public:
                 }
             }
         }
-
         return result;
     }
 };

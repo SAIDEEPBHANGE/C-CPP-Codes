@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     // Method 1: Optimized version (string comparison)
@@ -16,7 +15,6 @@ public:
         }
         return res;
     }
-
     // Method 2: Original version (integer comparison with skip)
     string largestGoodIntegerOriginal(string num) {
         int n = num.length() - 2;
@@ -33,7 +31,6 @@ public:
         return str;
     }
 };
-
 int main() {
     vector<string> testCases = {
         "6777133339",
@@ -44,7 +41,6 @@ int main() {
         "999111000888",
         "222333444555666777888999"
     };
-
     Solution sol;
     cout << "Testing both versions:\n\n";
     for (const string& test : testCases) {
@@ -53,6 +49,5 @@ int main() {
         cout << "Original : " << sol.largestGoodIntegerOriginal(test) << "\n";
         cout << "----------------------------------\n";
     }
-
     return 0;
 }

@@ -31,37 +31,30 @@ public:
         return res;
     }
 };
-
 int main() {
     Solution sol;
-
     vector<vector<int>> mat1 = {
         {1, 2, 3},
         {4, 5, 6},
         {7, 8, 9}
     };
-
     vector<int> result = sol.findDiagonalOrder(mat1);
-
     cout << "Diagonal traversal: ";
     for (int num : result) {
         cout << num << " ";
     }
     cout << endl;
-
     // Additional test cases
     vector<vector<int>> mat2 = {
         {1, 2},
         {3, 4},
         {5, 6}
     };
-
     result = sol.findDiagonalOrder(mat2);
     cout << "Diagonal traversal: ";
     for (int num : result) {
         cout << num << " ";
     }
     cout << endl;
-
     return 0;
 }

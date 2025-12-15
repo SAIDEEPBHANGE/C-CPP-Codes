@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     int triangularSum(vector<int>& nums) {
@@ -14,10 +13,8 @@ public:
         return nums[0];
     }
 };
-
 int main() {
     Solution sol;
-
     // Vector of test cases
     vector<vector<int>> testCases = {
         {1, 2, 3, 4, 5},      // Expected: 8
@@ -27,12 +24,10 @@ int main() {
         {1, 1, 1, 1, 1},     // Expected: 5
         {9, 9, 9, 9, 9, 9},  // Expected: 6
     };
-
     for (int i = 0; i < testCases.size(); ++i) {
         vector<int> test = testCases[i];
         int result = sol.triangularSum(test);
         cout << "Test Case " << i + 1 << ": Result = " << result << endl;
     }
-
     return 0;
 }
