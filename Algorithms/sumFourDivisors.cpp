@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     /*------------------------------------------------------------
@@ -27,7 +26,6 @@ public:
         }
         return result;
     }
-
     /*------------------------------------------------------------
      Approach 2: Mathematical Optimization
      Observation:
@@ -42,7 +40,6 @@ public:
         }
         return true;
     }
-
     int sumFourDivisors_math(const vector<int>& nums) {
         int result = 0;
         for (int num : nums) {
@@ -53,7 +50,6 @@ public:
                 result += (1 + p + p * p + num);
                 continue;
             }
-
             // Case 2: p * q
             for (int i = 2; i * i <= num; i++) {
                 if (num % i == 0) {
@@ -68,7 +64,6 @@ public:
         }
         return result;
     }
-
     /*------------------------------------------------------------
      Approach 3: Brute Force with Memoization
      - Cache results for repeated numbers
@@ -77,13 +72,11 @@ public:
     int sumFourDivisors_memo(const vector<int>& nums) {
         unordered_map<int, int> memo;
         int result = 0;
-
         for (int num : nums) {
             if (memo.count(num)) {
                 if (memo[num] != -1) result += memo[num];
                 continue;
             }
-
             int cnt = 0, sum = 0;
             for (int i = 1; i * i <= num; i++) {
                 if (num % i == 0) {
@@ -95,7 +88,6 @@ public:
                     }
                 }
             }
-
             if (cnt == 4) {
                 memo[num] = sum;
                 result += sum;
@@ -106,13 +98,10 @@ public:
         return result;
     }
 };
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-
     Solution sol;
-
     // Hardcoded test cases
     vector<vector<int>> testCases = {
         {21, 4, 7},
@@ -120,23 +109,17 @@ int main() {
         {16, 9, 25},
         {21, 21, 8, 10}
     };
-
     for (size_t i = 0; i < testCases.size(); i++) {
         cout << "Test Case " << i + 1 << ": ";
         for (int x : testCases[i]) cout << x << " ";
         cout << "\n";
-
         cout << "  Brute Force Result      : "
              << sol.sumFourDivisors_bruteforce(testCases[i]) << "\n";
-
         cout << "  Math Optimized Result   : "
              << sol.sumFourDivisors_math(testCases[i]) << "\n";
-
         cout << "  Memoized Result         : "
              << sol.sumFourDivisors_memo(testCases[i]) << "\n";
-
         cout << "----------------------------------------\n";
     }
-
     return 0;
 }

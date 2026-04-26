@@ -1,9 +1,6 @@
 # C and C++ Problem Set
-
 This repository contains a collection of C and C++ programming problems and projects, designed to demonstrate my skills in data structures, algorithms, object-oriented programming, concurrency, and more. The solutions showcase my understanding of these key concepts and algorithms, and provide detailed code implementations for each problem.
-
 ## Table of Contents
-
 1. [Data Structures](#data-structures)
    - Linked List Implementation
    - Stack Implementation
@@ -28,11 +25,8 @@ This repository contains a collection of C and C++ programming problems and proj
    - Sudoku Solver
    - Maze Solver
    - Chat Application (using sockets) -->
-
 ## How to Use
-
 Clone the repository to your local machine:
-
 ```bash
 git clone https://github.com/SAIDEEPBHANGE/C-CPP-Codes.git
 ```

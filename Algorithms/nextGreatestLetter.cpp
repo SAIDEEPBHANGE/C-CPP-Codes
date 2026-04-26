@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     // Approach 1: Binary Search (Manual)
@@ -16,7 +15,6 @@ public:
         }
         return letters[left % letters.size()];
     }
-
     // Approach 2: Linear Scan
     char nextGreatestLetter_Linear(vector<char>& letters, char target) {
         for (char c : letters) {
@@ -25,7 +23,6 @@ public:
         // Wrap around case
         return letters[0];
     }
-
     // Approach 3: Using STL upper_bound
     char nextGreatestLetter_STL(vector<char>& letters, char target) {
         auto it = upper_bound(letters.begin(), letters.end(), target);
@@ -33,13 +30,10 @@ public:
         return *it;
     }
 };
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-
     Solution sol;
-
     // Hardcoded test cases
     vector<vector<char>> testLetters = {
         {'c', 'f', 'j'},
@@ -48,24 +42,18 @@ int main() {
         {'a'}
     };
     vector<char> testTargets = {'a', 'c', 'z', 'a'};
-
     for (size_t i = 0; i < testLetters.size(); i++) {
         cout << "Test Case " << i + 1 << ":\n";
         cout << "Letters: ";
         for (char c : testLetters[i]) cout << c << " ";
         cout << "\nTarget: " << testTargets[i] << "\n";
-
         cout << "Binary Search Approach: "
              << sol.nextGreatestLetter_BinarySearch(testLetters[i], testTargets[i]) << "\n";
-
         cout << "Linear Scan Approach: "
              << sol.nextGreatestLetter_Linear(testLetters[i], testTargets[i]) << "\n";
-
         cout << "STL upper_bound Approach: "
              << sol.nextGreatestLetter_STL(testLetters[i], testTargets[i]) << "\n";
-
         cout << "-----------------------------\n";
     }
-
     return 0;
 }

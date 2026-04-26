@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Solution {
 public:
     /*
@@ -19,7 +18,6 @@ public:
         }
         return true;
     }
-
     int approach1(int left, int right) {
         int ans = 0;
         for (int i = left; i <= right; i++) {
@@ -30,7 +28,6 @@ public:
         }
         return ans;
     }
-
     /*
         ---------------------------------------------------------
         Approach 2: Brian Kernighan’s Algorithm + Precomputed Primes
@@ -47,11 +44,9 @@ public:
         }
         return cnt;
     }
-
     int approach2(int left, int right) {
         int result = 0;
         unordered_set<int> primeSet = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31};
-
         for (int i = left; i <= right; i++) {
             int cnt = countSetBits(i);
             if (primeSet.count(cnt)) {
@@ -60,7 +55,6 @@ public:
         }
         return result;
     }
-
     /*
         ---------------------------------------------------------
         Approach 3: Bitmask Trick for Prime Checking
@@ -72,7 +66,6 @@ public:
     */
     int approach3(int left, int right) {
         int result = 0;
-
         // Bitmask representing primes up to 31
         // Bits set at prime indices: 2,3,5,7,11,13,17,19,23,29,31
         int primeMask = 0;
@@ -80,24 +73,19 @@ public:
         for (int p : primes) {
             primeMask |= (1 << p);
         }
-
         for (int i = left; i <= right; i++) {
             int setBits = __builtin_popcount(i);
             if ((primeMask >> setBits) & 1) {
                 result++;
             }
         }
-
         return result;
     }
 };
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-
     Solution sol;
-
     // Hardcoded test cases: {left, right}
     vector<pair<int, int>> testCases = {
         {6, 10},
@@ -106,23 +94,18 @@ int main() {
         {842, 888},
         {1000, 1100}
     };
-
     for (size_t i = 0; i < testCases.size(); i++) {
         int left = testCases[i].first;
         int right = testCases[i].second;
-
         cout << "Test Case " << i + 1 << " (Range: " 
              << left << " to " << right << ")\n";
-
         int res1 = sol.approach1(left, right);
         int res2 = sol.approach2(left, right);
         int res3 = sol.approach3(left, right);
-
         cout << "Approach 1 (Prime Check with sqrt): " << res1 << "\n";
         cout << "Approach 2 (Kernighan + Prime Set): " << res2 << "\n";
         cout << "Approach 3 (Bitmask Optimization): " << res3 << "\n";
         cout << "----------------------------------------\n";
     }
-
     return 0;
 }
