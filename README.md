@@ -4,13 +4,10 @@ This repository contains C and C++ examples covering data structures, algorithms
 
 ## Repository layout
 
-The complete directory tree is maintained in [`folder-structure.txt`](./folder-structure.txt).
-
 - [`Data-Structures/`](./Data-Structures/) contains trees, linked lists, stacks, queues, and graphs.
-- [`Algorithms/`](./Algorithms/) contains searching, sorting, dynamic programming, and math examples.
+- [`Algorithms/`](./Algorithms/) contains searching, sorting, greedy, dynamic programming, and math examples.
 - [`College-Codes/`](./College-Codes/) groups classroom exercises by topic.
 - [`LeetCode/`](./LeetCode/) contains one folder per identified problem, with its source and a problem-specific README.
-- [`C-CPP-Codes-Structure.txt`](./C-CPP-Codes-Structure.txt) and [`Propmt.txt`](./Propmt.txt) are repository reference files.
 
 ## Browsing LeetCode solutions
 
@@ -25,9 +22,3 @@ git clone https://github.com/SAIDEEPBHANGE/C-CPP-Codes.git
 ```
 
 Open the relevant topic folder and compile an individual source file with a C or C++ compiler when it is a standalone program. LeetCode class-method solutions are intended for the online judge unless their README says otherwise.
-
-## Organization policy
-
-- Source code is not rewritten or discarded as part of organization.
-- Folder assignments and the current tree are documented in [`folder-structure.txt`](./folder-structure.txt).
-- [`ACTION-PLAN.md`](./ACTION-PLAN.md) records the approved organization plan.
