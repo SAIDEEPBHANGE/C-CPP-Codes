@@ -1,118 +1,90 @@
 #include <bits/stdc++.h>
 using namespace std;
-
 class Twitter {
 private:
     unordered_map<int, unordered_set<int>> following;
     unordered_map<int, vector<pair<int, int>>> tweets;
     int timestamp = 0;
-
 public:
     Twitter() {}
-
     // Approach 1: Max Heap (Optimal)
     // Time: O(F + 10 log F)
     // Space: O(F)
     void postTweet(int userId, int tweetId) {
         tweets[userId].push_back({++timestamp, tweetId});
     }
-
     vector<int> getNewsFeed(int userId) {
         priority_queue<tuple<int, int, int>> pq;
-
         unordered_set<int> users = following[userId];
         users.insert(userId);
-
         for (int id : users) {
             if (!tweets[id].empty()) {
                 int index = tweets[id].size() - 1;
                 pq.push({tweets[id][index].first, id, index});
             }
         }
-
         vector<int> feed;
-
         while (!pq.empty() && feed.size() < 10) {
             auto [time, id, index] = pq.top();
             pq.pop();
-
             feed.push_back(tweets[id][index].second);
-
             if (index > 0) {
                 int prev = index - 1;
                 pq.push({tweets[id][prev].first, id, prev});
             }
         }
-
         return feed;
     }
-
     void follow(int followerId, int followeeId) {
         if (followerId != followeeId) {
             following[followerId].insert(followeeId);
         }
     }
-
     void unfollow(int followerId, int followeeId) {
         following[followerId].erase(followeeId);
     }
-
     // Approach 2: Collect and Sort All Tweets
     // Time: O(T log T)
     // Space: O(T)
     vector<int> getNewsFeedSorting(int userId) {
         vector<pair<int, int>> allTweets;
-
         unordered_set<int> users = following[userId];
         users.insert(userId);
-
         for (int id : users) {
             for (auto& tweet : tweets[id]) {
                 allTweets.push_back(tweet);
             }
         }
-
         sort(allTweets.rbegin(), allTweets.rend());
-
         vector<int> feed;
-
         for (int i = 0; i < min(10, (int)allTweets.size()); i++) {
             feed.push_back(allTweets[i].second);
         }
-
         return feed;
     }
-
     // Approach 3: Maintain Top 10 Tweets
     // Time: O(10 * T)
     // Space: O(10)
     vector<int> getNewsFeedTop10(int userId) {
         vector<pair<int, int>> latest;
-
         unordered_set<int> users = following[userId];
         users.insert(userId);
-
         for (int id : users) {
             for (auto& tweet : tweets[id]) {
                 latest.push_back(tweet);
                 sort(latest.rbegin(), latest.rend());
-
                 if (latest.size() > 10) {
                     latest.pop_back();
                 }
             }
         }
-
         vector<int> feed;
-
         for (auto& tweet : latest) {
             feed.push_back(tweet.second);
         }
-
         return feed;
     }
 };
-
 void printFeed(const vector<int>& feed) {
     cout << "[ ";
     for (int id : feed) {
@@ -120,11 +92,9 @@ void printFeed(const vector<int>& feed) {
     }
     cout << "]\n";
 }
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
-
     vector<vector<tuple<string, int, int>>> testCases = {
         {
             {"post", 1, 5},
@@ -159,13 +129,10 @@ int main() {
             {"feed", 1, 0}
         }
     };
-
     for (int tc = 0; tc < (int)testCases.size(); tc++) {
         Twitter t1, t2, t3;
-
         cout << "\n========== Test Case "
              << tc + 1 << " ==========\n";
-
         for (auto [op, a, b] : testCases[tc]) {
             if (op == "post") {
                 t1.postTweet(a, b);
@@ -184,18 +151,14 @@ int main() {
             }
             else if (op == "feed") {
                 cout << "\nUser " << a << " News Feed:\n";
-
                 cout << "Approach 1 (Max Heap): ";
                 printFeed(t1.getNewsFeed(a));
-
                 cout << "Approach 2 (Sorting): ";
                 printFeed(t2.getNewsFeedSorting(a));
-
                 cout << "Approach 3 (Top 10): ";
                 printFeed(t3.getNewsFeedTop10(a));
             }
         }
     }
-
     return 0;
 }
