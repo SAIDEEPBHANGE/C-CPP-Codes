@@ -13,8 +13,7 @@ Solution-facing declarations extracted from the source:
 - `int AllPossible(int i, vector<int>& nums, int sum)`
 - `int maxAbsoluteSumRecursion(vector<int>& nums)`
 - `void compareMethods(vector<int>& nums)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -57,14 +56,12 @@ flowchart TD
 ## Core logic and invariant
 
 Compare brute-force and recursive methods with Kadane-style maximum and minimum running sums.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n) optimized; O(n^2) brute.
 - **Auxiliary space:** O(1) optimized.
-
 
 ## Compile and run
 

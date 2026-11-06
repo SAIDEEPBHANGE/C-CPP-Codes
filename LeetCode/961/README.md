@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `int repeatedNTimes_freqMap(vector<int>& nums)`
 - `int repeatedNTimes_neighborCheck(vector<int>& nums)`
 - `int repeatedNTimes_set(vector<int>& nums)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Find the value appearing more than once using frequency, neighbor comparison, or a set.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n).
 - **Auxiliary space:** O(n) frequency/set.
-
 
 ## Compile and run
 

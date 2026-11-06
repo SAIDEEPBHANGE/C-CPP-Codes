@@ -36,7 +36,7 @@ flowchart TD
 
 ## Core logic and invariants
 
-Brute force enumerates divisor pairs up to sqrt(x); math recognizes p^3 or distinct prime p*q; memoized brute force caches divisor sum or a nonqualifying sentinel for repeated inputs.
+Brute force enumerates divisor pairs up to sqrt(x); math recognizes p^3 or distinct prime p\*q; memoized brute force caches divisor sum or a nonqualifying sentinel for repeated inputs.
 
 ## Complexity
 
@@ -56,5 +56,3 @@ g++ -std=c++17 LeetCode\1390\1390.cpp -o solution.exe
 ```
 
 For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
-
-

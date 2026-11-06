@@ -1,9 +1,7 @@
 # Finding Pairs With a Certain Sum
 
 **LeetCode ID:** 1865
-
 **Source file(s):** `1865.cpp` (originally `FindSumPairs.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Maintains a frequency table for nums2; add updates old/new frequency and count scans nums1 for matching complements.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

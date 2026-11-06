@@ -40,7 +40,7 @@ The grid starts at zero. Operands are signed or unsigned integers or references;
 
 ## Complexity
 
-Grid initialization/storage O(rows*26); cell update O(1), formula evaluation O(L) in formula length L.
+Grid initialization/storage O(rows\*26); cell update O(1), formula evaluation O(L) in formula length L.
 
 ## Comparison and optimization
 

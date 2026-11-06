@@ -1,9 +1,7 @@
 # Count Equal and Divisible Pairs in an Array
 
 **LeetCode ID:** 2176
-
 **Source file(s):** `2176.cpp` (originally `countPairs.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -42,8 +40,7 @@ flowchart TD
 
 ## Core logic and invariant
 
-Counts i<j with equal values and (i*j)%k==0; the second version groups indices by value before pair testing.
-
+Counts i<j with equal values and (i\*j)%k==0; the second version groups indices by value before pair testing.
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

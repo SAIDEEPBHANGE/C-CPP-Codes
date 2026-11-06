@@ -1,9 +1,7 @@
 # Convert Integer to the Sum of Two No-Zero Integers
 
 **LeetCode ID:** 1317
-
 **Source file(s):** `1317.cpp` (originally `getNoZeroIntegers.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Tests candidate splits i and n-i in increasing order and returns the first pair whose decimal strings contain no zero.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
@@ -52,7 +49,7 @@ The positive addends sum to n and are independently checked for zero digits.
 
 ## Complexity
 
-O(n*d) time and O(d) temporary string space.
+O(n\*d) time and O(d) temporary string space.
 
 ## Compile and run
 

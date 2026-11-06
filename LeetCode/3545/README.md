@@ -9,8 +9,7 @@
 Solution-facing declarations extracted from the source:
 
 - `int minDeletionsToLimitDistinctChars(string s, int k)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -53,14 +52,12 @@ flowchart TD
 ## Core logic and invariant
 
 Count character frequencies, sort them, and delete all occurrences of the least frequent excess characters.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n + sigma log sigma).
 - **Auxiliary space:** O(sigma).
-
 
 ## Compile and run
 

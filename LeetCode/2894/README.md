@@ -1,9 +1,7 @@
 # Divisible and Non-divisible Sums Difference
 
 **LeetCode ID:** 2894
-
 **Source file(s):** `2894.cpp` (originally `differenceOfSums.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Computes sum(nonmultiples of m)-sum(multiples), with a loop and a closed-form arithmetic-series formula.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

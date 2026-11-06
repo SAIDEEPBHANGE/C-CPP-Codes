@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `int partitionArray(vector<int>& nums, int k)`
 - `void runTestCases()`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Sort values and start a new group when the current value exceeds the group's minimum by more than k.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n log n).
 - **Auxiliary space:** O(1) beyond sorting.
-
 
 ## Compile and run
 

@@ -1,9 +1,7 @@
 # Maximum Area of Longest Diagonal Rectangle
 
 **LeetCode ID:** 3000
-
 **Source file(s):** `3000.cpp` (originally `areaOfMaxDiagonal.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Scans rectangles, computes each diagonal with sqrt, and retains the area for the longest diagonal, breaking ties by larger area.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

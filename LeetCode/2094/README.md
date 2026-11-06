@@ -1,9 +1,7 @@
 # Finding 3-Digit Even Numbers
 
 **LeetCode ID:** 2094
-
 **Source file(s):** `2094.cpp` (originally `findEvenNumbers.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Enumerates three-digit even candidates, verifies digit multiplicities, and returns unique values in ascending order; includes brute force, recursion, and frequency methods.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
@@ -52,7 +49,7 @@ Digit counts cannot exceed input frequencies; frequency checking avoids repeated
 
 ## Complexity
 
-Fixed-domain candidate scan O(900*d); frequency version O(900+digits); output storage.
+Fixed-domain candidate scan O(900\*d); frequency version O(900+digits); output storage.
 
 ## Compile and run
 

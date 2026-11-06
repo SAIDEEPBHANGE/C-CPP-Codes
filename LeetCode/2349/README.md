@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `void change(int index, int number)`
 - `int find(int number)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Maintain index-to-number assignments and an ordered set of indices for each number.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(log n) change/find.
 - **Auxiliary space:** O(n).
-
 
 ## Compile and run
 

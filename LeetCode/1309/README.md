@@ -1,9 +1,7 @@
 # Decrypt String from Alphabet to Integer Mapping
 
 **LeetCode ID:** 1309
-
 **Source file(s):** `1309.cpp` (originally `freqAlphabets.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Scans left-to-right; a two-digit token followed by # maps 10..26 to j..z, otherwise one digit maps 1..9 to a..i.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

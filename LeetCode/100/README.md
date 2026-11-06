@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `bool getAllNode(TreeNode* p, TreeNode* q)`
 - `bool isSameTree(TreeNode* p, TreeNode* q)`
 - `void testCaseResult(int index, bool result)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Recursively compare corresponding nodes, values, and both child pairs.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(N).
 - **Auxiliary space:** O(H) recursion.
-
 
 ## Compile and run
 

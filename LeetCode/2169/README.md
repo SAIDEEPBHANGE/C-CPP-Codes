@@ -1,9 +1,7 @@
 # Count Operations to Obtain Zero
 
 **LeetCode ID:** 2169
-
 **Source file(s):** `2169.cpp` (originally `countOperations.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Orders the values and repeatedly adds the integer quotient, replaces the larger value by its remainder, and swaps—batched Euclidean subtraction.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

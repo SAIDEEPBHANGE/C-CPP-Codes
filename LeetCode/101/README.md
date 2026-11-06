@@ -12,8 +12,7 @@ Solution-facing declarations extracted from the source:
 - `bool isSymmetric(TreeNode* root)`
 - `TreeNode* createSymmetricTree()`
 - `TreeNode* createAsymmetricTree()`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -56,14 +55,12 @@ flowchart TD
 ## Core logic and invariant
 
 Recursively compare mirrored node pairs with crossed child positions.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(N).
 - **Auxiliary space:** O(H) recursion.
-
 
 ## Compile and run
 

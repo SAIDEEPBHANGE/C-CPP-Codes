@@ -1,9 +1,7 @@
 # Number of Smooth Descent Periods of a Stock
 
 **LeetCode ID:** 2110
-
 **Source file(s):** `2110.cpp` (originally `getDescentPeriods.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,12 +41,11 @@ flowchart TD
 ## Core logic and invariant
 
 Tracks the current run where each price is one lower than its predecessor and adds that run length per endpoint.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
 
-A run of length L contributes L*(L+1)/2 subarrays; adding current run length counts those ending here.
+A run of length L contributes L\*(L+1)/2 subarrays; adding current run length counts those ending here.
 
 ## Complexity
 

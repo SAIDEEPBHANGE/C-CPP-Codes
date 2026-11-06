@@ -1,9 +1,7 @@
 # Find Closest Person
 
 **LeetCode ID:** 3516
-
 **Source file(s):** `3516.cpp` (originally `findClosest.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Compares absolute distances from x and y to z and returns 1, 2, or 0 for person 1, person 2, or tie.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

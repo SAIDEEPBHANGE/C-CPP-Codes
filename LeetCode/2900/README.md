@@ -1,9 +1,7 @@
 # Longest Unequal Adjacent Groups Subsequence I
 
 **LeetCode ID:** 2900
-
 **Source file(s):** `2900.cpp` (originally `getLongestSubsequence.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Keeps the first word and each later word whose group differs from the last selected group.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

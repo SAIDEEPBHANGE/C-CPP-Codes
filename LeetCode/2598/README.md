@@ -1,9 +1,7 @@
 # Smallest Missing Non-negative Integer After Operations
 
 **LeetCode ID:** 2598
-
 **Source file(s):** `2598.cpp` (originally `findSmallestInteger.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Counts normalized modulo-value residues (including negatives), then consumes residue counts in ascending candidate order until one is exhausted.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

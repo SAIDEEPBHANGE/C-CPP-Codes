@@ -12,8 +12,7 @@ Solution-facing declarations extracted from the source:
 - `bool checkGridOptimized(const vector<vector<int>>& grid, int r, int c)`
 - `int numMagicSquaresBrute(vector<vector<int>>& grid)`
 - `int numMagicSquaresOptimized(vector<vector<int>>& grid)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -56,12 +55,11 @@ flowchart TD
 ## Core logic and invariant
 
 Inspect each 3x3 window for digits 1 through 9 and equal row, column, and diagonal sums.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
-- **Time:** O(R*C).
+- **Time:** O(R\*C).
 - **Auxiliary space:** O(1) per window.
 
 ## Approach comparison
@@ -72,8 +70,7 @@ The source contains multiple implementations for comparison:
 - `bool checkGridOptimized(const vector<vector<int>>& grid, int r, int c)`
 - `int numMagicSquaresBrute(vector<vector<int>>& grid)`
 - `int numMagicSquaresOptimized(vector<vector<int>>& grid)`
-
-The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
 
 ```mermaid
 flowchart LR

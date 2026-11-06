@@ -1,9 +1,7 @@
 # Count the Number of Arrays with K Matching Adjacent Elements
 
 **LeetCode ID:** 3405
-
 **Source file(s):** `3405.cpp` (originally `countGoodArrays.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -42,8 +40,7 @@ flowchart TD
 
 ## Core logic and invariant
 
-Uses C(n-1,k)*m*(m-1)^(n-k-1) modulo 1e9+7; compares per-call factorial work with precomputed factorial and inverse-factorial tables.
-
+Uses C(n-1,k)_m_(m-1)^(n-k-1) modulo 1e9+7; compares per-call factorial work with precomputed factorial and inverse-factorial tables.
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

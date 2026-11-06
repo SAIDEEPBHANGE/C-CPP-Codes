@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `int numSteps_simulation(string s)`
 - `int numSteps_optimized(string s)`
 - `int numSteps_bigint(string s)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Simulate odd increment and even halving, with carry-based optimized variants.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n) optimized.
 - **Auxiliary space:** O(1) carry.
-
 
 ## Compile and run
 

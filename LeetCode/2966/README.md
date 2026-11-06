@@ -1,9 +1,7 @@
 # Divide Array Into Arrays With Max Difference
 
 **LeetCode ID:** 2966
-
 **Source file(s):** `2966.cpp` (originally `divideArray.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Sorts values and groups consecutive triples; accepts each only if max-min<=k and otherwise returns empty.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

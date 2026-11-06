@@ -1,9 +1,7 @@
 # Maximum Number of Words You Can Type
 
 **LeetCode ID:** 1935
-
 **Source file(s):** `1935.cpp` (originally `canBeTypedWords.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Splits text into words and counts words containing no broken letter; compares repeated string searches with a 26-entry broken-letter table.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
@@ -52,7 +49,7 @@ The boolean alphabet table avoids repeated find searches and enables early exit.
 
 ## Complexity
 
-v1 O(T*B) worst case; v2 O(T+B); constant-size alphabet table.
+v1 O(T\*B) worst case; v2 O(T+B); constant-size alphabet table.
 
 ## Compile and run
 

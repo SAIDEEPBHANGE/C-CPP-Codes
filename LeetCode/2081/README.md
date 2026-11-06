@@ -13,8 +13,7 @@ Solution-facing declarations extracted from the source:
 - `long long makePalindrome(int half, bool odd)`
 - `long long kMirrorV1(int k, int n)`
 - `long long kMirrorV2(int k, int n)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -57,12 +56,11 @@ flowchart TD
 ## Core logic and invariant
 
 Enumerate decimal palindromes, convert to base k, and accumulate values palindromic in both bases.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
-- **Time:** O(C * d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
+- **Time:** O(C \* d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
 - **Auxiliary space:** O(d) for the current candidate and its base-k representation.
 
 ## Approach comparison
@@ -71,8 +69,7 @@ The source contains multiple implementations for comparison:
 
 - `long long kMirrorV1(int k, int n)`
 - `long long kMirrorV2(int k, int n)`
-
-The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
 
 ```mermaid
 flowchart LR

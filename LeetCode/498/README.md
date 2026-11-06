@@ -1,9 +1,7 @@
 # Diagonal Traverse
 
 **LeetCode ID:** 498
-
 **Source file(s):** `498.cpp` (originally `findDiagonalOrder.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Enumerates diagonals by constant row+column sum, alternating upward-right and downward-left.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

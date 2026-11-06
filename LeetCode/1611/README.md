@@ -9,8 +9,7 @@
 Solution-facing declarations extracted from the source:
 
 - `int minimumOneBitOperations(int n)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -53,14 +52,12 @@ flowchart TD
 ## Core logic and invariant
 
 Use the recursive Gray-code relation to map n to its minimum one-bit operation count.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(log n).
 - **Auxiliary space:** O(log n) recursion.
-
 
 ## Compile and run
 

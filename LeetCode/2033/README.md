@@ -1,9 +1,7 @@
 # Minimum Operations to Make a Uni-Value Grid
 
 **LeetCode ID:** 2033
-
 **Source file(s):** `2033.cpp` (originally `Flatten_minOperations.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Flattens the grid, checks all values share a remainder modulo x, sorts, then sums step distances to the median.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

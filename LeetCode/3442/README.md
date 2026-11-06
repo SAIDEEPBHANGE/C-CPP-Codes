@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `int maxDifference_map(string s)`
 - `int maxDifference_vector(string s)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Count lowercase letters and subtract the smallest positive even frequency from the largest odd frequency.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n + 26).
 - **Auxiliary space:** O(1).
-
 
 ## Compile and run
 

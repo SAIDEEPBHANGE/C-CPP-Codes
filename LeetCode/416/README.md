@@ -1,9 +1,7 @@
 # Partition Equal Subset Sum
 
 **LeetCode ID:** 416
-
 **Source file(s):** `416.cpp` (originally `canPartition.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Rejects odd total sums; otherwise runs 0/1 subset-sum DP toward half the total.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
@@ -52,7 +49,7 @@ Descending sums prevent reusing the current number; one-dimensional DP compresse
 
 ## Complexity
 
-O(n*target) time and O(target) space.
+O(n\*target) time and O(target) space.
 
 ## Compile and run
 

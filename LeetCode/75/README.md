@@ -23,6 +23,7 @@ flowchart TD
  F --> C
  G --> C
 ```
+
 ## Important branch / loop
 
 ```mermaid
@@ -40,6 +41,7 @@ flowchart TD
  I -- Yes --> A
  I -- No --> J[All values are partitioned]
 ```
+
 ## Core logic and invariants
 
 The first method, named Bubble in the source, uses nested pairwise exchanges. Counting counts each color then overwrites the array. DNF maintains low, mid and high boundaries: zeros before low, ones in [low,mid), unknowns in [mid,high], twos after high. After swapping a 2, mid is rechecked.
@@ -62,6 +64,3 @@ g++ -std=c++17 LeetCode\75\75.cpp -o solution.exe
 ```
 
 For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
-
-
-

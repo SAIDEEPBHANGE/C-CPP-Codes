@@ -1,9 +1,7 @@
 # Find the Lexicographically Largest String From the Box I
 
 **LeetCode ID:** 3403
-
 **Source file(s):** `3403.cpp` (originally `answerString.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Sets the maximum piece length to n-(numFriends-1), considers each start position with that length capped by the remaining suffix, and returns the lexicographically greatest candidate.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

@@ -1,9 +1,7 @@
 # Find All Possible Recipes from Given Supplies
 
 **LeetCode ID:** 2115
-
 **Source file(s):** `2115.cpp` (originally `findAllRecipes.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Builds ingredient-to-recipe edges for non-supplies, computes indegrees, and performs Kahn topological processing from recipes requiring only supplies.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

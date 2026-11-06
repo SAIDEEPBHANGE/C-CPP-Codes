@@ -1,9 +1,7 @@
 # Find Kth Bit in Nth Binary String
 
 **LeetCode ID:** 1545
-
 **Source file(s):** `1545.cpp` (originally `findKthBit.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -42,8 +40,7 @@ flowchart TD
 
 ## Core logic and invariant
 
-Uses S_n=S_(n-1)+1+reverse(invert(S_(n-1))); efficient methods mirror positions around the midpoint and track inversion.
-
+Uses S*n=S*(n-1)+1+reverse(invert(S\_(n-1))); efficient methods mirror positions around the midpoint and track inversion.
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

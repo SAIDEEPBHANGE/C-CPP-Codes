@@ -13,8 +13,7 @@ Solution-facing declarations extracted from the source:
 - `bool isPalindrome(string baseK)`
 - `string convertToBaseK(long long num, int k)`
 - `long long kMirror(int k, int n)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -57,14 +56,12 @@ flowchart TD
 ## Core logic and invariant
 
 Generate decimal palindromes by length and accumulate those whose base-k digits are also palindromic.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
-- **Time:** O(C * d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
+- **Time:** O(C \* d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
 - **Auxiliary space:** O(d) for the current candidate and its base-k representation.
-
 
 ## Compile and run
 

@@ -56,4 +56,3 @@ g++ -std=c++17 LeetCode\3453\3453.cpp -o solution.exe
 ```
 
 For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
-

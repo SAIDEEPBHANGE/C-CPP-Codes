@@ -9,8 +9,7 @@
 Solution-facing declarations extracted from the source:
 
 - `long long putMarbles(vector<int>& weights, int k)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -53,14 +52,12 @@ flowchart TD
 ## Core logic and invariant
 
 Sort adjacent pair sums and take the difference between the largest and smallest k-1 boundary choices.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n log n).
 - **Auxiliary space:** O(n).
-
 
 ## Compile and run
 

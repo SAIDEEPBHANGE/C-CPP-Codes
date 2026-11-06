@@ -1,9 +1,7 @@
 # Count Subarrays Where Max Element Appears at Least K Times
 
 **LeetCode ID:** 2962
-
 **Source file(s):** `2962.cpp` (originally `countSubarrays2962.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Finds the global maximum and counts subarrays containing it at least k times; the sliding window adds all valid endings.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

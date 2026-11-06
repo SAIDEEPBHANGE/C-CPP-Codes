@@ -6,7 +6,7 @@ int smallestRepunitDivByK(int k); return the digit count of the smallest repunit
 
 ## Identification evidence
 
-It rejects k divisible by 2 or 5 and advances the repunit remainder using (remainder*10+1)%k, uniquely identifying problem 1015.
+It rejects k divisible by 2 or 5 and advances the repunit remainder using (remainder\*10+1)%k, uniquely identifying problem 1015.
 
 ## Main flow
 

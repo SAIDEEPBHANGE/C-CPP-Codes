@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `TreeNode* lcaDeepestLeaves(TreeNode* root)`
 - `TreeNode* buildTree(const vector<int>& values)`
 - `void printTree(TreeNode* root)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Return subtree depth and propagate the deepest-leaf ancestor; choose the current node when depths tie.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(N).
 - **Auxiliary space:** O(H).
-
 
 ## Compile and run
 

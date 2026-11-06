@@ -1,9 +1,7 @@
 # Count Subarrays of Length Three With a Condition
 
 **LeetCode ID:** 3392
-
 **Source file(s):** `3392.cpp` (originally `countSubarrays.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Checks every length-three window; counts when the middle value is even and middle/2 equals the sum of its neighbors.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

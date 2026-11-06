@@ -1,9 +1,7 @@
 # Divide a String Into Groups of Size k
 
 **LeetCode ID:** 2138
-
 **Source file(s):** `2138.cpp` (originally `divideString.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Pads the final partial group and slices into k-sized strings; V1 always appends k-remainder characters, even when divisible, while V2/V3 fix that.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

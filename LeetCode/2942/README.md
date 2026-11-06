@@ -1,9 +1,7 @@
 # Find Words Containing Character
 
 **LeetCode ID:** 2942
-
 **Source file(s):** `2942.cpp` (originally `findWordsContaining.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Scans words in original order and emits each index whose word contains the requested character.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

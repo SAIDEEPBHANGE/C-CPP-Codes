@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `char kthCharacterSim(ll k, vector<int>& operations)`
 - `char kthCharacterBitLogic(ll k, vector<int>& operations)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Compare explicit transformed-word simulation with reverse traversal of doubling intervals and accumulated shifts.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(k) simulation; O(log k) reverse.
 - **Auxiliary space:** O(k) simulation; O(1) reverse.
-
 
 ## Compile and run
 

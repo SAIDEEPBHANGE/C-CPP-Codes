@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `void CalculateVector(vector<int>& arr, ll& arrSum, int& arrZero)`
 - `long long minSum(vector<int>& nums1, vector<int>& nums2)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Treat each zero as a required replacement by at least one, then check whether the minimum sums can be equal.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n+m).
 - **Auxiliary space:** O(1).
-
 
 ## Compile and run
 

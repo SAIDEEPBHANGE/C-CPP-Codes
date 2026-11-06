@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `long long maximumTripletValueBruteForce(vector<int>& nums)`
 - `long long maximumTripletValueOptimized(vector<int>& nums)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,7 +53,6 @@ flowchart TD
 ## Core logic and invariant
 
 Maximize the ordered triplet expression using direct triples or a prefix maximum difference.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
@@ -68,8 +66,7 @@ The source contains multiple implementations for comparison:
 
 - `long long maximumTripletValueBruteForce(vector<int>& nums)`
 - `long long maximumTripletValueOptimized(vector<int>& nums)`
-
-The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
 
 ```mermaid
 flowchart LR

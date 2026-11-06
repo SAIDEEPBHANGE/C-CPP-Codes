@@ -9,8 +9,7 @@
 Solution-facing declarations extracted from the source:
 
 - `int numRabbits(vector<int>& answers)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -53,14 +52,12 @@ flowchart TD
 ## Core logic and invariant
 
 Group equal answers into batches of answer+1 rabbits and charge a full batch per partial group.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n).
 - **Auxiliary space:** O(u).
-
 
 ## Compile and run
 

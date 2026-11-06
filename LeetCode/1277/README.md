@@ -1,9 +1,7 @@
 # Count Square Submatrices with All Ones
 
 **LeetCode ID:** 1277
-
 **Source file(s):** `1277.cpp` (originally `countSquares.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 For each 1 cell, stores the largest all-one square side ending there as 1+min(top,left,diagonal), and sums side lengths.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

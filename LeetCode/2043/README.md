@@ -1,9 +1,7 @@
 # Simple Bank System
 
 **LeetCode ID:** 2043
-
 **Source file(s):** `2043.cpp` (originally `Bank.cpp`), `2043-duplicate.cpp` (originally `countUnguarded.cpp`)
-
 **Identification evidence:** The Bank class/API in the source uniquely identifies problem 2043; SHA-256 equality confirms the second source is byte-for-byte identical to Bank.cpp.
 
 > **Same-ID collision:** `Bank.cpp` and `countUnguarded.cpp` both implement problem 2043. The second copy is `2043-duplicate.cpp`; neither source was overwritten.
@@ -45,7 +43,6 @@ flowchart TD
 ## Core logic and invariant
 
 Stores a reference to the supplied balance vector; validates 1-based account IDs and sufficient funds before changing balances.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

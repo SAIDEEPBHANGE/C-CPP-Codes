@@ -1,9 +1,7 @@
 # Count Square Sum Triples
 
 **LeetCode ID:** 1925
-
 **Source file(s):** `1925.cpp` (originally `countTriples.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Precomputes square values up to n^2, then tests ordered positive a,b pairs for a^2+b^2 being a square within the bound.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

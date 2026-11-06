@@ -1,9 +1,7 @@
 # Final Value of Variable After Performing Operations
 
 **LeetCode ID:** 2011
-
 **Source file(s):** `2011.cpp` (originally `finalValueAfterOperations.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Starts X at zero and adds or subtracts one based on the middle character of each operation token.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

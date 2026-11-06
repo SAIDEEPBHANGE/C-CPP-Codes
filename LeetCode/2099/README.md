@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `vector<int> maxSubsequence(vector<int>& nums, int k)`
 - `vector<pair<int, int>> topK(indexed.begin(), indexed.begin() + k); // Sort top-k by index to maintain original order`
 - `void printVector(const vector<int>& v)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Select the k largest indexed values, then restore their original order.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(n log n).
 - **Auxiliary space:** O(n).
-
 
 ## Compile and run
 

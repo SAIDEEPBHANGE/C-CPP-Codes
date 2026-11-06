@@ -6,7 +6,7 @@ int totalMoney(int n); return total deposits over the first n days under the wee
 
 ## Identification evidence
 
-It sums complete weeks as 28+7*weekIndex and adds a partial increasing week, identifying problem 1716.
+It sums complete weeks as 28+7\*weekIndex and adds a partial increasing week, identifying problem 1716.
 
 ## Main flow
 

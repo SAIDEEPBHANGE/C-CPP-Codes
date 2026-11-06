@@ -1,9 +1,7 @@
 # Number of Arithmetic Triplets
 
 **LeetCode ID:** 2367
-
 **Source file(s):** `2367.cpp` (originally `arithmeticTriplets.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -42,8 +40,7 @@ flowchart TD
 
 ## Core logic and invariant
 
-Counts increasing triples with consecutive differences diff; includes cubic index enumeration and hash-set checks for num+diff and num+2*diff.
-
+Counts increasing triples with consecutive differences diff; includes cubic index enumeration and hash-set checks for num+diff and num+2\*diff.
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

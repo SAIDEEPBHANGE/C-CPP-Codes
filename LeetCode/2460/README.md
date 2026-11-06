@@ -1,9 +1,7 @@
 # Apply Operations to an Array
 
 **LeetCode ID:** 2460
-
 **Source file(s):** `2460.cpp` (originally `ApplyOperations.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Doubles equal adjacent nonzero values and zeroes the right slot, then erases each zero and appends it to the end. Class and free-function copies are present.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

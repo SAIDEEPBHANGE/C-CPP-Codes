@@ -1,9 +1,7 @@
 # Design Twitter
 
 **LeetCode ID:** 355
-
 **Source file(s):** `355.cpp` (originally `355.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Stores per-user timestamped tweets and follow sets; a max-heap merges visible users' reverse-chronological streams to return at most ten tweet IDs. Sorting-all and repeated-top-ten variants are also included.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

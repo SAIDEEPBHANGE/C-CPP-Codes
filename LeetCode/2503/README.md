@@ -10,8 +10,7 @@ Solution-facing declarations extracted from the source:
 
 - `vector<int> maxPoints(vector<vector<int>>& grid, vector<int>& queries)`
 - `bool InBoundry(int& x, int& y, int& m, int& n)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -54,14 +53,12 @@ flowchart TD
 ## Core logic and invariant
 
 Sort queries by threshold and flood from the start cell with a min-heap as cells become reachable.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O((R*C+Q) log(R*C+Q)).
-- **Auxiliary space:** O(R*C).
-
+- **Auxiliary space:** O(R\*C).
 
 ## Compile and run
 

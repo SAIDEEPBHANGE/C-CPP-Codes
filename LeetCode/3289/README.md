@@ -1,9 +1,7 @@
 # The Two Sneaky Numbers of Digitville
 
 **LeetCode ID:** 3289
-
 **Source file(s):** `3289.cpp` (originally `getSneakyNumbers.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Sorts values and appends a value when adjacent entries match, skipping past the matched pair.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

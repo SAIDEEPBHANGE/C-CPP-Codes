@@ -1,9 +1,7 @@
 # Count the Number of Fair Pairs
 
 **LeetCode ID:** 2563
-
 **Source file(s):** `2563.cpp` (originally `countFairPairs.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Sorts values; for each i, binary-searches the allowable partner range [lower-nums[i], upper-nums[i]] among later indices.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

@@ -1,9 +1,7 @@
 # Check If a String Contains All Binary Codes of Size K
 
 **LeetCode ID:** 1461
-
 **Source file(s):** `1461.cpp` (originally `hasAllCodes.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,7 +41,6 @@ flowchart TD
 ## Core logic and invariant
 
 Encodes each length-k bit window and counts distinct values using a set, rolling bitmask hash set, or boolean vector.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

@@ -1,9 +1,7 @@
 # Kth Smallest Product of Two Sorted Arrays
 
 **LeetCode ID:** 2040
-
 **Source file(s):** `2040.cpp` (originally `findCountSmallest.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 ## Expected input/output or judge interface
@@ -43,12 +41,11 @@ flowchart TD
 ## Core logic and invariant
 
 Binary-searches product value; for each candidate, binary-searches each sorted array row with monotonic directions adjusted for negative multipliers.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison
 
-For fixed nums1[i], products increase with nums2 for nonnegative factors and decrease for negative factors; threshold counting avoids materializing n*m products.
+For fixed nums1[i], products increase with nums2 for nonnegative factors and decrease for negative factors; threshold counting avoids materializing n\*m products.
 
 ## Complexity
 

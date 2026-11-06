@@ -11,8 +11,7 @@ Solution-facing declarations extracted from the source:
 - `char nextGreatestLetter_BinarySearch(vector<char>& letters, char target)`
 - `char nextGreatestLetter_Linear(vector<char>& letters, char target)`
 - `char nextGreatestLetter_STL(vector<char>& letters, char target)`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -55,14 +54,12 @@ flowchart TD
 ## Core logic and invariant
 
 Use ordered-letter search to return the first letter strictly greater than target, with wraparound.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
 
 - **Time:** O(log n).
 - **Auxiliary space:** O(1).
-
 
 ## Compile and run
 

@@ -1,9 +1,7 @@
 # Find All K-Distant Indices in an Array
 
 **LeetCode ID:** 2200
-
 **Source file(s):** `2200.cpp` (originally `findKDistantIndices.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 > **Source blocker:** The original file has duplicated/interleaved code and the token `Result.bac#include`, so it is not valid C++. Bytes are preserved exactly; repairing the source was outside the requested scope.
@@ -45,7 +43,6 @@ flowchart TD
 ## Core logic and invariant
 
 Contains intended interval-union scans around key indices, but source is interleaved/corrupted mid-token (`Result.bac#include`) and is not valid C++.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

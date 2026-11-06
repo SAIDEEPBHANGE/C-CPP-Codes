@@ -1,9 +1,7 @@
 # Avoid Flood in The City
 
 **LeetCode ID:** 1488
-
 **Source file(s):** `1488.cpp` (originally `avoidFlood.cpp`)
-
 **Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
 
 > **Implementation caveat:** `filledLakes` is never cleared after a scheduled drain, and the dry-day choice is based on map order rather than the next urgent rain. This implementation can reject feasible schedules or choose an invalid drain.
@@ -45,7 +43,6 @@ flowchart TD
 ## Core logic and invariant
 
 Queues future rainy days by lake, scans days, and chooses the first map-ordered lake with a queued future rain on dry days. A filled-lake set detects repeated rain.
-
 The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
 
 ## Optimization / comparison

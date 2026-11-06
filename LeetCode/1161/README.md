@@ -13,8 +13,7 @@ Solution-facing declarations extracted from the source:
 - `int maxLevelSumBFS(TreeNode* root)`
 - `TreeNode* buildTreeExample1()`
 - `TreeNode* buildTreeExample2()`
-
-The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
 
 ## Identification evidence
 
@@ -57,7 +56,6 @@ flowchart TD
 ## Core logic and invariant
 
 Accumulate sums by depth with DFS or process complete levels with BFS.
-
 After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
 
 ## Complexity
@@ -72,8 +70,7 @@ The source contains multiple implementations for comparison:
 - `void dfs(TreeNode* root, int level, vector<int>& sums)`
 - `int maxLevelSumDFS(TreeNode* root)`
 - `int maxLevelSumBFS(TreeNode* root)`
-
-The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
 
 ```mermaid
 flowchart LR
