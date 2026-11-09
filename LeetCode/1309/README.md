@@ -1,63 +1,134 @@
-# Decrypt String from Alphabet to Integer Mapping
+# 1309 — Decrypt String from Alphabet to Integer Mapping
 
-**LeetCode ID:** 1309
-**Source file(s):** `1309.cpp` (originally `freqAlphabets.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे अंकांपासून अक्षरांमध्ये decoding.
 
-string freqAlphabets(string s). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Decode digits `1`–`9` as `a`–`i`, and `10#`–`26#` as `j`–`z`.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत अंकांपासून अक्षरांमध्ये decoding कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> `"10#11#12"` becomes `"jkab"`. At each position, a `#` exactly two places ahead marks a two-digit code; otherwise decode one digit.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे # चिन्ह पाहून एक किंवा दोन अंक वाचणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is a **left-to-right parser with lookahead**.
+> | Input cue | Consume |
+> |---|---|
+> | `s[i+2]=='#'` | Two digits and `#` |
+> | Otherwise | One digit |
+> | Letter value `v` | `'a'+v-1` |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना # चिन्ह पाहून एक किंवा दोन अंक वाचणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Parse with a separate tokenization pass: correct but extra work/storage.
+- Source uses direct lookahead and appends decoded characters in one pass: optimal `O(n)`.
+- Greedy choice is safe because the encoding explicitly marks all two-digit tokens with `#`.
+
+## 5. Mermaid flowchart and explanation
+
+आकृतीमध्ये # चिन्ह पाहून एक किंवा दोन अंक वाचणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
+> Lookahead detects a complete `xx#` token before falling back to one digit.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{third character from current position is #?}
-    E -- Yes --> F[decode two digits and advance three]
-    E -- No --> G[decode one digit and advance one]
-    F --> D
-    G --> D
+ A([Start at index 0]) --> B{At end?}
+ B -- Yes --> Z([Return decoded text])
+ B -- No --> C{Character two positions later is #?}
+ C -- Yes --> D[Parse two digits and append mapped letter]
+ D --> E[Advance by 3]
+ C -- No --> F[Map one digit and append letter]
+ F --> G[Advance by 1]
+ E --> B
+ G --> B
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{third character from current position is #?}
-    B -- Yes --> C[decode two digits and advance three]
-    B -- No --> D[decode one digit and advance one]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+मूळ कल्पना: # चिन्ह पाहून एक किंवा दोन अंक वाचणे.
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Scan once. If `i+2` is in bounds and contains `#`, parse the two-digit value and skip three characters; otherwise map the current digit and advance one. The marker removes ambiguity.
 
-Scans left-to-right; a two-digit token followed by # maps 10..26 to j..z, otherwise one digit maps 1..9 to a..i.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+Code मधील state आणि updates हे # चिन्ह पाहून एक किंवा दोन अंक वाचणे या कल्पनेशी जोडून वाचा.
 
-The # marker makes tokenization unambiguous; greedy lookahead avoids a token list.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `freqAlphabets` checks both bounds and marker, uses `stoi(s.substr(i,2))` for marked codes, otherwise `s[i]-'0'`, and appends the corresponding character. Source `main()` is a local demo.
 
-## Complexity
+## 8. Dry run
 
-O(n) time and O(n) output space.
+Dry run मध्ये # चिन्ह पाहून एक किंवा दोन अंक वाचणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Input `"10#11#12"`:
+> | Index | Token | Value | Letter |
+> |---:|---|---:|---|
+> | 0 | `10#` | 10 | `j` |
+> | 3 | `11#` | 11 | `k` |
+> | 6 | `1` | 1 | `a` |
+> | 7 | `2` | 2 | `b` |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\1309\1309.cpp -o solution.exe
-.\solution.exe
-```
+# चिन्ह पाहून एक किंवा दोन अंक वाचणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(n)` scan plus output space `O(n)`. Substring/`stoi` work is bounded to two digits.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद # चिन्ह पाहून एक किंवा दोन अंक वाचणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> At each index, the encoding rule makes the token unambiguous: a `#` at offset two denotes the only possible two-digit code; otherwise the next character belongs to a one-digit code. The loop consumes exactly that token and maps its value to its specified letter, so all input is decoded in order.
+
+## 11. Mistakes / interview traps
+
+लक्षात ठेवा: दोन अंकी code वाचताना मर्यादा तपासायची.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Check bounds before reading `s[i+2]`.
+- Advance by three after a `#` token; otherwise the digits are decoded twice.
+- Use `value-1` for zero-based alphabet offset.
+- Inputs are valid by problem guarantee; malformed strings need validation separately.
+
+## 12. Quick revision
+
+थोडक्यात, # चिन्ह पाहून एक किंवा दोन अंक वाचणे. दोन अंकी code वाचताना मर्यादा तपासायची.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Two-place lookahead for `#` → consume 3, else consume 1. Map `v` to `'a'+v-1`.
+
+## 13. Related problems / variations
+
+संबंधित प्रश्नांत अंकांपासून अक्षरांमध्ये decoding यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> Decode Ways, String to Integer (atoi), basic token parsers; variation: parse variable-width codes using separators or a trie.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून अंकांपासून अक्षरांमध्ये decoding याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What does the `#` signal?
+2. Why is lookahead safe here?
+3. How many characters does a marked code consume?
+4. What is the mapping formula for value 26?

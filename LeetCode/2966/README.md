@@ -1,63 +1,94 @@
-# Divide Array Into Arrays With Max Difference
+# 2966 — Divide Array Into Arrays With Max Difference
 
-**LeetCode ID:** 2966
-**Source file(s):** `2966.cpp` (originally `divideArray.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Problem understanding and constraints
 
-## Expected input/output or judge interface
+Partition all numbers into groups of three so each group's maximum minus minimum is at most `k`; return empty if any group fails. The input length is divisible by three under the problem constraints. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-divideArrayApproach1/2(vector<int>& nums,int k). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Stepwise example and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `nums=[1,3,4,8,9,10], k=2`: sorted groups `[1,3,4]` and `[8,9,10]` both have range ≤2. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
+
+## 3. Pattern identification — clue table
+
+Sort then greedily form consecutive fixed-size groups. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on sort then greedily form consecutive fixed-size groups. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
+
+## 4. Multiple approaches
+
+Trying arbitrary triples is exponential in the worst case and offers no benefit. The source includes two sorting-based implementations; both are correct when every sorted triple passes. Sorted consecutive triples minimize each group's spread. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{triple spread nums at i+2 minus nums at i exceeds k?}
-    E -- Yes --> F[return empty]
-    E -- No --> G[append triple and continue]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{triple spread nums at i+2 minus nums at i exceeds k?}
-    B -- Yes --> C[return empty]
-    B -- No --> D[append triple and continue]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is nums[i+2] - nums[i] ≤ k?}
+    D -->|Yes| E[append the next three sorted values]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Sorts values and groups consecutive triples; accepts each only if max-min<=k and otherwise returns empty.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 6. Selected algorithm and intuition
 
-## Optimization / comparison
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Sort once, then inspect indices `i,i+1,i+2`. If their endpoint difference exceeds `k`, no alternative grouping can rescue the remaining smallest values.
 
-Consecutive sorted triples minimize each group's range. The first variant has malformed iterator-list construction that can prevent compilation.
+## 7. Code-specific explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\2966\2966.cpp` — `divideArrayApproach1` and `divideArrayApproach2` build groups from sorted data and return `{}` on the first invalid triple. Both sort `nums` in place; returned groups are ascending.
 
-O(n log n) time and O(n) output.
+## 8. Dry run
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | Sorted `[1,3,4,8,9,10]`: group `[1,3,4]`, range 3 |
+> | 2 | if `k=3` keep it. Next `[8,9,10]`, range 2. Output has two triples. |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. **The current file may not compile as a whole:** `divideArrayApproach1` initializes a vector from two iterators with a brace-enclosed initializer, which is not the iterator-range constructor. The source is preserved unchanged; use the valid `divideArrayApproach2` implementation when extracting a judge solution. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\2966\2966.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(n log n)` time, `O(n)` result space; sorting may use `O(log n)` stack space. If the vector is copied by the method, that copy is also `O(n)`.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Sorting makes each selected triple's minimum and maximum its first and last values. If the first three remaining values already exceed the allowed range, any group containing the smallest remaining value must include a value at least as large as the third-smallest, so no valid partition exists. Otherwise greedily taking them is safe.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Check the range, not adjacent pair differences alone.
+- Return an empty vector immediately on failure.
+- Preserve groups of exactly three and do not forget the divisibility constraint.
+
+## 12. Quick revision
+
+**झटपट:** Sort once, then inspect indices `i,i+1,i+2`. If their endpoint difference exceeds `k`, no alternative grouping can rescue the remaining smallest values. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Greedy grouping after sorting; interval partitioning; minimax grouping.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why are consecutive sorted triples the natural greedy choice?
+2. What exact check validates a group?
+3. When must the function return an empty result?

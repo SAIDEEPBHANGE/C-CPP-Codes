@@ -1,63 +1,72 @@
-# Final Value of Variable After Performing Operations
+# Final Value of Variable After Performing Operations — LeetCode 2011
 
-**LeetCode ID:** 2011
-**Source file(s):** `2011.cpp` (originally `finalValueAfterOperations.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Variable `X` starts at `0`. Each operation is one of `++X`, `X++`, `--X`, `X--`; apply all operations and return final value.
+Example: `[++X, X--, X++]`: changes `+1,-1,+1`, final `1`. Empty operation list (if considered) leaves `0`.
 
-int finalValueAfterOperations(vector<string>& operations). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | operation has only increment/decrement effect | direct simulation |
+> | `X` location differs but effect same | inspect operator character |
+> | each operation independent | accumulate delta |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Inspect middle character and update counter | Selected, `O(n)` / `O(1)` |
+> | Parse all operation strings into arithmetic expression | Correct but needless |
+> | Interpret prefix/postfix as different values | Incorrect; no expression evaluation occurs |
+> | Count only plus and ignore minus | Incorrect |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{middle character is +?}
-    E -- Yes --> F[increment X]
-    E -- No --> G[decrement X]
-    F --> D
-    G --> D
+    A[X=0] --> B{More operations?}
+    B -- Yes --> C{Middle character is +?}
+    C -- Yes --> D[X++]
+    C -- No --> E[X--]
+    D --> B
+    E --> B
+    B -- No --> F[Return X]
 ```
 
-## Important branch and loop flow
+चार valid operation formsमध्ये `operations[i][1]` हाच increment/decrement चिन्ह आहे.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{middle character is +?}
-    B -- Yes --> C[increment X]
-    B -- No --> D[decrement X]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, source explanation, dry run
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `finalValueAfterOperations` loops over strings and checks `i[1]`; plus increments `X`, otherwise decrements. `main` runs sample arrays and prints final state.
+> Dry run (`["--X","X++","X++"]`):
+> | Operation | Middle char | X after |
+> |---|---|---:|
+> | `--X` | `-` | -1 |
+> | `X++` | `+` | 0 |
+> | `X++` | `+` | 1 |
 
-Starts X at zero and adds or subtracts one based on the middle character of each operation token.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> Empty operations leave X at 0; all increments or all decrements are simple sign checks.
 
-Each token changes X by exactly one; no state beyond the running total is needed.
+## Complexity, correctness, traps
 
-## Complexity
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(n)` time, `O(1)` extra. Correctness: each operation changes `X` exactly by its sign; accumulating each delta equals sequential execution.
+> Trap: prefix/postfix syntax is intentionally equivalent in this problem; source assumes only the four valid 3-character strings. No need to parse full token.
 
-O(n) time and O(1) space.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: middle characterवरून `X`चा delta जोडा.
+Check index 1; `+` means +1, otherwise -1. Related: token classification, counting signed events.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\2011\2011.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. What is middle index in each 3-character operation?
+2. Does `++X` differ from `X++` here?
+3. What is result for `[++X,--X]`?
+4. What state does empty input return?

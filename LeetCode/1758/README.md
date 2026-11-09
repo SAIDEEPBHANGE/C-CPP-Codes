@@ -1,91 +1,72 @@
-# Minimum Changes To Make Alternating Binary String
+# Minimum Changes To Make Alternating Binary String — LeetCode 1758
 
-**Problem ID:** 1758  
-**Source:** `minOperations1758.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Binary stringमध्ये कोणत्याही adjacent characters equal नसावेत. एका characterला flip करण्याची किंमत 1; minimum flips परत करा.
+Example: `0100`: `0101` साठी 1 flip, `1010` साठी 3; answer `1`. `1111`: either alternating targetला 2 flips. Length 1 string आधीच alternating → `0`.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int approachPatternCompare(string s)`
-- `int approachGreedy(string s)`
-- `int approachBuildPattern(string s)`
-- `int minOperations(string s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | only two valid alternating shapes | compare candidate patterns |
+> | flip count equals mismatch count | Hamming distance |
+> | second target is complement of first | one count gives both answers |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare the input with both alternating binary patterns and count mismatches.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Compare with both patterns in one scan | Selected `O(n)` / `O(1)` |
+> | Count mismatches against `0101...`, answer `min(x,n-x)` | Correct `O(n)` / `O(1)` |
+> | Build both target strings then compare | Correct, `O(n)` time / `O(n)` space |
+> | Greedily flip local equal pair without target | Incorrect; a flip affects both neighbors and may be suboptimal |
 
-## Main flow
-
-Compare the input with both alternating binary patterns and count mismatches.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare the input with both alternating binary patterns and count mismatches."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[Set mismatch counts to zero] --> B{For each index i}
+    B -- More --> C[Expected bits: i parity and opposite]
+    C --> D[Increment mismatch for each unequal target]
+    D --> B
+    B -- Done --> E[Return smaller mismatch count]
 ```
 
-## Core logic and invariant
+Only two possible patterns आहेत; त्यांपैकी कमी mismatches असलेला target optimum.
 
-Compare the input with both alternating binary patterns and count mismatches.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, source explanation, dry run
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `approachPatternCompare` tests expected `'0'` at even indices and `'1'` at odd indices, while simultaneously counting opposite-start pattern mismatches. `approachGreedy` counts only first target and uses `n-mismatch`; `approachBuildPattern` materializes targets. `minOperations` forwards to compare method.
+> Dry run (`0100`):
+> | Index | Actual | Pattern 0101 mismatch? | Pattern 1010 mismatch? |
+> |---:|---:|---|---|
+> | 0 | 0 | No | Yes |
+> | 1 | 1 | No | Yes |
+> | 2 | 0 | No | Yes |
+> | 3 | 0 | Yes | No |
+> | Total | — | 1 | 3 |
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> A one-character string needs 0 flips; already alternating strings need 0; either starting bit is a candidate.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `int approachPatternCompare(string s)`
-- `int approachGreedy(string s)`
-- `int approachBuildPattern(string s)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> The comparison logic is `O(n)` time and `O(1)` algorithmic extra space. Source methods take `string` by value, so the call-level input copy uses `O(n)` memory. Correctness: every valid alternating string must start with `0` or `1`; fixed start determines all positions, and each mismatch needs exactly one flip.
+> Traps: do not only enforce adjacency with an unproven greedy; compare both starts. `n-x` is valid because patterns are complements at every index.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: दोन्ही alternating startsचे mismatch मोजा.
+Two targets; mismatch count; return minimum. Related: Hamming distance, binary string transformation, parity-pattern matching.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1758\1758.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. `1111` साठी उत्तर?
+2. एक targetचा mismatch दुसऱ्यासाठी काय संबंध ठेवतो?
+3. Index parityने expected bit कसा ठरतो?
+4. Pattern constructionची अतिरिक्त जागा किती?

@@ -1,93 +1,112 @@
-# Rotated Digits
+# 788. Rotated Digits
 
-**Problem ID:** 788  
-**Source:** `rotatedDigits.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `788.cpp`; brute force, digit classification DP, and digit-DP variants.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count numbers from 1 through `n` that remain valid after rotating every decimal digit 180 degrees and are changed to a different number. Digits 3, 4, 7 invalidate; 2, 5, 6, 9 change; 0, 1, 8 stay fixed.
 
-- `bool isGood(int num)`
-- `int rotatedDigits_Brute(int n)`
-- `int rotatedDigits_DP(int n)`
-- `int digitDP(int pos, bool tight, bool changed, string &s, vector<vector<vector<int>>> &dp)`
-- `int rotatedDigits_DigitDP(int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `2` is good (`2→5`); `11` stays the same, not good; `17` is invalid because 7 has no valid rotation. `n=0` yields zero.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Count numbers whose digits stay valid under rotation and whose value changes, with brute-force and digit-DP variants.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is digit classification with a “valid and changed at least once” state; for large bounds use digit DP.
+> | Need | Pattern |
+> |---|---|
+> | Classify whole number | Invalid / same / changed |
+> | Count all values up to bound | Digit DP with `tight` |
+> | Require at least one changed digit | Boolean state `changed` |
 
-Count numbers whose digits stay valid under rotation and whose value changes, with brute-force and digit-DP variants.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Count numbers whose digits stay valid under rotation and whose value changes, with brute-force and digit-DP variants."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Brute (`rotatedDigits_Brute`) — clear, `O(n log n)`:** inspect every digit of every number.
+- **DP table (`rotatedDigits_DP`) — used, `O(n)` time/space:** derive classification from prefix and final digit.
+- **Digit DP (`rotatedDigits_DigitDP`) — scales with digits:** `O(d·10)` states/transitions, `O(d)` memo; best when the numeric bound is huge.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Digit DP position]) --> B{All digits processed?}
+    B -- Yes --> C{At least one changing digit?}
+    C -- Yes --> Y([Count one])
+    C -- No --> Z([Count zero])
+    B -- No --> D[Set digit limit from tight state]
+    D --> E[Try each digit through limit]
+    E --> F{Digit is 3 4 or 7?}
+    F -- Yes --> G[Skip invalid branch]
+    F -- No --> H[Update tight and changed states]
+    H --> I[Recurse and add ways]
+    G --> J{More digits?}
+    I --> J
+    J -- Yes --> E
+    J -- No --> K([Memoize and return])
 ```
 
-## Core logic and invariant
+Leading zero digits represent shorter numbers; they stay unchanged and never create a false “good” result.
 
-Count numbers whose digits stay valid under rotation and whose value changes, with brute-force and digit-DP variants.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Each digit is independently either invalid, unchanged, or changed. A number is good iff no digit is invalid and at least one digit changes. Digit DP tracks position, whether the prefix still matches `n`, and whether a change has occurred.
 
-- **Time:** O(d) digit DP.
-- **Auxiliary space:** O(d).
+## 7. Code explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `isGood` scans digits. `rotatedDigits_DP` labels each integer as 0 invalid, 1 valid-same, or 2 valid-changed. `digitDP` memoizes `(pos,tight,changed)` and skips invalid digits. `nextTight` remains true only when the chosen digit equals the bound digit.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `int rotatedDigits_Brute(int n)`
-- `int rotatedDigits_DP(int n)`
-- `int digitDP(int pos, bool tight, bool changed, string &s, vector<vector<vector<int>>> &dp)`
-- `int rotatedDigits_DigitDP(int n)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Number | Digits classified | Outcome |
+> |---:|---|---|
+> | 25 | 2 changed, 5 changed | valid and changed → good |
+> | 18 | 1 same, 8 same | valid but unchanged → not good |
+> | 27 | 2 changed, 7 invalid | invalid → not good |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Brute: `O(n·d)` time, `O(d)` temporary scan. Array DP: `O(n)` time/space. Digit DP: `O(d·2·2·10)` time and `O(d·2·2)` memo space.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\788\788.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The digit classes exactly match the rotation rules. Brute accepts precisely when every digit is valid and at least one changes. The DP variants combine those classifications; digit DP explores every bound-respecting digit choice once per state and accepts only changed terminal paths, so it counts exactly the good values.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Valid-but-unchanged numbers do not count.
+- Any one invalid digit makes the whole number invalid.
+- Ensure `tight` is not lost when choosing a bound-equal digit.
+- The digit DP counts leading-zero representations only as the number zero, which is not good.
+
+## 12. Quick revision
+
+Allowed same `{0,1,8}`, allowed changed `{2,5,6,9}`, forbidden `{3,4,7}`; need valid + changed.
+किमान एक digit बदलला पाहिजे, नाहीतर number good नाही.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Digit DP counting numbers with forbidden digits; strobogrammatic numbers; count numbers containing at least one special digit.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does 11 not count?
+2. Which state ensures some digit actually changes?
+3. What does `tight` mean?
+4. When is digit DP better than scanning all values?

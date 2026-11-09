@@ -1,63 +1,96 @@
-# Count Operations to Obtain Zero
+# Count Operations to Obtain Zero — LeetCode 2169
 
-**LeetCode ID:** 2169
-**Source file(s):** `2169.cpp` (originally `countOperations.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `2169.cpp`; the active method uses quotient/remainder steps, with repeated subtraction shown as a commented alternative.
 
-## Expected input/output or judge interface
+## 1. Understanding — समजून घ्या
 
-int countOperations(int num1,int num2). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+Given nonnegative `num1` and `num2`, repeatedly subtract the smaller from the larger while both are nonzero. Count the subtractions until one becomes zero.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `(18,12)`: subtract 12 once → `(6,12)`, then subtract 6 twice → `(6,0)`, total 3. If either input is zero initially, answer is 0. Equal positive values require one operation.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Repeated subtraction of smaller | Euclidean algorithm |
+> | Many identical subtractions | Batch them with quotient |
+> | Stop at zero | Positive remainder loop |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Literal repeated subtraction is correct but can require O(max(num1,num2)) iterations (for `(large,1)`). The source accelerates each run of subtractions using integer division, like Euclid's algorithm. Be careful to count quotient steps, not just Euclidean iterations.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{both values are nonzero?}
-    E -- Yes --> F[add quotient and replace larger by remainder]
-    E -- No --> G[stop when either is zero]
-    F --> D
-    G --> D
+    A([Set a=max,b=min,count=0]) --> B{b is zero?}
+    B -- Yes --> Z([Return count])
+    B -- No --> C[Add a/b to count]
+    C --> D[Set a=a mod b]
+    D --> E[Swap a,b]
+    E --> B
 ```
 
-## Important branch and loop flow
+## 6. Algorithm and intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{both values are nonzero?}
-    B -- Yes --> C[add quotient and replace larger by remainder]
-    B -- No --> D[stop when either is zero]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For positive `a>=b`, `a/b` is the number of consecutive subtractions of `b` from `a` before the remainder is smaller than `b`. Add that quotient to the operation count, keep the remainder, and swap to continue.
 
-## Core logic and invariant
+## 7. Code explanation
 
-Orders the values and repeatedly adds the integer quotient, replaces the larger value by its remainder, and swaps—batched Euclidean subtraction.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The method orders inputs using `max`/`min`. Each loop does `cnt += a/b`, then `a %= b`, then swaps. The commented alternative performs one subtraction per iteration and initializes the count based on whether either value is zero.
 
-## Optimization / comparison
+## 8. Dry run
 
-Each quotient counts repeated subtraction steps; division batches the commented one-at-a-time approach.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | `a,b` before | Quotient added | Remainder, swap |
+> |---|---:|---|
+> | `18,12` | 1 | `(6,12)` → `(12,6)` |
+> | `12,6` | 2 | `(0,6)` → `(6,0)` |
+> Total `1+2=3`.
 
-## Complexity
+## 9. Complexity
 
-O(log(min(num1,num2))) iterations for positive inputs; O(1) space.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> The quotient/remainder method takes **O(log(max(a,b)))** Euclidean iterations and **O(1)** space. Repeated subtraction can take **O(max(a,b))** operations.
 
-## Compile and run
+## 10. Correctness
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> For `a>=b>0`, exactly `floor(a/b)` repeated subtractions of `b` can be performed before the remaining value is below `b`; that remainder equals `a%b`. Thus each quotient contributes exactly the operations being counted, and swapping preserves the next larger/smaller pair. The loop ends precisely when one number is zero.
 
-```powershell
-g++ -std=c++17 LeetCode\2169\2169.cpp -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes and interview traps
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Add the quotient to the count; one modulo step may represent many subtractions.
+- Stop when the smaller value is zero to avoid division by zero.
+- For equal inputs, quotient is one.
+- This operation count is related to, but not identical to, merely counting Euclidean algorithm steps.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** वजाबाकींची संख्या भागाकाराने एकदम मोजा.
+> While `b>0`: `count += a/b; a%=b; swap(a,b)`.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Euclidean GCD; count subtraction operations; reduce ratios; replace repeated addition/subtraction loops with quotient batching.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What does `a/b` count in this process?
+2. Why is the swap needed after taking the remainder?
+3. How does this improve the `(large,1)` case?

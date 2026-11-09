@@ -1,71 +1,107 @@
-# Rabbits in Forest
+# 781. Rabbits in Forest
 
-**Problem ID:** 781  
-**Source:** `numRabbits.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `781.cpp`; `numRabbits(vector<int>& answers)`.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Each rabbit says how many other rabbits share its color. Find the minimum total rabbit count consistent with all answers.
 
-- `int numRabbits(vector<int>& answers)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[1,1,2]`: answer 1 implies a color group of 2; answer 2 implies a group of 3; total 5. Empty answers return 0. If `x=0`, each report is a singleton color.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Group equal answers into batches of answer+1 rabbits and charge a full batch per partial group.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Identical reports imply bounded group sizes; group observed counts with ceiling division.
+> | Clue | Pattern |
+> |---|---|
+> | Report says “others” | Add one to get group capacity |
+> | More reports than one group fits | Ceiling number of groups |
+> | Minimize unseen entities | Greedy grouping by report value |
 
-Group equal answers into batches of answer+1 rabbits and charge a full batch per partial group.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Group equal answers into batches of answer+1 rabbits and charge a full batch per partial group."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Treat every report as a distinct color — correct but overcounts.**
+- **Frequency map + group rounding — used and optimal:** each answer value is independent; `O(n)` average.
+- Avoid pairing different answers together: one color group has one fixed size and therefore one fixed answer.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Count frequency of each answer x]
+    B --> C[Set total to zero]
+    C --> D[For each distinct answer]
+    D --> E[Group size equals x plus 1]
+    E --> F[Groups equals ceiling frequency divided by group size]
+    F --> G[Add groups times group size]
+    G --> H{More answers?}
+    H -- Yes --> D
+    H -- No --> I([Return total])
 ```
 
-## Core logic and invariant
+Incomplete groups still require the full group size.
 
-Group equal answers into batches of answer+1 rabbits and charge a full batch per partial group.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For answer `x`, each color group contains `x+1` rabbits. If `f` rabbits report `x`, need `ceil(f/(x+1))` groups, contributing that many complete groups. Sum independently for each answer.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(u).
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The source stores `AnswerFreq[x]`, computes `ColorGroupSize=x+1`, uses floating `ceil(Freq/size)`, and adds `groups*size`. Integer ceiling formula is `(f+x)/(x+1)`.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\781\781.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Answer `x` | Frequency | Group size | Groups | Rabbits |
+> |---:|---:|---:|---:|---:|
+> | 1 | 2 | 2 | 1 | 2 |
+> | 2 | 1 | 3 | 1 | 3 |
+> | total | — | — | — | 5 |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Average `O(n)` time and `O(u)` space, where `u` is the number of distinct answers.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> An answer `x` partitions rabbits of that report into groups of exactly `x+1`; no such group can contain more or fewer reporters without contradicting their answer. Thus at least `ceil(f/(x+1))` groups are needed, and that many full groups suffice. Different answers require distinct colors, so summing these minima is optimal.
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- “x other rabbits” means total group size `x+1`.
+- Round groups upward, not down.
+- A partial final group still contributes all `x+1` rabbits.
+- Avoid floating point with the integer ceiling formula if desired.
+
+## 12. Quick revision
+
+For each answer `x`, `g=x+1`, `groups=ceil(freq/g)`, add `groups*g`.
+शेवटचा group अपूर्ण असला तरी पूर्ण group size मोजायचा.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Minimum groups with fixed capacity; car pooling/group-size counting; frequency bucket rounding.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is group size `x+1`, not `x`?
+2. Why round the number of groups upward?
+3. Why cannot answer-1 and answer-2 rabbits share a group?
+4. What integer formula replaces `ceil`?

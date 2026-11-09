@@ -1,63 +1,94 @@
-# Compare Version Numbers
+# Compare Version Numbers — LeetCode 165
 
-**LeetCode ID:** 165
-**Source file(s):** `165.cpp` (originally `compareVersion.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+Dot-separated non-negative integer revision components असलेल्या दोन version strings lexicographically by numeric component compare करा. Return `-1`, `1`, किंवा `0`.
 
-int compareVersion(string version1,string version2). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Worked examples and edges
 
-## Main flow
+- `"1.0.1"` vs `"1.0.2"` → -1.
+- `"1.2"` vs `"1.10"` → -1; string comparison करू नका.
+- `"1.1.0"` vs `"1.1"` → 0; missing components zero मानले जातात.
+- Leading zeros असलेले components numeric valueने समान.
+
+## 3. Pattern identification + cheat sheet
+
+| Clue                       | Pattern                    | कारण                               |
+| -------------------------- | -------------------------- | ---------------------------------- |
+| Delimited numeric fields   | Tokenize / parse           | प्रत्येक revision स्वतंत्र compare |
+| Different component counts | Zero padding               | Missing trailing component = 0     |
+| First difference decides   | Lexicographic numeric scan | पुढे जाण्याची गरज नाही             |
+
+## 4. Approaches
+
+- Source `splitVersion` + vectors: O(n+m) parse/compare time, O(n+m) space.
+- In-place two-string pointers: O(n+m) time, O(1) extra space; efficient variation.
+- Direct whole-string lexical comparison चुकीची (`"10"` vs `"2"`).
+- `stoi` overflow हा constraintबाहेरच्या मोठ्या componentसाठी धोका; arbitrary length असल्यास digit-wise compare.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{aligned component values differ?}
-    E -- Yes --> F[return -1 or 1 at the first difference]
-    E -- No --> G[continue; return 0 after all components tie]
-    F --> D
-    G --> D
+ A([Start]) --> B[Split both versions into numeric parts]
+ B --> C[Set i=0 up to longer component count]
+ C --> D[Read part1 or 0 if missing]
+ D --> E[Read part2 or 0 if missing]
+ E --> F{Parts differ?}
+ F -- Yes --> G[Return -1 or 1]
+ F -- No --> H{More components?}
+ H -- Yes --> C
+ H -- No --> I[Return 0]
 ```
 
-## Important branch and loop flow
+पहिला non-equal numeric componentच ordering ठरवतो.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{aligned component values differ?}
-    B -- Yes --> C[return -1 or 1 at the first difference]
-    B -- No --> D[continue; return 0 after all components tie]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm / intuition
 
-## Core logic and invariant
+दोन्ही strings `.` वर split करा. Indexने paired values compare करा; कमी arrayमध्ये component नसेल तर 0. First differenceवर sign return, अन्यथा equal.
 
-Splits dotted revisions into integers, compares aligned components, and treats missing trailing components as zero.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+`splitVersion` `stringstream/getline` वापरून `stoi` components तयार करतो. `compareVersion` max component count loop करतो, absent componentला zero देतो आणि -1/1/0 परत करतो.
 
-Numeric component comparison handles 1.2 < 1.10, unlike lexical string comparison.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `"1.2"` vs `"1.10"`:
+> | component | v1 | v2 | decision |
+> |---:|---:|---:|---|
+> | 0 | 1 | 1 | equal |
+> | 1 | 2 | 10 | return -1 |
 
-O(a+b) time and space for parsed revision lengths.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Let total string length be `L`: O(L) time, O(L) space for split vectors (ignoring output).
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\165\165.cpp -o solution.exe
-.\solution.exe
-```
+Version order हा पहिल्या वेगळ्या numeric componentच्या orderने ठरतो. Code प्रत्येक component क्रमाने तपासतो आणि missing trailing ones zero करतो; म्हणून पहिल्या differenceचा sign योग्य, आणि differences नसल्यास versions equivalent.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes and interview traps
+
+- Components numeric compare करा, lexical नाही.
+- Trailing zeros equality बदलत नाहीत.
+- Dot parsing boundary cases, e.g. versions with unequal number of components, handle.
+- Component size constraints allow `stoi`; otherwise overflow-safe parse design.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Split → pair components → missing=0 → first difference determines result.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Natural sort, compare semantic versions (pre-release rules differ), compare numeric strings, version normalization.
+
+## 14. Self-assessment
+
+1. `"1.0"` आणि `"1"` equal का?
+2. `"1.2"` vs `"1.10"` कोणता मोठा?
+3. Missing componentची value?
+4. Very long component असल्यास `stoi`चा पर्याय?

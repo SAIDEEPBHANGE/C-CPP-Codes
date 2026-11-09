@@ -1,63 +1,70 @@
-# Finding Pairs With a Certain Sum
+# Finding Pairs With a Certain Sum — LeetCode 1865
 
-**LeetCode ID:** 1865
-**Source file(s):** `1865.cpp` (originally `FindSumPairs.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Maintain `nums1`, `nums2` with operations: `add(index,val)` updates `nums2[index]`; `count(tot)` counts index pairs `(i,j)` where `nums1[i]+nums2[j]=tot`. Equal values at different indices are separate pairs.
+Example: `nums1=[1,2,3]`, `nums2=[3,4]`, `count(5)=2` (`1+4`, `2+3`). Then `add(0,1)` makes `nums2=[4,4]`; `count(5)=1`.
 
-FindSumPairs(nums1,nums2); add(index,val); count(tot). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | many repeated sum queries | frequency map |
+> | only second array is mutable | update its count incrementally |
+> | pair count asks multiplicity | add frequency, not just existence |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Hash frequency of `nums2`; scan `nums1` complements | Selected; expected `count O(n1)`, `add O(1)` |
+> | Rebuild all pairs for every count | Correct brute force `O(n1*n2)` per query |
+> | Store only set of nums2 values | Incorrect; loses duplicate pair counts |
+> | Update value without decrement old frequency | Incorrect; stale counts remain |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{complement tot-nums1()i() exists?}
-    E -- Yes --> F[add its multiplicity]
-    E -- No --> G[continue scan]
-    F --> D
-    G --> D
+    A[Construct: count nums2 frequencies] --> B{Operation?}
+    B -- add --> C[Decrement old value frequency]
+    C --> D[Update nums2[index]; increment new frequency]
+    B -- count --> E[For each x in nums1, add freq(total-x)]
+    E --> F[Return accumulated pair count]
 ```
 
-## Important branch and loop flow
+Old frequency कमी केल्याशिवाय map actual `nums2`शी consistent राहणार नाही.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{complement tot-nums1()i() exists?}
-    B -- Yes --> C[add its multiplicity]
-    B -- No --> D[continue scan]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, code-specific explanation, dry run
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `FindSumPairs` constructor copies arrays and builds `freq2`. `add` gets old value, decrements and erases zero frequency, changes the stored element and increments new frequency. `count` sums `freq2[tot-num]` for every `nums1` element. Distinct indices in `nums1` naturally each contribute.
+> Dry run (`nums1=[1,2,3]`, `nums2=[3,4]`, total 5):
+> | `nums1` value | complement in nums2 | frequency | running count |
+> |---:|---:|---:|---:|
+> | 1 | 4 | 1 | 1 |
+> | 2 | 3 | 1 | 2 |
+> | 3 | 2 | 0 | 2 |
 
-Maintains a frequency table for nums2; add updates old/new frequency and count scans nums1 for matching complements.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> Duplicate values represent multiple index pairs; an update can remove the last occurrence of an old key; empty frequency means no match.
 
-freq2 always reflects current nums2; multiplicity accounts for all index pairs.
+## Complexity, correctness, traps
 
-## Complexity
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Constructor `O(n2)` expected, map space `O(distinct nums2)` plus stored arrays. `add` expected `O(1)`; `count` expected `O(n1)`. Correctness: each `nums1` index has exactly `freq2[tot-x]` matching `nums2` indices, and summing covers all pairs once.
+> Traps: decrement old value before replacing; erase zero count optionally; duplicates multiply pair count. Hash operation costs are expected.
 
-Constructor O(n2), add expected O(1), count O(n1) expected; O(u2) frequencies.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: `nums2` frequency update करून complement count करा.
+Hash second array; update old/new; scan complements. Related: Two Sum, dynamic frequency maps, online pair counting.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\1865\1865.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. Why does `count` add a frequency rather than 1?
+2. What changes if `nums1` also has duplicate values?
+3. When can an old key be erased?
+4. Complexity of `add` in expected terms?

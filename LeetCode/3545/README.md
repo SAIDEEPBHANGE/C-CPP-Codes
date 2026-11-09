@@ -1,71 +1,94 @@
-# Minimum Deletions for At Most K Distinct Characters
+# 3545 — Minimum Deletions for at Most K Distinct Characters
 
-**Problem ID:** 3545  
-**Source:** `minDeletionsToLimitDistinctChars.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+Delete the fewest characters so the string contains at most k distinct characters. Character frequencies determine which symbols are cheapest to remove entirely. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `int minDeletionsToLimitDistinctChars(string s, int k)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `s="abc", k=2`: delete any one character; answer 1. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Count character frequencies, sort them, and delete all occurrences of the least frequent excess characters.
+Frequency counting; remove least frequent distinct characters. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on frequency counting | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Count character frequencies, sort them, and delete all occurrences of the least frequent excess characters.
+Trying subsets of character types is exponential in alphabet size. Sort distinct-character frequencies ascending and delete the smallest counts until only k types remain; source implements this greedy. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Count character frequencies, sort them, and delete all occurrences of the least frequent excess characters."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{are more than k character types still retained?}
+    D -->|Yes| E[delete the smallest remaining frequency]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Count character frequencies, sort them, and delete all occurrences of the least frequent excess characters.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> To minimize deleted characters, retain the k most frequent character types.
 
-- **Time:** O(n + sigma log sigma).
-- **Auxiliary space:** O(sigma).
+## 7. Code-specific explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3545\3545.cpp` — `minDeletionsToLimitDistinctChars` counts each char, sorts frequencies, and sums the `distinct-k` smallest. If distinct≤k, answer is zero.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\3545\3545.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | Frequencies `[1,1,1]`, k=2: delete smallest 1 → two types remain |
+> | 2 | answer 1. |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(n+u log u)` time and `O(u)` space for u distinct characters.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Keeping any k types with higher frequencies cannot require more deletions than replacing one with a lower-frequency type. Thus the optimal choice is the k most frequent types, and deleting the other frequencies gives the minimum.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Delete entire character types, not arbitrary copies while still counting them as distinct.
+- If distinct≤k, answer is 0.
+- Sort frequencies, not characters.
+
+## 12. Quick revision
+
+**झटपट:** To minimize deleted characters, retain the k most frequent character types. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Greedy by frequency; top-k selection; distinct-count minimization.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why keep the most frequent k types?
+2. What happens when distinct≤k?
+3. Which frequencies are summed?

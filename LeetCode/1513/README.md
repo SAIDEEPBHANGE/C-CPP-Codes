@@ -1,88 +1,134 @@
-# Number of Substrings With Only 1s
+# 1513 — Number of Substrings With Only 1s
 
-**Problem ID:** 1513  
-**Source:** `numSub.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+या प्रश्नाचा गाभा म्हणजे फक्त ones असलेल्या substrings ची मोजणी.
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count all substrings consisting only of `'1'`; return the answer modulo `1e9+7`.
 
-- `int numSub_DP(const string &s)`
-- `int numSub_Optimized(const string &s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+उदाहरणे आणि सीमाप्रकरणांत फक्त ones असलेल्या substrings ची मोजणी कशी लागू होते ते पाहा.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Count each maximal run of ones and add its triangular number, using DP or a running count.
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> A run of four ones contributes `4·5/2=10` substrings. `"101"` contributes two; `"000"` contributes zero.
 
-## Main flow
+## 3. Pattern identification + cheat sheet
 
-Count each maximal run of ones and add its triangular number, using DP or a running count.
+येथे मुख्य pattern म्हणजे सलग ones च्या suffix ची लांबी जमा करणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **count contiguous runs / one-pass DP**.
+> | Current character | State |
+> |---|---|
+> | `'1'` | Extend current run; add its length |
+> | `'0'` | Reset run length |
+> | Run length `r` | Adds `r(r+1)/2` total over the run |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना सलग ones च्या suffix ची लांबी जमा करणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Enumerate every substring and verify all ones: correct but `O(n²)` or worse.
+- Source DP array: `O(n)` time, `O(n)` space.
+- Source running counter: `O(n)` time, `O(1)` extra space and preferred.
+
+## 5. Mermaid flowchart and explanation
+
+आकृतीमध्ये सलग ones च्या suffix ची लांबी जमा करणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
+> Every new one-ending substring is the prior run plus the new one-character substring.
 
 ```mermaid
 flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Count each maximal run of ones and add its triangular number, using DP or a running count."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
+ A([Start with count and answer zero]) --> B[Read next character]
+ B --> C{Character is 1?}
+ C -- Yes --> D[Increment current run]
+ D --> E[Add run length to answer modulo MOD]
+ C -- No --> F[Reset run length to zero]
+ E --> G{More characters?}
+ F --> G
+ G -- Yes --> B
+ G -- No --> H([Return answer])
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+मूळ कल्पना: सलग ones च्या suffix ची लांबी जमा करणे.
 
-```mermaid
-flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> If the current suffix of ones has length `r`, there are exactly `r` all-one substrings ending at this position. Add `r`; zero resets the suffix length.
 
-## Core logic and invariant
+## 7. Code explanation
 
-Count each maximal run of ones and add its triangular number, using DP or a running count.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+Code मधील state आणि updates हे सलग ones च्या suffix ची लांबी जमा करणे या कल्पनेशी जोडून वाचा.
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `numSub_Optimized` keeps `count` and `result`. `numSub_DP` stores the run-ending count for each position and sums it. The DP method indexes `s[0]`, so it assumes nonempty input; problem constraints guarantee this.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## 8. Dry run
 
-## Approach comparison
+Dry run मध्ये सलग ones च्या suffix ची लांबी जमा करणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-The source contains multiple implementations for comparison:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `"1110"`:
+> | Character | Current run | Added substrings | Total |
+> |---|---:|---:|---:|
+> | 1 | 1 | 1 | 1 |
+> | 1 | 2 | 2 | 3 |
+> | 1 | 3 | 3 | 6 |
+> | 0 | 0 | 0 | 6 |
 
-- `int numSub_DP(const string &s)`
-- `int numSub_Optimized(const string &s)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+## 9. Complexity
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+सलग ones च्या suffix ची लांबी जमा करणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Both methods use `O(n)` time. Optimized uses `O(1)` auxiliary space; DP uses `O(n)`. Modulo prevents count overflow for long input.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\1513\1513.cpp" -o solution.exe
-.\solution.exe
-```
+योग्यतेचा युक्तिवाद सलग ones च्या suffix ची लांबी जमा करणे यावर आधारित आहे; वरील अटी तपासा.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> At each index, the algorithm maintains the exact length of the all-one suffix ending there. Each such suffix length corresponds one-to-one with all-one substrings ending at that index. Summing these contributions counts every valid substring once by its endpoint.
+
+## 11. Mistakes / interview traps
+
+लक्षात ठेवा: zero आल्यावर suffix लांबी पुन्हा शून्य करायची.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Count substrings, not runs; a run of length `r` contributes triangularly.
+- Reset on zero.
+- Apply modulo during accumulation.
+- Empty-string handling would need guarding in the DP implementation.
+
+## 12. Quick revision
+
+थोडक्यात, सलग ones च्या suffix ची लांबी जमा करणे. zero आल्यावर suffix लांबी पुन्हा शून्य करायची.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Scan: one → `run++`, answer `+=run`; zero → run reset. A run of `r` contributes `r(r+1)/2`.
+
+## 13. Related problems / variations
+
+संबंधित प्रश्नांत फक्त ones असलेल्या substrings ची मोजणी यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> Count Binary Substrings, Number of Substrings With Only 1s variants, Max Consecutive Ones; variation: count substrings with at most `k` zeros.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून फक्त ones असलेल्या substrings ची मोजणी याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why add the current run length?
+2. How many substrings does a run of five ones contribute?
+3. What happens to the state on zero?
+4. Why is the running-counter version constant-space?

@@ -1,91 +1,70 @@
-# Last Day Where You Can Still Cross
+# Last Day Where You Can Still Cross — LeetCode 1970
 
-**Problem ID:** 1970  
-**Source:** `latestDayToCross.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+An `row x col` grid starts as land. `cells[d]` floods one-based row/column on day `d+1`. From any top-row land cell, move four-directionally to bottom row through land. Return the last day crossing remains possible.
+Example: `2x2`, flood order `[(1,1),(2,1),(1,2),(2,2)]`: after day 1 and day 2, the right column remains a land path; after day 3, crossing is impossible, so answer `2`. One-row grid loses crossing when its final usable top/bottom land is flooded.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `bool dfs(vector<vector<int>>& grid, vector<vector<bool>>& vis,`
-- `int latestDayToCross_DFS(int row, int col, vector<vector<int>> cells)`
-- `int findSet(int x)`
-- `void unite(int a, int b)`
-- `int latestDayToCross_DSU(int row, int col, vector<vector<int>> cells)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | connectivity changes as cells flood | dynamic connectivity |
+> | asks latest feasible day, monotone over time | binary search + connectivity, or reverse process |
+> | reversing floods adds land | DSU union operations |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare day-by-day DFS reachability with reverse-time union-find until top and bottom connect.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Reverse flood order with DSU + virtual top/bottom | Selected, `O(RC α(RC))` |
+> | Binary search day and run BFS/DFS | Correct, about `O(RC log(RC))` |
+> | Forward DFS after each flood | Correct but source naive repeated search; can be very slow, conservative worst `O(D*C*R*C)` |
+> | Flood days with no reachability test | Incorrect; connectivity, not flooded count, decides crossing |
 
-## Main flow
-
-Compare day-by-day DFS reachability with reverse-time union-find until top and bottom connect.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare day-by-day DFS reachability with reverse-time union-find until top and bottom connect."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[Start with all cells water] --> B[Process flood list backwards]
+    B --> C[Turn current cell into land]
+    C --> D[Union with adjacent land]
+    D --> E{Touches top or bottom?}
+    E -- Yes --> F[Union virtual boundary]
+    E -- No --> G[Check top and bottom components]
+    F --> G
+    G --> H{Top connected to bottom?}
+    H -- Yes --> I[Return this flood index day]
+    H -- No --> J[Continue backwards]
+    J --> B
 ```
 
-## Core logic and invariant
+Reverseमध्ये land वाढत असल्याने DSUने components merge होतात; first connection मिळताच त्या पुढच्या forward floodच्या आधी crossing शक्य असते.
 
-Compare day-by-day DFS reachability with reverse-time union-find until top and bottom connect.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, source-specific explanation, dry run
 
-## Complexity
+`latestDayToCross_DSU` initializes all cells as water, then opens `cells[day]` from last to first. Cell id `x*col+y`; neighboring land unions; top/bottom row union to virtual nodes. `findSet(TOP)==findSet(BOTTOM)` झाल्यावर `day` return. Alternative source `latestDayToCross_DFS` builds water forward and searches each day. `main` compares them.
+Dry run (2x2 order above): reverse opens `(2,2)` (original flood day 4), then `(1,2)` (original flood day 3). They connect top and bottom while the first two flood cells remain water, so this is the grid after forward day 2; return `2`.
 
-- **Time:** O(R*C*D) DFS; O(R*C alpha(R*C)) DSU.
-- **Auxiliary space:** O(R\*C).
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> A 1x1 grid crosses before its only cell is flooded; day numbering must distinguish the state before and after each flood.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `bool dfs(vector<vector<int>>& grid, vector<vector<bool>>& vis,`
-- `int latestDayToCross_DFS(int row, int col, vector<vector<int>> cells)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> DSU `O(RC α(RC))` time and `O(RC)` DSU/grid space; source takes `cells` by value, an additional `O(RC)` copy. Correctness: reverse state after opening index `d` is the forward grid after flooding days `1..d`; first top-bottom connection marks the maximum crossing day.
+> Trap: input cell coordinates are 1-based, internal indices 0-based; return zero-based `day` as actual latest day count. Only four-neighbor land connects.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: floods reverse करून DSU connectivity शोधा.
+Reverse time, open land, union neighbors and virtual borders. Related: number of islands II, DSU connectivity, monotone binary search with BFS.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1970\1970.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. Why is DSU inconvenient during forward flooding?
+2. What does returned `day` mean in one-based flood list?
+3. Why add virtual top and bottom nodes?
+4. Are diagonal cells connected?

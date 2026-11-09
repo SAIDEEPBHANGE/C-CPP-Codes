@@ -1,63 +1,90 @@
-# Divide Array Into Equal Pairs
+# Divide Array Into Equal Pairs — LeetCode 2206
 
-**LeetCode ID:** 2206
-**Source file(s):** `2206.cpp` (originally `DivideArrPairs.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `2206.cpp` includes sorting-based and frequency-counting methods.
 
-## Expected input/output or judge interface
+## 1. Understanding — समजून घ्या
 
-divideArraySorting/Frequency(vector<int>& nums). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+Determine whether every array element can be used exactly once in a pair whose two values are equal.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[1,2,3,4,2,1,4,3]` is valid: every frequency is even. `[1,1,2]` is invalid because the 2 has odd frequency (the problem normally guarantees even array length). Empty input is vacuously pairable mathematically, though the judge requires nonempty even-length input.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Pair only equal values | Frequency counting |
+> | Need matching adjacent values | Sort then compare pairs |
+> | Every item used once | Even frequency for each value |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Sorting then checking positions `(0,1),(2,3),...` is correct at O(n log n) time. Counting each value's frequency is expected O(n) and is the optimal source alternative. Checking only whether each value occurs at least twice is incorrect when a value occurs three times.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{a value has odd frequency / sorted pair differs?}
-    E -- Yes --> F[return false]
-    E -- No --> G[continue; return true if all groups pass]
-    F --> D
-    G --> D
+    A([Count each value]) --> B[Inspect every frequency]
+    B --> C{Any odd frequency?}
+    C -- Yes --> D[Return false]
+    C -- No --> E[Return true]
 ```
 
-## Important branch and loop flow
+## 6. Algorithm and intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{a value has odd frequency / sorted pair differs?}
-    B -- Yes --> C[return false]
-    B -- No --> D[continue; return true if all groups pass]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Equal values can pair among themselves iff their count is even. Thus build a frequency map and reject as soon as any count is odd. The sorting variant puts equal values adjacent and checks each consecutive pair.
 
-## Core logic and invariant
+## 7. Code explanation
 
-Checks whether every value occurs an even number of times using sorted adjacent pairs or a frequency map.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `divideArrayFrequency` increments `freq[num]` and checks `entry.second % 2`. `divideArraySorting` sorts `ns` in place, then compares `ns[i]` with `ns[i+1]` for even `i`.
 
-## Optimization / comparison
+## 8. Dry run
 
-Every value must occur evenly; frequency counting avoids sorting, while sorting directly exhibits pairs.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `[1,2,1,2]`, counts are `1→2`, `2→2`, both even → `true`. For `[1,2,1,3]`, count of 2 and 3 is odd → `false`.
 
-## Complexity
+## 9. Complexity
 
-Sorting O(n log n); frequency expected O(n) time and O(u) space.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Frequency version: expected **O(n)** time, **O(u)** space for `u` distinct values. Sorting version: **O(n log n)** time and implementation-dependent sort stack space; it mutates the input.
 
-## Compile and run
+## 10. Correctness
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> A value with odd frequency always leaves one occurrence unpaired; if every frequency is even, occurrences of each value can be partitioned into pairs. These independent per-value pairings cover every element exactly once.
 
-```powershell
-g++ -std=c++17 LeetCode\2206\2206.cpp -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes and interview traps
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Check parity of frequency, not just presence.
+- The array must have even length; an odd-length array cannot be fully paired.
+- Sorting-based method changes input order.
+- Pairing arbitrary equal-looking values is not possible if their counts are odd.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** प्रत्येक संख्येची वारंवारता सम असली पाहिजे.
+> Every distinct number must occur an even number of times.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Pair array elements by value; find unpaired element; count minimum deletions to make all frequencies even; pair items with a target sum using a frequency map.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is even frequency sufficient?
+2. What is the runtime difference between the two source methods?
+3. Does frequency counting preserve the input?

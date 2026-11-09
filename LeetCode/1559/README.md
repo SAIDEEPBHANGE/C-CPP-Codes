@@ -1,63 +1,69 @@
-# Detect Cycles in 2D Grid
+# Detect Cycles in 2D Grid — LeetCode 1559
 
-**LeetCode ID:** 1559
-**Source file(s):** `1559.cpp` (originally `containsCycle.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Gridमध्ये horizontal/vertical adjacent, समान अक्षरांच्या cellsचा cycle आहे का ते ठरवा. Cycleला किमान 4 cells लागतात. Grid rectangular आणि non-empty असते.
+Example: `a a / a a` मध्ये चार `a` cellsचा cycle → true. एका rowमधील `a a a` मध्ये cycle नाही; pathला परत त्याच parentकडे जाणे cycle समजू नये.
 
-containsCycleDFS/BFS/UnionFind(vector<vector<char>> grid). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+| Clue                               | Pattern                      |
+| ---------------------------------- | ---------------------------- |
+| same-character connected cells     | connected components / graph |
+| grid adjacencyला graph edges       | DFS/BFS किंवा DSU            |
+| visited neighbor हा parent नसल्यास | undirected-cycle test        |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Complexity |
+> |---|---|---|
+> | DFS + parent coordinates | Selected; `O(RC)` time, `O(RC)` visited + recursion |
+> | BFS + parent coordinates | Correct; `O(RC)` time/space |
+> | Union-Find on same-char right/down edges | Correct; optimized `O(RC α(RC))`, `O(RC)` space |
+> | Visited neighbor without excluding parent | Incorrect; every ordinary tree edge looks cyclic |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{same-character neighbor is visited/connected other than parent?}
-    E -- Yes --> F[report cycle]
-    E -- No --> G[visit or union neighbor and continue]
-    F --> D
-    G --> D
+    A[Find unvisited cell] --> B[DFS same-character neighbors]
+    B --> C{Neighbor outside grid or different char?}
+    C -- Yes --> B
+    C -- No --> D{Neighbor visited?}
+    D -- No --> E[Visit with current cell as parent]
+    E --> B
+    D -- Yes --> F{Neighbor is not parent?}
+    F -- Yes --> G[Cycle found]
+    F -- No --> B
+    B --> H[All components checked?]
+    H -- No --> A
+    H -- Yes --> I[No cycle]
 ```
 
-## Important branch and loop flow
+असंबद्ध components सुरूवातीपासून scan होतात; cycleसाठी समान अक्षर आणि non-parent visited neighbor दोन्ही आवश्यक.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{same-character neighbor is visited/connected other than parent?}
-    B -- Yes --> C[report cycle]
-    B -- No --> D[visit or union neighbor and continue]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, source explanation, dry run
 
-## Core logic and invariant
+`containsCycleDFS` सर्व unvisited cellsवर `dfs` बोलावतो. `dfs` cell visited mark करतो, चार directions तपासतो, वेगळे अक्षर/बाहेरचे neighbor skip करतो, unvisited neighborकडे parent म्हणून `(x,y)` पाठवतो. Sourceमध्ये BFS, basic DSU आणि rank+path-compression DSUही आहेत. Grid argument by value असल्याने प्रत्येक callमध्ये matrix copy होते.
+Dry run (`a a / a a`): `A→B→D→C`; `C` ला visited `A` दिसतो, तो parent `D` नाही → cycle.
 
-Detects cycles among orthogonally adjacent equal-character cells using parent-aware traversal or union-find; four alternatives are included.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> A single cell and a straight same-letter path have no cycle; the smallest grid cycle is a 2x2 square.
 
-DFS/BFS are direct; DSU detects an edge joining vertices already in the same component.
+## Complexity, correctness, traps
 
-## Complexity
+DFS scan `O(RC)` graph work; `vis` `O(RC)`, recursion worst `O(RC)`; sourceचे by-value grid copyही `O(RC)`. Correctness: undirected DFSमध्ये tree-edge parent वगळल्यावर visited same-component neighbor म्हणजे alternate path + edge, hence cycle.
+Mistakes: diagonal neighbors धरू नका; characters समान असणे आवश्यक; parent-edge ignore करणे विसरू नका. Deep grid recursion stack concern interviewमध्ये नमूद करा; iterative BFS/DSU पर्याय.
 
-DFS/BFS O(mn); DSU O(mn alpha(mn)); O(mn) storage.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: same-character neighbor आणि parent वेगळे ओळखा.
+Four directions + same-char + visited non-parent. Related: Number of Islands, graph cycle detection, DSU connectivity.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\1559\1559.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. `1x3` same-letter rowला cycle का नाही?
+2. Parent exclusionचा उद्देश काय?
+3. DSUमध्ये फक्त right/down edges का पुरतात?
+4. Diagonal adjacency allowed आहे का?

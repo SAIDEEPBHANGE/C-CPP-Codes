@@ -1,63 +1,108 @@
-# Count Square Submatrices with All Ones
+# 1277 — Count Square Submatrices with All Ones
 
-**LeetCode ID:** 1277
-**Source file(s):** `1277.cpp` (originally `countSquares.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count every square submatrix containing only ones, across all possible sizes. A cell can represent several squares ending at that cell.
 
-int countSquares(vector<vector<int>>& matrix). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Worked examples and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> An all-one `2×2` matrix contains four `1×1` squares and one `2×2` square: answer `5`. A zero cell contributes no square; one-cell matrices return `0` or `1`.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **2D dynamic programming** using the smallest neighboring square.
+> | Cell | DP value |
+> |---|---|
+> | Matrix value is 0 | 0 |
+> | First row/column and value 1 | 1 |
+> | Other one cell | `1+min(top,left,diagonal)` |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Enumerate every top-left and size, check cells: correct but expensive (`O(mn·min(m,n)^2)` or worse).
+- Source DP: `O(mn)` and counts all sizes at once.
+- Rolling rows can reduce auxiliary DP space to `O(n)`, but source uses a full table.
+
+## 5. Mermaid flowchart and explanation
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
+> The three neighbors certify that every smaller square needed to extend the current square exists.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{cell equals 1?}
-    E -- Yes --> F[compute DP side length and add to total]
-    E -- No --> G[retain zero at this cell]
-    F --> D
-    G --> D
+ A([Visit cell]) --> B{Cell is 1?}
+ B -- No --> C[dp is zero]
+ B -- Yes --> D{First row or column?}
+ D -- Yes --> E[dp is one]
+ D -- No --> F[dp = 1 + minimum of top left diagonal]
+ C --> G[Add dp to total]
+ E --> G
+ F --> G
+ G --> H{More cells?}
+ H -- Yes --> A
+ H -- No --> I([Return total])
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{cell equals 1?}
-    B -- Yes --> C[compute DP side length and add to total]
-    B -- No --> D[retain zero at this cell]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `dp[i][j]` is the largest all-one square with bottom-right corner `(i,j)`. If the cell is one, its square size is limited by the smallest square ending above, left, and diagonally above-left, plus this cell.
 
-## Core logic and invariant
+## 7. Code explanation
 
-For each 1 cell, stores the largest all-one square side ending there as 1+min(top,left,diagonal), and sums side lengths.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `countSquares` traverses top-left to bottom-right, fills `dp`, and adds each `dp[i][j]` to `res`; a value `k` counts one square of each size `1..k`. Source assumes matrix is nonempty. Demo `main()` is not part of judge code.
 
-## Optimization / comparison
+## 8. Dry run
 
-Every square ending at a cell is counted once through its maximum side length; recurrence replaces testing every square.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `[[1,1],[1,1]]`:
+> | Cell | Top | Left | Diagonal | `dp` |
+> |---|---:|---:|---:|---:|
+> | (0,0) | — | — | — | 1 |
+> | (0,1) | — | 1 | — | 1 |
+> | (1,0) | 1 | — | — | 1 |
+> | (1,1) | 1 | 1 | 1 | 2 |
+> Total `1+1+1+2=5`.
 
-## Complexity
+## 9. Complexity
 
-O(mn) time and O(mn) space.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(mn)` time and `O(mn)` auxiliary space in this implementation.
 
-## Compile and run
+## 10. Correctness
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> For each cell, all-one squares ending there must include that cell. At borders, only size one can be established. Else the largest possible extension is exactly one plus the minimum of the three prerequisite squares; summing these sizes counts each valid square once by its unique bottom-right corner and size.
 
-```powershell
-g++ -std=c++17 LeetCode\1277\1277.cpp -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes / interview traps
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The answer is the sum of DP sizes, not the number of cells equal to one.
+- Use the minimum of all three neighbors.
+- Do not access neighbors at the top/left boundary.
+- Confirm nonempty dimensions before reading `matrix[0]` if constraints do not guarantee them.
+
+## 12. Quick revision
+
+Bottom-right DP: `1 + min(top,left,diag)`; add every DP value to answer. प्रत्येक cell अनेक squares मोजू शकतो.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Maximal Square, Count Submatrices With All Ones, largest plus sign; variation: return only the largest square.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What does `dp[i][j]=3` count?
+2. Why use the minimum neighbor?
+3. Why does summing DP values count each square once?
+4. What changes for maximum-square-only?

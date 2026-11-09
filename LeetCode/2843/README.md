@@ -1,63 +1,133 @@
-# Count Symmetric Integers
+# 2843 — Count Symmetric Integers
 
-**LeetCode ID:** 2843
-**Source file(s):** `2843.cpp` (originally `countSymmetricIntegers.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे दोन्ही अर्ध्यांच्या अंकबेरजा समान असलेल्या संख्यांची मोजणी.
 
-int countSymmetricIntegers(int low,int high). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Within inclusive range `[low,high]`, count numbers with an even number of digits whose first-half digit sum equals the second-half digit sum.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत दोन्ही अर्ध्यांच्या अंकबेरजा समान असलेल्या संख्यांची मोजणी कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> `1230` is symmetric because `1+2 = 3+0`. `1234` is not (`1+2 != 3+4`). Odd-digit numbers are never symmetric by definition. Single-digit inputs are skipped.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **bounded enumeration + digit property check**.
+> | Check | Reason |
+> |---|---|
+> | Convert integer to string | Easy digit boundaries |
+> | Even string length | Required by definition |
+> | Sum each half | Compare digit totals |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Generate all numbers in the range and inspect digits: direct and suitable for the problem's small limits. A more optimized approach could derive digit-sum formulas by digit length, but is unnecessary and more complex.
+
+## 5. Flowchart
+
+आकृतीमध्ये सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{digit count even and half sums equal?}
-    E -- Yes --> F[increment count]
-    E -- No --> G[continue]
-    F --> D
-    G --> D
+    A[For each integer low through high] --> B[Convert to decimal string]
+    B --> C{Digit count even?}
+    C -->|no| D[Skip]
+    C -->|yes| E[Sum left and right halves]
+    E --> F{Sums equal?}
+    F -->|yes| G[Increment count]
+    F -->|no| H[Keep count]
+    G --> I{More integers?}
+    H --> I
+    D --> I
+    I -->|yes| A
+    I -->|no| J[Return count]
 ```
 
-## Important branch and loop flow
+Odd-length values can be rejected without computing digit sums.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{digit count even and half sums equal?}
-    B -- Yes --> C[increment count]
-    B -- No --> D[continue]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+मूळ कल्पना: सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे.
 
-Converts each integer to decimal digits, ignores odd lengths, and compares sums of the two halves.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Loop through the range, stringify each integer, skip odd lengths, and use digit sums on the two equal-length halves. Count matches.
 
-## Optimization / comparison
+## 7. Code explanation
 
-Only equal-length halves are compared; every integer is considered once.
+Code मधील state आणि updates हे सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे या कल्पनेशी जोडून वाचा.
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `countSymmetricIntegers` uses a lambda with `accumulate` to sum character digits (`ch-'0'`). It checks `NoStr.size()%2==0` before comparing sums. Complexity depends on both range width and number of digits.
 
-O((high-low+1)\*d) time and O(d) temporary string space.
+## 8. Dry run
 
-## Compile and run
+Dry run मध्ये सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `1230`:
+> | Half | Digits | Sum |
+> |---|---|---:|
+> | Left | `1,2` | 3 |
+> | Right | `3,0` | 3 |
+> | Result | equal | counted |
 
-```powershell
-g++ -std=c++17 LeetCode\2843\2843.cpp -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For `R=high-low+1` and at most `d` digits: `O(R*d)` time and `O(d)` temporary string space.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Each integer in the inclusive interval is examined once. Odd-length numbers are excluded exactly as required. For each even-length number, the code sums precisely the left and right halves and increments iff they are equal. Therefore the counter equals the number of symmetric integers.
+
+## 11. Mistakes and interview traps
+
+लक्षात ठेवा: विषम अंकसंख्या असलेली संख्या वगळायची.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Range endpoints are inclusive.
+- Digit halves are based on string length, not numeric division.
+- Leading zeros are not part of the integer's representation.
+- `accumulate` sums digit values only after subtracting `'0'`.
+
+## 12. Quick revision
+
+थोडक्यात, सम अंकसंख्या असलेल्या प्रत्येक संख्येचे अर्धे तपासणे. विषम अंकसंख्या असलेली संख्या वगळायची.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Enumerate; convert to string; even length + equal half digit sums means symmetric.
+
+## 13. Related problems and variations
+
+संबंधित प्रश्नांत दोन्ही अर्ध्यांच्या अंकबेरजा समान असलेल्या संख्यांची मोजणी यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> LeetCode 129 (Sum Root to Leaf Numbers); 2283 (Check if Number Has Equal Digit Count and Digit Value); variations: compare alternating digit sums or count by digit length.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून दोन्ही अर्ध्यांच्या अंकबेरजा समान असलेल्या संख्यांची मोजणी याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why are odd-length numbers skipped?
+2. Does `1230` qualify, and why?
+3. What are the time and extra-space costs?

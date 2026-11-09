@@ -1,63 +1,73 @@
-# Minimum Operations to Make a Uni-Value Grid
+# Minimum Operations to Make a Uni-Value Grid — LeetCode 2033
 
-**LeetCode ID:** 2033
-**Source file(s):** `2033.cpp` (originally `Flatten_minOperations.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+One operation adds/subtracts `x` from one grid cell. Make all values equal with minimum operations, or return `-1` if impossible. Grid is non-empty and `x>0`.
+Example: `[1,2,3]`, `x=1` → median `2`; changes are `1+0+1=2`. With `x=2`, values `1` and `2` have different residues mod 2, so impossible → `-1`.
 
-int minOperations(vector<vector<int>>& grid,int x). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | each operation changes value by fixed step `x` | residue invariant |
+> | all targets require sum of absolute distances | median minimizes L1 distance |
+> | 2D cells independent after flattening | flatten + sort |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Check common residue, choose median, sum step counts | Selected `O(N log N)` time, `O(N)` space |
+> | Try every possible target | Correct but slow; target range can be large |
+> | Choose arithmetic mean | Incorrect in general; absolute-distance sum is minimized by median |
+> | Skip residue check and divide differences | Incorrect when difference is not divisible by `x` |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{all remainders match / cell distance to median?}
-    E -- Yes --> F[compute median operation count / add distance]
-    E -- No --> G[return -1 if incompatible]
-    F --> D
-    G --> D
+    A[Flatten grid] --> B[Take first value residue mod x]
+    B --> C{Every value same residue?}
+    C -- No --> Z[Return -1]
+    C -- Yes --> D[Sort flattened values]
+    D --> E[Choose middle value as median]
+    E --> F[Sum abs(value-median)/x]
+    F --> G[Return operations]
 ```
 
-## Important branch and loop flow
+Same residue असल्यास सर्व pairwise differences `x` ने divisible; median minimizes total absolute adjustment.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{all remainders match / cell distance to median?}
-    B -- Yes --> C[compute median operation count / add distance]
-    B -- No --> D[return -1 if incompatible]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, source-specific explanation, dry run
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `Flatten` copies grid values into `fg`. `minOperations` stores `fg[0]%x`, rejects any different residue, sorts, selects `fg[size/2]`, and sums `abs(fg[i]-median)/x`. Source requires non-empty grid; main demonstrates `x=1`.
+> Dry run (`[1,2,3]`, `x=1`):
+> | Sorted value | Distance from 2 | Operations |
+> |---:|---:|---:|
+> | 1 | 1 | 1 |
+> | 2 | 0 | 0 |
+> | 3 | 1 | 1 |
+> | Total | — | 2 |
 
-Flattens the grid, checks all values share a remainder modulo x, sorts, then sums step distances to the median.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> A one-cell grid needs 0 operations; x=1 always passes residue compatibility; mismatched residues return -1.
 
-Equal residues are necessary and sufficient; median minimizes total absolute deviations.
+## Complexity, correctness, traps
 
-## Complexity
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For `N=m*n`: flatten/residue check `O(N)`, sort `O(N log N)`, sum `O(N)`; total `O(N log N)` time, `O(N)` space. Correctness: modular residue is invariant under ±x; if compatible, each unit step costs equal per `x`, and median minimizes sum absolute differences.
+> Trap: check feasibility before choosing target; use middle after sorting; for even N either middle is optimal. Source uses `int` operation sum, within given constraints.
 
-O(N log N) time and O(N) space.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: residue जुळल्यावर medianकडे values हलवा.
+Flatten; equal residue; median; sum distance divided by `x`. Related: L1 median, modular invariants, equalization by fixed increments.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\2033\2033.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. Why must residues match?
+2. Why is median preferred over mean?
+3. What is cost for value equal to median?
+4. If `x=2` and values are 1,3,5, possible?

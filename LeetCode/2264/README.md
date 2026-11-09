@@ -1,88 +1,95 @@
-# Largest 3-Same-Digit Number in String
+# Largest 3-Same-Digit Number in String — LeetCode 2264
 
-**Problem ID:** 2264  
-**Source:** `largestGoodInteger.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2264.cpp` provides `largestGoodIntegerOptimized` and `largestGoodIntegerOriginal`.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+Find the lexicographically/numerically largest length-3 substring made of the same digit. Return the three-character string, or `""` if no such substring exists.
 
-- `string largestGoodIntegerOptimized(string num)`
-- `string largestGoodIntegerOriginal(string num)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `"6777133339"` contains `"777"` and `"333"`; return `"777"`. `"0000000"` returns `"000"`—do not parse it as integer zero and lose width. `"123456"` has no triple, so return empty.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Scan all length-three windows and retain the greatest triple of equal digits.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Fixed length 3 | Sliding window |
+> | All characters equal | Adjacent comparisons |
+> | Largest digit triplet | Lexicographic comparison (digits) |
 
-Scan all length-three windows and retain the greatest triple of equal digits.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Scan all length-three windows and retain the greatest triple of equal digits."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Check all windows of length 3 and keep the largest: O(n), optimal. An inefficient method can construct and sort all matching triplets. Do not compare parsed integer results if the required output must preserve leading zeroes.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Set best empty]) --> B[Visit each length-3 window]
+    B --> C{All three chars equal?}
+    C -- No --> E{More windows?}
+    C -- Yes --> D{Window greater than best?}
+    D -- Yes --> F[Set best to window]
+    D -- No --> E
+    F --> E
+    E -- Yes --> B
+    E -- No --> Z([Return best])
 ```
 
-## Core logic and invariant
+## 6. Algorithm and intuition
 
-Scan all length-three windows and retain the greatest triple of equal digits.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Every possible answer is one of the `n-2` consecutive windows. Test whether its three characters match. Since all candidates have equal length and contain decimal digits, lexicographic order matches digit-value order; keep the maximum string.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The optimized method scans windows, extracts `num.substr(i,3)` when all three characters match, and updates `res` if it is greater. The original method stores the best digit as an integer and skips the rest of a found run; both are intended to return the same string for valid input.
 
-## Approach comparison
+## 8. Dry run
 
-The source contains multiple implementations for comparison:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `"6777133339"`: window `"777"` sets best to `"777"`; later `"333"` is smaller; final best remains `"777"`.
 
-- `string largestGoodIntegerOptimized(string num)`
-- `string largestGoodIntegerOriginal(string num)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+## 9. Complexity
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> **O(n)** time and **O(1)** auxiliary space; returned strings are length 3. The source assumes the problem's input length is at least 3.
 
-## Compile and run
+## 10. Correctness
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The scan visits every contiguous length-3 substring exactly once. It accepts exactly those whose characters are all equal and retains the greatest accepted candidate. Therefore the final best is the largest good integer, or remains empty if none exists.
 
-```powershell
-g++ -std=c++17 "LeetCode\2264\2264.cpp" -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes and interview traps
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Compare characters at `i`, `i+1`, and `i+2`.
+- Return a three-character string; `"000"` is valid.
+- Include the final starting index `n-3`.
+- Empty result is `""`, not `"0"`.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** प्रत्येक तीन अक्षरांची खिडकी तपासा आणि मोठा triplet ठेवा.
+> Scan `i=0..n-3`; if `s[i]==s[i+1]==s[i+2]`, keep the largest substring.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Longest run of equal characters; largest fixed-width substring meeting a predicate; sliding-window maximum over character patterns.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is string comparison valid for these equal-length digit strings?
+2. Why must `"000"` remain a string?
+3. What is the last valid window start?

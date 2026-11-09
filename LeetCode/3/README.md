@@ -1,73 +1,97 @@
-# Longest Substring Without Repeating Characters
+# Longest Substring Without Repeating Characters — LeetCode 3
 
-**Problem ID:** 3  
-**Source:** `lengthOfLongestSubstring.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+String मधील duplicate नसलेला सर्वात लांब contiguous substring ची length शोधा. Source मध्ये last-occurrence sliding window, string-window आणि brute-force set methods आहेत.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `int lengthOfLongestSubstring_SlidingWindowArray(const string &s)`
-- `int lengthOfLongestSubstring_SlidingWindowString(const string &s)`
-- `int lengthOfLongestSubstring_BruteForce(const string &s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `"abcabcbb"` → `3` (`"abc"`).
+- `"pwwkew"` → `3` (`"wke"`); substring contiguous असतो.
+- `""` → 0; `"bbbbb"` → 1; `"dvdf"` → 3.
+- Source ची array implementation `last(256)` वापरते; bytes/ASCII input अपेक्षित.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Use last-seen positions to move a duplicate-free sliding window forward.
+| Clue                           | Pattern         | कारण                                 |
+| ------------------------------ | --------------- | ------------------------------------ |
+| Contiguous substring + longest | Sliding window  | Valid interval वाढवत/हलवत राहतो      |
+| Uniqueness constraint          | Last-seen index | Duplicate आल्यावर left boundary jump |
+| All substrings test            | Brute force     | Valid baseline, quadratic            |
 
-## Main flow
+## 4. Approaches
 
-Use last-seen positions to move a duplicate-free sliding window forward.
+- Brute-force set: start бүрून extend until repeat — O(n²) expected, O(min(n,alphabet)) space.
+- `SlidingWindowString`: `find` आणि `substr` वापरते — worst-case O(n²), string-copy O(n) शक्य.
+- `SlidingWindowArray`: last occurrence index राखते — O(n), fixed 256-entry auxiliary array.
+- चुकीचा update: duplicate सापडल्यावर `left = last[c] + 1`; `left` मागे नेऊ नका.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Use last-seen positions to move a duplicate-free sliding window forward."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Initialize last positions to -1, left=0, best=0]
+ B --> C[Advance right to next character]
+ C --> D{Was character seen inside window?}
+ D -- Yes --> E[Move left past its previous index]
+ D -- No --> F[Keep current left]
+ E --> G[Update last position and best length]
+ F --> G
+ G --> H{More characters?}
+ H -- Yes --> C
+ H -- No --> I[Return best]
 ```
 
-## Core logic and invariant
+Window मधील uniqueness invariant राखण्यासाठी `left` फक्त पुढे सरकतो.
 
-Use last-seen positions to move a duplicate-free sliding window forward.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+`last[c]` मध्ये शेवटचा index ठेवा. `right` पुढे नेताना repeated char सध्याच्या window मध्ये असेल तर त्याच्या नंतर `left` ठेवा; मग length आणि best update करा.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1) fixed byte alphabet.
+## 7. Code explanation
 
-## Compile and run
+`lengthOfLongestSubstring_SlidingWindowArray` हा optimal source method. `SlidingWindowString` जुना window string शोधून trim करतो. `BruteForce` प्रत्येक start साठी set बनवतो. Source चे `main()` तिन्हींची तुलना करतो.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\3\3.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `"abba"`:
+> | right | char | previous | left | current length | best |
+> |---:|:---:|---:|---:|---:|---:|
+> | 0 | a | -1 | 0 | 1 | 1 |
+> | 1 | b | -1 | 0 | 2 | 2 |
+> | 2 | b | 1 | 2 | 1 | 2 |
+> | 3 | a | 0 (<left) | 2 | 2 | 2 |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Array sliding window: O(n) time, O(256)=O(1) space. String window and brute-force: O(n²) worst-case time, O(n) auxiliary space.
+
+## 10. Correctness
+
+प्रत्येक step नंतर `[left,right]` मध्ये duplicates नाहीत: duplicate सध्याच्या window मध्ये आल्यास `left` त्याच्या मागील occurrence च्या पुढे जातो. प्रत्येक right endpoint साठी मिळालेली window ही त्या endpoint ला संपणारी maximal valid substring असल्याने max length उत्तर आहे.
+
+## 11. Mistakes and interview traps
+
+- Substring म्हणजे contiguous; subsequence नाही.
+- `left=max(left,last[c]+1)` हा monotonic rule; source `last[c] >= left` guard वापरून तेच करतो.
+- Empty input आणि repeated same character तपासा.
+- 256-entry table Unicode code points साठी सर्वसाधारण उपाय नाही.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Last-seen index + two pointers. Duplicate in window? jump left. Update last and `right-left+1`.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Minimum Window Substring, Longest Repeating Character Replacement, longest substring with at most K distinct chars.
+
+## 14. Self-assessment
+
+1. `"abba"` वर left मागे न नेता काय होते?
+2. Substring आणि subsequence मध्ये फरक?
+3. Array version ला O(1) space का म्हणतो?
+4. Unicode input साठी काय बदलाल?

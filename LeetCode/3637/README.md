@@ -1,90 +1,96 @@
-# Trionic Array I
+# 3637 — Trionic Array I
 
-**Problem ID:** 3637  
-**Source:** `isTrionic.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+A trionic array has three strict phases: increasing, then decreasing, then increasing again, each with a non-empty phase. Determine whether the whole array has that shape. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `bool isTrionicGreedy(vector<int>& nums)`
-- `bool isTrionicBruteforce(vector<int>& nums)`
-- `bool isTrionicDP(vector<int>& nums)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[1,3,2,4]`: rise 1<3, fall 3>2, rise 2<4 → true. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Track increasing, decreasing, then increasing phases and compare greedy, brute-force, and DP variants.
+Finite-state scan for monotonic phases. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on finite-state scan for monotonic phases. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Track increasing, decreasing, then increasing phases and compare greedy, brute-force, and DP variants.
+Explicitly trying all split points is correct but `O(n²)`. Source provides a one-pass greedy state machine, a brute-force split check, and a precomputed DP-style alternative. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Track increasing, decreasing, then increasing phases and compare greedy, brute-force, and DP variants."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{does the next comparison match the current phase?}
+    D -->|Yes| E[advance within phase or transition to next]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Track increasing, decreasing, then increasing phases and compare greedy, brute-force, and DP variants.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Consume a non-empty rising run, then a non-empty falling run, then require a non-empty rising run through the final element.
 
-- **Time:** O(n) greedy.
-- **Auxiliary space:** O(1) greedy; O(n) DP.
+## 7. Code-specific explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3637\3637.cpp` — `isTrionicGreedy` transitions among three phases and rejects missing/empty phases. Brute-force checks candidate p,q; DP arrays mark increasing prefixes/suffixes and descending middle.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `bool isTrionicGreedy(vector<int>& nums)`
-- `bool isTrionicBruteforce(vector<int>& nums)`
-- `bool isTrionicDP(vector<int>& nums)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | `[1,3,2,4]`: state rise consumes 1→3 |
+> | 2 | fall consumes 3→2 |
+> | 3 | final rise consumes 2→4 |
+> | 4 | all phases exist. |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Greedy `O(n)` time, `O(1)` space. Brute force `O(n²)` time; DP variant `O(n)` time and `O(n)` space.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\3637\3637.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The greedy scan accepts only when each phase has at least one strict edge and all adjacent comparisons follow the required order. Every valid trionic array has exactly such a left-to-right phase sequence; invalid or missing transitions are rejected.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- All inequalities are strict; equal adjacent values break a phase.
+- Each of the three runs must be non-empty.
+- End in the final increasing phase, not immediately after the decrease.
+
+## 12. Quick revision
+
+**झटपट:** Consume a non-empty rising run, then a non-empty falling run, then require a non-empty rising run through the final element. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Finite-state machines; monotonic runs; peak/valley arrays.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What are the three required directions?
+2. Why must each phase have an edge?
+3. What happens on equal adjacent values?

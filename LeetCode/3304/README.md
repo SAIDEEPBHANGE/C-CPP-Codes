@@ -1,71 +1,94 @@
-# Find the K-th Character in String Game I
+# 3304 — Find the K-th Character in String Game I
 
-**Problem ID:** 3304  
-**Source:** `kthCharacter.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+Start with `a`; each operation appends a copy of the current string with every character advanced by one alphabet letter. Return the 1-indexed kth character. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `char kthCharacter(int k)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> The strings begin `a → ab → abbc → abbccd`; k=5 gives `c`. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Repeatedly append a character-shifted copy until position k is present.
+Doubling construction; recursive half/block mapping can avoid building the string. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on doubling construction | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Repeatedly append a character-shifted copy until position k is present.
+Direct simulation is conceptually correct for small k. The source's `kthCharacter` builds the string but its shift expression `(i+1)%122` is incorrect for letters near `y`/`z` (it produces control characters rather than wrapping to `a`); do not treat it as fully correct. Correct shifting is modulo 26 over alphabet indices. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Repeatedly append a character-shifted copy until position k is present."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{has the generated string reached at least k characters?}
+    D -->|Yes| E[append a correctly alphabet-shifted copy]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Repeatedly append a character-shifted copy until position k is present.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Each round doubles length; the appended half is the previous half shifted by one. Character values must wrap in the 26-letter alphabet.
 
-- **Time:** O(k).
-- **Auxiliary space:** O(k).
+## 7. Code-specific explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3304\3304.cpp` — `kthCharacter` stores the whole string until its length exceeds k, then returns `Result[k-1]`. The indexing is 1-based at input and 0-based in C++; the source's character wrap is a correctness bug.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\3304\3304.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | For k=5: build `a`, `ab`, `abbc`, `abbcc...` |
+> | 2 | index 4 is `c`. |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Source simulation uses `O(k)` time and `O(k)` memory; output length is the next power of two ≥k. Correctness requires shifting `((c-'a'+1)%26)+'a'`.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> With a correct modulo-26 shift, each appended block is exactly the defined transform of the prior string; repeated doubling therefore constructs the sequence, and index k-1 is the desired character. The checked-in modulo-122 expression breaks this proof for letters near z.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- `k` is 1-indexed.
+- Wrap `z` to `a`, not ASCII modulo 122.
+- For large k, use the bit/reverse mapping rather than materializing all prefixes.
+
+## 12. Quick revision
+
+**झटपट:** Each round doubles length; the appended half is the previous half shifted by one. Character values must wrap in the 26-letter alphabet. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Divide-and-conquer string indexing; binary representation; recursive sequence lookup.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What is the correct alphabet shift expression?
+2. Why does the generated string double?
+3. Where does 1-based indexing change to 0-based?

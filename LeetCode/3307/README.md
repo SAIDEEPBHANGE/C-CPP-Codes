@@ -1,72 +1,96 @@
-# Find the K-th Character in String Game II
+# 3307 — Find the K-th Character in String Game II
 
-**Problem ID:** 3307  
-**Source:** `kthCharacter_Hard.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+The string doubles per operation; operation 0 copies the block, operation 1 copies it with each letter shifted by one. Find the 1-indexed kth character without necessarily building a huge string. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `char kthCharacterSim(ll k, vector<int>& operations)`
-- `char kthCharacterBitLogic(ll k, vector<int>& operations)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `operations=[0,1]`: sequence goes `a → aa → aabb`; k=4 is `b`. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare explicit transformed-word simulation with reverse traversal of doubling intervals and accumulated shifts.
+Reverse block mapping / count set-bit ancestor operations. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on reverse block mapping / count set-bit ancestor operations. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Compare explicit transformed-word simulation with reverse traversal of doubling intervals and accumulated shifts.
+Simulation is correct but uses O(k) memory and may not scale. Source also has bit-based reverse logic, which is efficient; floating-point `log2` and index assumptions deserve care at bounds. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare explicit transformed-word simulation with reverse traversal of doubling intervals and accumulated shifts."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is k in the appended half of the current block?}
+    D -->|Yes| E[subtract half-length and accumulate that operation's shift]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Compare explicit transformed-word simulation with reverse traversal of doubling intervals and accumulated shifts.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Trace k backward: if it lies in an appended half, subtract that half's length and add the corresponding operation's shift; repeat until position 1.
 
-- **Time:** O(k) simulation; O(log k) reverse.
-- **Auxiliary space:** O(k) simulation; O(1) reverse.
+## 7. Code-specific explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3307\3307.cpp` — `kthCharacterSim` builds integer shift values. `kthCharacterBitLogic` walks backward using powers of two and sums operation flags modulo 26.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\3307\3307.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | k=4, operations `[0,1]`: highest block is length 2 |
+> | 2 | k→2 and add op[1]=1 |
+> | 3 | then k→1 and add op[0]=0 |
+> | 4 | character=`b`. |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Simulation `O(k)` time/space. Reverse method `O(log k)` time and `O(1)` extra space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Each appended-half position maps to the same offset in the previous block, with an added shift exactly when that operation is 1. Repeating reaches the original `a`; accumulated shifts modulo 26 give the character.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Use 1-based k consistently.
+- Operation index corresponds to the block level.
+- Prefer integer bit operations over floating-point power calculations for robust bounds.
+
+## 12. Quick revision
+
+**झटपट:** Trace k backward: if it lies in an appended half, subtract that half's length and add the corresponding operation's shift; repeat until position 1. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Binary lifting; recursive strings; bit decomposition.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. How does a position in the appended half map backward?
+2. When is a shift added?
+3. What is the reverse algorithm's time?

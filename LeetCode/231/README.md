@@ -1,92 +1,91 @@
-# Power of Two
+# Power of Two — LeetCode 231
 
-**Problem ID:** 231  
-**Source:** `isPowerOfTwo.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+दिलेला signed integer positive power of two आहे का ते तपासा: `1,2,4,8,...`. Zero आणि negative numbers false.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `bool isPowerOfTwo_iterative(int n)`
-- `bool recursiveHelper(int n, long long ans)`
-- `bool isPowerOfTwo_recursive(int n)`
-- `bool isPowerOfTwo_bitwise(int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `1=2^0`, `1024=2^10` → true.
+- `3`, `0`, `-2` → false.
+- Positive power of twoच्या binary representationमध्ये एकच set bit असतो.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare iterative and recursive power generation with the one-set-bit test.
+| Clue                             | Pattern           | कारण                               |
+| -------------------------------- | ----------------- | ---------------------------------- |
+| Repeated multiplication/division | Number theory     | Powers sequence                    |
+| Exactly one set bit              | Bit manipulation  | `n & (n-1)` bit clear करतो         |
+| Positive input guard             | Boundary handling | 0 वर bit identityही true दिसू शकते |
 
-## Main flow
+## 4. Approaches
 
-Compare iterative and recursive power generation with the one-set-bit test.
+- Iterative doubling: O(log n) time/O(1) space; source method.
+- Recursive doubling: O(log n) time, O(log n) stack; source method.
+- Bitwise `n>0 && (n&(n-1))==0`: O(1), O(1), optimal source method.
+- `n>0` guard नसलेली bit test 0ला चुकून true देईल.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare iterative and recursive power generation with the one-set-bit test."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B{n <= 0?}
+ B -- Yes --> C[Return false]
+ B -- No --> D{Only one set bit?}
+ D -- Yes --> E[Return true]
+ D -- No --> F[Return false]
 ```
 
-## Core logic and invariant
+Positive power-of-twoमध्ये एक set bit, बाकी zero असतात.
 
-Compare iterative and recursive power generation with the one-set-bit test.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+Binary `n-1` हा lowest set bit आणि त्याखालील bits बदलतो. Power of twoमध्ये `n` आणि `n-1` यांचे set bits overlap होत नाहीत; म्हणून AND zero.
 
-- **Time:** O(1) bitwise.
-- **Auxiliary space:** O(1); O(log n) recursion.
+## 7. Code explanation
 
-## Approach comparison
+`isPowerOfTwo_iterative` powers generate करतो; `recursiveHelper` current power double करतो; `isPowerOfTwo_bitwise` concise test. Recursive public method आधी `n<=0` reject करतो.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `bool isPowerOfTwo_iterative(int n)`
-- `bool recursiveHelper(int n, long long ans)`
-- `bool isPowerOfTwo_recursive(int n)`
-- `bool isPowerOfTwo_bitwise(int n)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `n=8 (1000₂)`:
+> | value | binary | result |
+> |---:|---|---|
+> | n | `1000` | |
+> | n-1 | `0111` | |
+> | AND | `0000` | one set bit; true |
+> `n=12 (1100₂)`, `n-1=1011₂`, AND=`1000₂` → false.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Bitwise O(1) time/O(1) space; iterative O(log n); recursive O(log n) stack.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\231\231.cpp" -o solution.exe
-.\solution.exe
-```
+Positive integer power of twoचे binary representation exactly one set bit असते; subtract oneने तो bit clear व lower bits set होतात, त्यामुळे AND zero. दोन किंवा अधिक set bits असतील तर highest shared set bit उरतो, त्यामुळे AND nonzero.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+- `n=0` special: guard अनिवार्य.
+- Signed negative values reject करा.
+- Source iterative `long long` वापरते, त्यामुळे `2^31` पर्यंत generation सुरक्षित.
+- Bit trick power of fourला थेट लागू नाही; bit position constraint वेगळी.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Positive check + `(n & (n-1)) == 0`.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Power of Three, Power of Four, Count Set Bits, Hamming weight.
+
+## 14. Self-assessment
+
+1. `n&(n-1)` काय करतो?
+2. 0 positive guard शिवाय का problem?
+3. `12` power of two का नाही?
+4. Power of fourला अजून कोणती condition लागते?

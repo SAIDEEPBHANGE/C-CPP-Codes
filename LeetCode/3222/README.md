@@ -1,58 +1,94 @@
-﻿# Find the Winning Player in Coin Game — LeetCode 3222
+# 3222 — Find the Winning Player in Coin Game
 
-## Problem and judge interface
+## 1. Problem understanding and constraints
 
-string winningPlayer(int x, int y); return Alice or Bob for x 75-value coins and y 10-value coins.
+Two players alternately remove one 10-coin pile and four 1-coin piles. The player unable to move loses. Determine the winner from initial counts. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-## Identification evidence
+## 2. Stepwise example and edge cases
 
-The code counts min(x,y/4) moves, each consuming one x and four y coins, then uses parity as in problem 3222.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `x=2,y=7`: only one full move is possible, so Alice makes it and wins. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Main flow
+## 3. Pattern identification — clue table
+
+Game theory reduced to number of complete moves and parity. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on game theory reduced to number of complete moves and parity. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
+
+## 4. Multiple approaches
+
+State-space game search is correct but unnecessary. The source checks the number of moves allowed by both resources and uses parity; no simulation is needed. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
- A([Start]) --> B[Compute min(x, floor(y/4))]
- B --> C[Determine the parity of the move count]
- C --> D{Is move count odd?}
- D -- Yes --> E[Return Alice]
- D -- No --> F[Return Bob]
- E --> G{More work remains?}
- F --> G
- G -- Yes --> C
- G -- No --> H([Return result])
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is the number of complete moves odd?}
+    D -->|Yes| E[return the first player if odd, otherwise second]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Important branch / loop
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-```mermaid
-flowchart TD
- A[Compare available x coins and y bundles] --> B{Which resource limits moves?}
- B -- Yes --> C[Use x as maximum]
- B -- No --> D[Use floor(y/4) as maximum]
- C --> E([Continue or return as indicated])
- D --> E
-```
+## 6. Selected algorithm and intuition
 
-## Core logic and invariants
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Each turn consumes exactly `(1,4)`, so at most `min(x,y/4)` turns occur. Odd number means the first player makes the final move.
 
-Maximum legal moves are min(x,floor(y/4)). Alternating turns mean Alice wins exactly when this count is odd.
+## 7. Code-specific explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3222\3222.cpp` — `winningPlayer` returns the named player according to the move count. Ensure integer division `y/4` is used.
 
-O(1) time and O(1) space.
+## 8. Dry run
 
-## Comparison and optimization
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | `x=2,y=7`: min(2,1)=1 move |
+> | 2 | odd → Alice wins. |
 
-Count-and-parity replaces explicit turn simulation because each move consumes the same bundle.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(1)` time and `O(1)` space.
 
-The `.cpp` is the original standalone source, including its local `main()` demonstration where present. Compile and run from the repository root with a C++17 compiler:
+## 10. Correctness
 
-```text
-g++ -std=c++17 LeetCode\3222\3222.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The game has no choices that change resource consumption; every legal move reduces x by one and y by four. Thus exactly the minimum resource quotient determines the number of moves, and alternating turns make parity determine the winner.
 
-For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The game ends when either resource cannot cover a complete move.
+- Use floor division for y/4.
+- Zero moves means Alice loses.
+
+## 12. Quick revision
+
+**झटपट:** Each turn consumes exactly `(1,4)`, so at most `min(x,y/4)` turns occur. Odd number means the first player makes the final move. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Game parity; deterministic impartial games; resource batching.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. How many coins are consumed per move?
+2. Why is min used?
+3. Who wins if the move count is even?

@@ -1,72 +1,108 @@
-# Delete Columns to Make Sorted
+# 944. Delete Columns to Make Sorted
 
-**Problem ID:** 944  
-**Source:** `minDeletionSize.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `944.cpp`; column-build/sort and direct-comparison approaches.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Given equal-length strings as rows, delete columns that are not nondecreasing from top to bottom. Return the number of deleted columns.
 
-- `int minDeletionSize_ColumnBuild(vector<string>& strs)`
-- `int minDeletionSize_DirectCompare(vector<string>& strs)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `["cba","daf","ghi"]`, column 0 is `c,d,g` sorted; column 1 is `b,a,h` not sorted; column 2 is `a,f,i` sorted → delete 1. One row means no column can be unsorted.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Inspect each column top-to-bottom and count columns with a descending adjacent pair.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Independently validate each column by checking adjacent rows.
+> | Clue | Pattern |
+> |---|---|
+> | Constraint applies column by column | Outer loop over columns |
+> | Nondecreasing order | Compare adjacent rows |
+> | Count violations by column | Break after first inversion |
 
-Inspect each column top-to-bottom and count columns with a descending adjacent pair.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Inspect each column top-to-bottom and count columns with a descending adjacent pair."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Build each column and sort it (`minDeletionSize_ColumnBuild`) — correct but extra allocation/sorting.**
+- **Direct adjacent comparison (`minDeletionSize_DirectCompare`) — used and preferred:** `O(rows·cols)`, constant extra space.
+- Comparing each row as a whole is incorrect; only individual columns are evaluated.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Set deletion count to zero]
+    B --> C[Select column c]
+    C --> D[Compare each row with previous row]
+    D --> E{Current char less than previous?}
+    E -- Yes --> F[Count this column once and stop its scan]
+    E -- No --> G[Continue down the column]
+    F --> H{More columns?}
+    G --> H
+    H -- Yes --> C
+    H -- No --> I([Return count])
 ```
 
-## Core logic and invariant
+One inversion is enough to delete a whole column, so the inner loop stops early.
 
-Inspect each column top-to-bottom and count columns with a descending adjacent pair.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For each column `c`, compare `strs[r][c]` with `strs[r-1][c]` for rows `1..m-1`. If any decrease occurs, increment answer once and move to the next column.
 
-- **Time:** O(rows\*cols).
-- **Auxiliary space:** O(1).
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The direct variant performs the adjacent check and `break`s after finding an inversion. The column-build variant assembles each column, sorts a copy, and compares it to the original.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\944\944.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Column | Top-to-bottom | Sorted? | Delete? |
+> |---:|---|---|---|
+> | 0 | `c,d,g` | yes | no |
+> | 1 | `b,a,h` | no (`a<b`) | yes |
+> | 2 | `a,f,i` | yes | no |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Direct: `O(mn)` time, `O(1)` auxiliary space. Build-and-sort: `O(mn log m)` time plus `O(mn)` column storage (and sort copies).
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> A column is nondecreasing iff every adjacent pair satisfies `strs[r-1][c] <= strs[r][c]`. The direct scan checks every such pair and counts a column exactly once if any condition fails; hence the count is exactly the number to delete.
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Delete a column once even if it has several inversions.
+- Equal adjacent letters are allowed.
+- Compare top-to-bottom, not left-to-right within strings.
+- Source assumes at least one string and consistent widths, as guaranteed by constraints.
+
+## 12. Quick revision
+
+For each column, scan adjacent rows; first decrease means one deletion and break.
+एका columnमध्ये अनेक inversions असले तरी delete count एकच वाढतो.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Delete Columns to Make Sorted II/III; lexicographic sorting; monotonic sequence validation.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is one inversion enough to count a deletion?
+2. Are equal adjacent characters valid?
+3. Why does sorting the extracted column work?
+4. What is the memory advantage of direct comparison?

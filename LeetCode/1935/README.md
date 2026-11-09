@@ -1,63 +1,72 @@
-# Maximum Number of Words You Can Type
+# Maximum Number of Words You Can Type — LeetCode 1935
 
-**LeetCode ID:** 1935
-**Source file(s):** `1935.cpp` (originally `canBeTypedWords.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Given words separated by spaces and a set of broken lowercase letters, count words that contain none of those letters. A broken letter invalidates a word if it appears anywhere in it.
+Example: `text="hello world"`, broken=`"ad"` → `hello` works, `world` has `d`, answer `1`. Empty broken string means every word can be typed.
 
-canBeTypedWords_v1/v2(text,brokenLetters). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | fixed alphabet of 26 lowercase letters | boolean lookup table |
+> | each word independently valid/invalid | tokenize and scan |
+> | repeated character membership checks | preprocess lookup |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | For each char, `string.find` among broken letters | Correct source v1; roughly `O(T*B)` |
+> | Mark broken letters, scan each word once | Selected v2; `O(B+T)` |
+> | Remove broken chars then count remaining words | Incorrect; a partially typed word is untypeable |
+> | Compare whole word with broken string | Incorrect; membership, not equality, matters |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{word contains a broken character?}
-    E -- Yes --> F[mark word untypable and stop scanning it]
-    E -- No --> G[count word if all letters pass]
-    F --> D
-    G --> D
+    A[Mark each broken letter] --> B[Read next word]
+    B --> C{Word has a broken character?}
+    C -- No --> D[Increment typed-word count]
+    C -- Yes --> E[Skip word]
+    D --> F{More words?}
+    E --> F
+    F -- Yes --> B
+    F -- No --> G[Return count]
 ```
 
-## Important branch and loop flow
+प्रत्येक wordमध्ये एक broken character सापडल्यावर उरलेले word scan थांबवता येते.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{word contains a broken character?}
-    B -- Yes --> C[mark word untypable and stop scanning it]
-    B -- No --> D[count word if all letters pass]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, code-specific explanation, dry run
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `canBeTypedWords_v2` builds `broken[26]`, streams words with `stringstream`, checks characters and breaks at first bad one. v1 uses `find` for every broken letter in each word. Both count words, not letters; `main` compares versions.
+> Dry run (`"hello world"`, broken=`"ad"`):
+> | Word | Broken hit? | Count after |
+> |---|---|---:|
+> | hello | none | 1 |
+> | world | `d` | 1 |
 
-Splits text into words and counts words containing no broken letter; compares repeated string searches with a 26-entry broken-letter table.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> No broken letters means every word counts; if every word contains a broken letter, answer is 0.
 
-The boolean alphabet table avoids repeated find searches and enables early exit.
+## Complexity, correctness, traps
 
-## Complexity
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> v2 `O(B+T)` time; v1 worst `O(T*B)` character search. Source parameters copy `text` and `brokenLetters`, so actual call-level space is `O(T+B)`; beyond those copies, v2 uses a fixed table and current token. Correctness: word is countable iff every character's membership flag is false; loop tests exactly that.
+> Trap: a word with multiple broken letters still counts as one invalid word; empty broken set means all words are valid. Input uses lowercase English alphabet and spaces.
 
-v1 O(T\*B) worst case; v2 O(T+B); constant-size alphabet table.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: broken letter मिळताच तो शब्द वगळा.
+Pre-mark alphabet, tokenize, reject word on first membership. Related: word filtering, set membership, character-frequency checks.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\1935\1935.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. If a word has two broken letters, how many are subtracted?
+2. What does empty brokenLetters imply?
+3. Why is fixed array indexed by `ch-'a'`?
+4. Which source version is asymptotically faster?

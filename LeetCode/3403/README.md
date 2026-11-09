@@ -1,63 +1,95 @@
-# Find the Lexicographically Largest String From the Box I
+# 3403 — Find the Lexicographically Largest String From the Box I
 
-**LeetCode ID:** 3403
-**Source file(s):** `3403.cpp` (originally `answerString.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Problem understanding and constraints
 
-## Expected input/output or judge interface
+Split the word among `numFriends` people under the problem's length restriction; return the lexicographically largest possible piece. The maximum candidate length is `n-numFriends+1`. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-string answerString(string word, int numFriends). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Stepwise example and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `word="dbca", numFriends=2`: candidates can be length at most 3; compare valid substrings and choose the lexicographically largest. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
+
+## 3. Pattern identification — clue table
+
+Bounded-length substring comparison; lexicographic maximum. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on bounded-length substring comparison | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
+
+## 4. Multiple approaches
+
+Enumerating every valid substring and comparing is correct, though quadratic. A suffix-array/string-index approach is unnecessary for the source constraints; source scans candidate starts and compares allowed pieces. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{candidate is lexicographically greater than current best?}
-    E -- Yes --> F[replace the best candidate]
-    E -- No --> G[retain the current best]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{candidate is lexicographically greater than current best?}
-    B -- Yes --> C[replace the best candidate]
-    B -- No --> D[retain the current best]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is this allowed substring lexicographically larger than best?}
+    D -->|Yes| E[replace best candidate]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Sets the maximum piece length to n-(numFriends-1), considers each start position with that length capped by the remaining suffix, and returns the lexicographically greatest candidate.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 6. Selected algorithm and intuition
 
-## Optimization / comparison
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> At any start, only a bounded prefix can be given to one friend because the others need at least one character each.
 
-Considers only the longest allowed candidate per start, rather than enumerating every possible partition.
+## 7. Code-specific explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3403\3403.cpp` — `answerString` handles the one-friend case by returning the whole word; otherwise it considers each start and a substring capped at `n-numFriends+1`.
 
-Worst-case O(n^2) time from substring construction/comparison; temporary strings may use O(n^2) total work.
+## 8. Dry run
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | For `word="dbca", friends=2`, maximum piece length=3 |
+> | 2 | start 0 gives `dbc`, start 1 gives `bca` |
+> | 3 | `dbc` wins. |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\3403\3403.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Source candidate comparisons can take `O(nL)` time where L=`n-numFriends+1` (worst `O(n²)`); `O(L)` auxiliary space for substrings.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Each possible piece begins at some index and cannot exceed the length bound; the scan examines all such starts and selects the greatest allowed candidate. The single-friend case has the whole word as the only piece.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Cap piece length based on the other friends.
+- Lexicographic order is not the same as length order.
+- Handle `numFriends==1` separately.
+
+## 12. Quick revision
+
+**झटपट:** At any start, only a bounded prefix can be given to one friend because the others need at least one character each. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> String comparison; substring enumeration; suffix arrays.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is maximum length n-friends+1?
+2. Can a shorter string beat a longer one lexicographically?
+3. Why special-case one friend?

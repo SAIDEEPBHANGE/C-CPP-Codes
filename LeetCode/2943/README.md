@@ -1,73 +1,94 @@
-# Maximize the Area of a Square Hole in a Grid
+# 2943 — Maximize the Area of a Square Hole in a Grid
 
-**Problem ID:** 2943  
-**Source:** `maximizeSquareHoleArea.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+Given removable horizontal and vertical bars, find the largest square opening. Consecutive removed bars extend an opening by one; the square side is one more than the shorter consecutive run. Inputs are valid bar indices within the grid dimensions. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `int maximizeSquareHoleArea_sorting( int n, int m, vector<int> hBars, vector<int> vBars`
-- `int maximizeSquareHoleArea_set( int n, int m, vector<int> hBars, vector<int> vBars`
-- `int maximizeSquareHoleArea_marking( int n, int m, vector<int> hBars, vector<int> vBars`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `n=m=5, hBars=[2,3], vBars=[2,3]` gives runs 2 and 2, side 3, area 9. No consecutive pair gives side 2 when each direction has at least one removable bar. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Find the longest consecutive removable-bar run in each dimension and square the smaller resulting side.
+Longest consecutive run in two independent dimensions; answer is `min(runH, runV)+1`, squared. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on longest consecutive run in two independent dimensions | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Find the longest consecutive removable-bar run in each dimension and square the smaller resulting side.
+`maximizeSquareHoleArea_sorting` sorts each list and scans runs: correct, `O(H log H+V log V)`. Set-based grouping is also correct but uses more memory. Boolean marking is useful only when dimensions are small; it scans dimension-sized arrays. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Find the longest consecutive removable-bar run in each dimension and square the smaller resulting side."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{next sorted bar is previous + 1?}
+    D -->|Yes| E[extend current run and update best]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Find the longest consecutive removable-bar run in each dimension and square the smaller resulting side.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Sort removable bar numbers; a gap of exactly one continues the run, any larger gap starts a new run. Only the smaller opening can bound a square.
 
-- **Time:** O(m log m + n log n).
-- **Auxiliary space:** O(m+n).
+## 7. Code-specific explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\2943\2943.cpp` — The source provides sorting, set, and marking methods. The demo calls all three. Sorting parameters are passed by value, so the copied bar lists use linear extra memory; ignore `n,m` except for the marking variant.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\2943\2943.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | `hBars=[2,3,5]`: scan 2→3 extends run to 2 |
+> | 2 | 5 resets it to 1. `vBars=[1,2,3]` has run 3. Side=`min(2,3)+1=3`, area=9. |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Sorting method: `O(H log H+V log V)` time and `O(H+V)` extra space for pass-by-value copies (plus sorting stack). Set method: same asymptotic time, `O(H+V)` space. Marking method: `O(n+m+H+V)` time and `O(n+m)` space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> A run of r consecutive removable bars creates exactly r+1 open grid units in that direction. Taking the longest run per dimension and then the smaller side gives the largest feasible square; squaring it returns its area.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Add 1 to the run length before squaring.
+- Use the smaller of horizontal and vertical openings.
+- Empty removable-bar lists need a baseline run of zero; the sorting variant initializes to one and relies on the stated input constraints.
+
+## 12. Quick revision
+
+**झटपट:** Sort removable bar numbers; a gap of exactly one continues the run, any larger gap starts a new run. Only the smaller opening can bound a square. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Longest consecutive sequence; histogram/coordinate scans; grid geometry.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is the side one larger than the removed-bar run?
+2. Why does the smaller dimension limit the square?
+3. Which implementation is unsuitable for very large dimensions?

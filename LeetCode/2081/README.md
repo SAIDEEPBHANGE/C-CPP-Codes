@@ -1,91 +1,102 @@
-# K-Mirror Numbers
+# Sum of k-Mirror Numbers — LeetCode 2081
 
-**Problem ID:** 2081  
-**Source:** `kMirror.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2081.cpp`. The file includes two generators; `kMirrorV2` is the length-by-length approach. The `kMirrorV1` loop processes even-length palindromes first and may stop before it ever generates odd-length palindromes, so it is not a correct general solution.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+A k-mirror number is a positive integer that reads the same in decimal and base `k`. Return the sum of the first `n` such numbers in increasing numeric order.
 
-- `bool isPalindrome(const string& s)`
-- `string convertToBaseK(long long num, int k)`
-- `long long makePalindrome(int half, bool odd)`
-- `long long kMirrorV1(int k, int n)`
-- `long long kMirrorV2(int k, int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `k = 2`, `n = 5`, the first values are `1, 3, 5, 7, 9`, sum `25`. Decimal candidates must be checked in ascending order. Odd-length decimal palindromes mirror the first half without repeating its center digit; even lengths mirror the whole first half.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Enumerate decimal palindromes, convert to base k, and accumulate values palindromic in both bases.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Use **generate candidates by structure, then validate in another representation**.
+> | Clue | Pattern |
+> |---|---|
+> | Decimal palindrome required | Construct by mirroring half |
+> | Also palindrome in base `k` | Convert and two-pointer check |
+> | Need first `n` in numeric order | Enumerate by decimal length |
 
-Enumerate decimal palindromes, convert to base k, and accumulate values palindromic in both bases.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Enumerate decimal palindromes, convert to base k, and accumulate values palindromic in both bases."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Testing every integer is correct but wastes work on non-decimal-palindromes. Generating only decimal palindromes is the useful optimization. `kMirrorV2` does that in increasing length/order. `kMirrorV1` is flawed: its parity loop starts with even-length candidates and can reach `n` before odd lengths are considered.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start length L]) --> B[Enumerate first halves in order]
+    B --> C[Mirror half to make decimal palindrome]
+    C --> D[Convert candidate to base k]
+    D --> E{Base-k digits palindrome?}
+    E -- Yes --> F[Add candidate; decrement n]
+    E -- No --> G[Skip]
+    F --> H{n is zero?}
+    G --> I{More halves at length L?}
+    H -- No --> I
+    H -- Yes --> Z([Return sum])
+    I -- Yes --> B
+    I -- No --> J[Increase L] --> B
 ```
 
-## Core logic and invariant
+The generator keeps candidates ordered; only the second-base palindrome test is selective.
 
-Enumerate decimal palindromes, convert to base k, and accumulate values palindromic in both bases.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For each decimal length `L`, enumerate all `(L+1)/2`-digit prefixes. Reverse a copy: append its full reverse for even `L`, or omit the duplicated middle digit for odd `L`. Convert the resulting number to base `k`, test palindrome, and add matches until `n` are found.
 
-- **Time:** O(C \* d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
-- **Auxiliary space:** O(d) for the current candidate and its base-k representation.
+## 7. Code explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `makePalindrome` and `convertToBaseK` are helpers. In `kMirrorV2`, `L` grows from 1, and `start..end` enumerate prefix values. `isPalindrome` compares ends inward. `long long` stores candidates and sum. `kMirrorV1` builds candidates from an unbounded half counter but does not correctly interleave odd and even lengths.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `long long kMirrorV1(int k, int n)`
-- `long long kMirrorV2(int k, int n)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `k=2`, `L=2`: prefix `1` → decimal palindrome `11` → binary `1011` (reject); prefix `2` → `22` → `10110` (reject). Then `L=3`: prefix `1` → `101` → binary `1100101` (reject); prefix `2` → `202` → binary `11001010` (reject). Continue in order until the required count is reached.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Let `C` be the number of decimal-palindrome candidates tested and `D` the largest candidate's digit count. Time is **O(C·D)** for construction, conversion, and checking; auxiliary space is **O(D)**, excluding the constant-size result sum.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\2081\2081.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Mirroring enumerates every decimal palindrome of each length exactly once and in increasing order. Base conversion preserves the candidate's value; the two-pointer test accepts exactly palindromic base-`k` representations. Therefore the accepted sequence is precisely the required first `n`, and summing it is correct.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- For odd lengths, do not append the center digit twice.
+- Do not enumerate arbitrary numbers if palindrome generation is available.
+- The base-`k` representation is a string; leading zeroes do not occur for positive candidates.
+- A reverse-order representation is still palindrome iff its forward order is, but `2081.cpp` reverses the digits back.
+- Avoid claiming `kMirrorV1` is equivalent to V2; its order/parity handling is defective.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** आधी दशमान पॅलिंड्रोम तयार करा; मग base `k` मध्ये तपासा.
+> Enumerate decimal palindromes by length → convert to base `k` → palindrome check → add matches. Use half-mirroring and `long long`.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Generate palindromes by mirroring; numbers palindromic in multiple bases; count rather than sum qualifying candidates; generate binary palindromes and test in decimal.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why do odd and even lengths use different mirror rules?
+2. Why does generation order guarantee the first `n` values?
+3. What is wrong with stopping after the even-length pass in V1?

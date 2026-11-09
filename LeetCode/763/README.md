@@ -1,72 +1,108 @@
-# Partition Labels
+# 763. Partition Labels
 
-**Problem ID:** 763  
-**Source:** `partitionLabels.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `763.cpp`; `partitionLabels(string s)`.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Split a string into as many contiguous parts as possible so each letter appears in at most one part. Return each part's length.
 
-- `vector<int> partitionLabels(string s)`
-- `void printVector(vector<int>& v)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `"ababcbacadefegdehijhklij"`, result is `[9,7,8]`. A single repeated character, `"aaaa"`, gives `[4]`; empty input returns an empty vector.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Record each character's last position and close a partition at the farthest last occurrence.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> An interval must extend through the last occurrence of every character it contains.
+> | Clue | Pattern |
+> |---|---|
+> | Need all occurrences in same segment | Last-occurrence map |
+> | Segment end can expand while scanning | Greedy interval merging |
+> | Return segment sizes | Boundary difference |
 
-Record each character's last position and close a partition at the farthest last occurrence.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Record each character's last position and close a partition at the farthest last occurrence."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Try every possible partition — exponential and unnecessary.**
+- **Greedy last-occurrence sweep — used:** extend current end to cover each character's final index; `O(n)`.
+- A two-pass array of last positions for lowercase letters is also `O(n)` and avoids hashing.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Record last index of each character]
+    B --> C[Start next segment at i]
+    C --> D[Set end to last occurrence of s i]
+    D --> E[Scan through segment and extend end as needed]
+    E --> F{Current scan position reached end?}
+    F -- No --> E
+    F -- Yes --> G[Append end minus previous boundary plus one]
+    G --> H{More characters?}
+    H -- Yes --> C
+    H -- No --> I([Return lengths])
 ```
 
-## Core logic and invariant
+The segment closes only after every character in it has had its last appearance included.
 
-Record each character's last position and close a partition at the farthest last occurrence.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Precompute each character's final index. At a segment start, initialize `end` to that character's last index. Scan through the growing interval, raising `end` whenever a newly encountered character reaches farther. Close when scan reaches `end`.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1) alphabet.
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `ump` stores last positions. `end` is the current inclusive segment endpoint; inner loop expands it. `preEnd` is one past the previous segment's endpoint, so length is `end-preEnd+1`. The loop sets `i=end` before its increment.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\763\763.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Scanned chars | Last positions force end to | Segment |
+> |---|---:|---|
+> | `ababcbaca` | 8 | `[0..8]`, length 9 |
+> | `defegde` | 15 | `[9..15]`, length 7 |
+> | `hijhklij` | 23 | `[16..23]`, length 8 |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Expected `O(n)` time and `O(σ)` space for distinct characters, where `σ` is alphabet size. The source uses an unordered map; for the fixed 26-letter alphabet this is `O(1)` auxiliary space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Any valid partition containing a character must include its last occurrence. The greedy endpoint is repeatedly expanded to include the last occurrence of every character encountered, so the closed interval is valid. Closing at the earliest such endpoint is safe and maximizes the number of segments; repeating gives the optimal partition.
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Use last occurrence, not first.
+- Inner scan must use the expanding endpoint.
+- Segment length is inclusive (`end-start+1`).
+- For lowercase-only constraints, fixed array can replace map; current code accepts generic char keys.
+
+## 12. Quick revision
+
+Last index map → grow current interval to cover every encountered character's last index → close and record length.
+एका partition मधला अक्षर पुन्हा पुढच्या partition मध्ये येऊ नये.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Merge Intervals; Minimum Number of Arrows to Burst Balloons; string partitioning with character-frequency constraints.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why must a segment include the last occurrence of each character?
+2. Why can the endpoint only move right?
+3. What makes closing at the earliest valid endpoint optimal?
+4. How would a fixed alphabet array change space/use?

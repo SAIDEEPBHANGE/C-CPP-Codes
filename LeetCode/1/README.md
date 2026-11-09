@@ -1,58 +1,92 @@
-﻿# Two Sum — LeetCode 1
+# Two Sum — LeetCode 1
 
-## Problem and judge interface
+## 1. Understanding
 
-`vector<int> twoSum(vector<int>& nums, int target)`; return indices of two distinct entries summing to target. Source methods are named twoSumOriginal and twoSumOptimized.
+`nums` मधील दोन वेगळ्या indices ची values मिळून `target` होतात; त्या indices परत करायच्या. Source मध्ये `twoSumOriginal` आणि `twoSumOptimized` आहेत.
 
-## Identification evidence
+## 2. Worked examples and edges
 
-Both implementations search for a complement and return the matching indices, identifying problem 1.
+- `[2,7,11,15], target=9` → `[0,1]`.
+- `[3,3], target=6` → दोन्ही equal values असूनही वेगळे indices `[0,1]`.
+- `[0,4,3,0], target=0` → duplicate zero indices valid.
+- Problem मध्ये exactly one answer असल्याची हमी आहे; source तरीही न मिळाल्यास empty vector परतवतो.
 
-## Main flow
+## 3. Pattern identification + cheat sheet
+
+| Clue                                 | Pattern           | कारण                                                  |
+| ------------------------------------ | ----------------- | ----------------------------------------------------- |
+| Pair sum आणि indices विचारले आहेत    | Complement lookup | `target - nums[i]` शोधायचा                            |
+| एका pass मध्ये पूर्वीची value उपयोगी | Hash map          | Seen values पटकन मिळतात                               |
+| Sorted data / pair existence         | Two pointers      | पण येथे indices/order जपण्यासाठी sort करणे योग्य नाही |
+
+## 4. Approaches
+
+- Brute force: प्रत्येक pair तपासा — O(n²), O(1); समजायला सोपे.
+- `twoSumOriginal`: प्रत्येक `i` साठी पुढील suffix मध्ये `find` — O(n²), O(1), accepted brute-force implementation.
+- `twoSumOptimized`: complement-to-index hash map — expected O(n), O(n), optimal practical choice.
+- चुकीचा trap: current value map मध्ये आधी घातली तर target 2x असताना तोच index दोनदा लागू शकतो.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
- A([Start]) --> B[Initialize empty result or map of seen values]
- B --> C[Visit each current array entry]
- C --> D{Was its complement seen earlier?}
- D -- Yes --> E[Return the two indices]
- D -- No --> F[Store value and continue]
- E --> G{More work remains?}
- F --> G
- G -- Yes --> C
- G -- No --> H([Return result])
+ A([Start]) --> B[Create empty value-to-index map]
+ B --> C[Read nums[i]]
+ C --> D[Find target - nums[i]]
+ D --> E{Complement already seen?}
+ E -- Yes --> F[Return seen index and i]
+ E -- No --> G[Store nums[i] with index i]
+ G --> H{More values?}
+ H -- Yes --> C
+ H -- No --> I[Return empty result]
 ```
 
-## Important branch / loop
+Map आधी तपासतो, नंतर current item store करतो; त्यामुळे एकच item पुन्हा वापरला जात नाही.
 
-```mermaid
-flowchart TD
- A[Compute target minus current value] --> B{Is complement in prior values?}
- B -- Yes --> C[Return distinct earlier and current indices]
- B -- No --> D[Store current value for later indices]
- C --> E([Continue or return as indicated])
- D --> E
-```
+## 6. Algorithm / intuition
 
-## Core logic and invariants
+प्रत्येक value `x` साठी `target-x` आधी पाहिला आहे का ते विचारा. असल्यास pair सापडतो; नसेल तर `x` चा index भविष्यातील values साठी ठेवा.
 
-Original scans each suffix for a complement. Optimized checks a hash map of earlier values before inserting the current value, preventing reuse of one index.
+## 7. Code explanation
 
-## Complexity
+`twoSumOriginal` पुढील elements मध्ये `find` करतो आणि iterator चे index मध्ये रूपांतर `distance` ने करतो. `twoSumOptimized` unordered map मध्ये value→index ठेवतो व match मिळताच `{seen[complement], i}` परत करतो.
 
-Original O(n^2) time and O(1) space; hash version expected O(n) time and O(n) space.
+## 8. Dry run
 
-## Comparison and optimization
+`nums=[2,7,11], target=9`
+| i | value | complement | map आधी | action |
+|---:|---:|---:|---|---|
+| 0 | 2 | 7 | `{}` | 2→0 store |
+| 1 | 7 | 2 | `{2:0}` | match; return `[0,1]` |
 
-Hash lookup removes repeated suffix scans. Adapt method name to judge-required twoSum; helper returns empty if no pair.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Original: O(n²) time, O(1) auxiliary space. Hash map: expected O(n) time and O(n) space; worst-case hash operations can degrade.
 
-The `.cpp` is the original standalone source, including its local `main()` demonstration where present. Compile and run from the repository root with a C++17 compiler:
+## 10. Correctness
 
-```text
-g++ -std=c++17 LeetCode\1\1.cpp -o solution.exe
-.\solution.exe
-```
+प्रत्येक index `i` आधी map मध्ये फक्त indices `< i` असतात. Complement सापडल्यास त्याची value आणि `nums[i]` यांची बेरीज target असते आणि indices distinct असतात. Pair नसल्यास scan नंतर map मध्ये नसलेला valid earlier complement नव्हता.
 
-For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
+## 11. Mistakes and interview traps
+
+- Values नव्हे, indices परत करा.
+- Duplicate values असू शकतात; map मध्ये फक्त value आहे म्हणून pair नाकारू नका.
+- Sort करून two pointers लावल्यास original indices हरवतात (index tracking शिवाय).
+- Expected O(n) म्हणताना hash-table worst case लक्षात ठेवा.
+
+## 12. Quick revision
+
+`complement = target - nums[i]`; आधी lookup, मग insert. दोन distinct indices, one pass, hash map.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> 3Sum, 4Sum, Two Sum II (sorted input), count pairs with given sum.
+
+## 14. Self-assessment
+
+1. Lookup insertion च्या आधी का?
+2. `[3,3]`, target 6 कसे हाताळले जाते?
+3. Hash-map आणि nested-loop complexities काय?
+4. Input sorted असता कोणता पर्याय उपयोगी?

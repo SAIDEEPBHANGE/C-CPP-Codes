@@ -1,71 +1,95 @@
-# Minimum Operations to Make Binary Array Elements Equal to One I
+# 3191 — Minimum Operations to Make Binary Array Elements Equal to One I
 
-**Problem ID:** 3191  
-**Source:** `minOperations.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+An operation flips exactly three consecutive bits. Find the minimum operations to make the array all ones, or return -1 if impossible. Array length is at least three by problem constraints. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `int minOperations(vector<int>& ns)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[0,0,0]`: flip indices 0–2 once → `[1,1,1]`; answer 1. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Scan left-to-right and flip a length-three window whenever its first bit is zero.
+Greedy forced left-to-right bit fixing. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on greedy forced left-to-right bit fixing. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Scan left-to-right and flip a length-three window whenever its first bit is zero.
+Trying arbitrary flip sequences is unnecessary. The source uses the correct greedy: when the current bit is zero, flip this triple. The choice is forced because earlier positions cannot be touched later. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Scan left-to-right and flip a length-three window whenever its first bit is zero."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is the leftmost not-yet-fixed bit zero?}
+    D -->|Yes| E[flip this bit and the next two]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Scan left-to-right and flip a length-three window whenever its first bit is zero.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> At index i, only the triple starting at i can still change `nums[i]`; make it one immediately, then continue.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## 7. Code-specific explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3191\3191.cpp` — `minOperations` mutates `ns` with XOR 1 on indices i, i+1, i+2. After scanning through n-3, the last two bits cannot be changed and decide feasibility.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\3191\3191.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | `[0,0,0,0,1]`: flip 0–2 → `[1,1,1,0,1]` |
+> | 2 | flip 3–5 unavailable, so final bit 3 remains 0 |
+> | 3 | return -1. |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(n)` time and `O(1)` extra space; input is modified.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Once indices before i are fixed, no future length-three operation starting after i can change them. Therefore a zero at i must be flipped using the operation starting at i; this forced choice is optimal. The final two bits are unfixable and the check detects impossibility.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The final two bits are not independently fixable.
+- Do not perform a flip when the current bit is already one.
+- The source assumes n≥3; that is guaranteed by the problem.
+
+## 12. Quick revision
+
+**झटपट:** At index i, only the triple starting at i can still change `nums[i]`; make it one immediately, then continue. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Greedy forced decisions; bit flipping; difference arrays for range toggles.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is the operation at i forced?
+2. Which bits remain after the loop?
+3. Why is there at most one optimal decision at each step?

@@ -1,63 +1,101 @@
-# Candy
+# Candy — LeetCode 135
 
-**LeetCode ID:** 135
-**Source file(s):** `135.cpp` (originally `candy.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+Ratings असलेल्या line मधील प्रत्येक childला किमान एक candy द्या; जास्त rating असलेल्या adjacent childला शेजाऱ्यापेक्षा अधिक candy द्यावी. Minimum total candies परत करा.
 
-int candy(vector<int>& ratings). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Worked examples and edges
 
-## Main flow
+- `[1,0,2]` → `[2,1,2]`, total 5.
+- `[1,2,2]` → `[1,2,1]`, total 4; equal neighborsवर condition नाही.
+- Increasing `[1,2,3]` → 1,2,3; decreasing `[3,2,1]` → 3,2,1.
+- Empty ratings sourceनुसार total 0.
+
+## 3. Pattern identification + cheat sheet
+
+| Clue                                         | Pattern             | कारण                                     |
+| -------------------------------------------- | ------------------- | ---------------------------------------- |
+| Adjacent pair constraints both directions    | Two-pass greedy     | Left आणि right dependency वेगळे          |
+| Minimize total while satisfying lower bounds | Greedy assignment   | प्रत्येकाला initial 1                    |
+| One-way scan insufficient                    | Bidirectional sweep | Descending slopesही दुरुस्त करावे लागतात |
+
+## 4. Approaches
+
+- Brute force repeatedly increase violated neighbor until stable: potentially very slow; termination/optimality harder.
+- Source two-pass greedy: O(n) time/O(n) candy array, clear optimal solution.
+- Single left-to-right pass alone चुकीचा; आधीच्या childला पुढे higher rating आल्यावर वाढवावे लागू शकते.
+- Constant-space slope greedy हे variation आहे; source मध्ये नाही.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{rating exceeds adjacent rating in pass direction?}
-    E -- Yes --> F[raise count to at least neighbor+1]
-    E -- No --> G[keep current assignment]
-    F --> D
-    G --> D
+ A([Start]) --> B[Initialize every candy count to 1]
+ B --> C[Scan left to right]
+ C --> D{Rating rises from previous?}
+ D -- Yes --> E[Set current to previous plus 1]
+ D -- No --> F[Keep at least 1]
+ E --> G[Scan right to left]
+ F --> G
+ G --> H{Rating higher than right neighbor?}
+ H -- Yes --> I[Raise current to max of existing and right plus 1]
+ H -- No --> J[Keep current count]
+ I --> K{More positions?}
+ J --> K
+ K -- Yes --> G
+ K -- No --> L[Sum candies and return]
 ```
 
-## Important branch and loop flow
+पहिला pass rising slopes, दुसरा descending slopes सांभाळतो; `max` पहिल्या passची गरज जपतो.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{rating exceeds adjacent rating in pass direction?}
-    B -- Yes --> C[raise count to at least neighbor+1]
-    B -- No --> D[keep current assignment]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm / intuition
 
-## Core logic and invariant
+सर्वांना 1 द्या. Left-to-rightमध्ये `ratings[i]>ratings[i-1]` असल्यास `candy[i]=candy[i-1]+1`. Reverse passमध्ये `ratings[i]>ratings[i+1]` असल्यास right neighborपेक्षा किमान एक जास्त द्या.
 
-Assigns one candy each, raises counts on increasing ratings left-to-right, then repairs descending constraints right-to-left.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+`candy` vector length `n`, सर्व values 1. दोन loops नंतर `accumulate` total काढतो. Source `candy` नावे वापरतो आणि input ratings mutate करत नाही.
 
-Two directional passes satisfy both neighbor constraints and handle peaks without repeated local corrections.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Ratings `[1,0,2]`:
+> | Pass | candies after pass |
+> |---|---|
+> | Initialize | `[1,1,1]` |
+> | Left→right | `[1,1,2]` |
+> | Right→left | `[2,1,2]` |
+> | Sum | `5` |
 
-O(n) time and O(n) space.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> O(n) time, O(n) auxiliary space for candy vector.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\135\135.cpp -o solution.exe
-.\solution.exe
-```
+Left pass प्रत्येक increasing adjacent pair साठी currentला leftपेक्षा अधिक करतो. Right pass प्रत्येक decreasing adjacent pairची अट पूर्ण करतो; `max` आधीचे constraints कमी होऊ देत नाही. सर्वांना 1 हे minimum lower bound, आणि प्रत्येक violated relationला आवश्यक तेवढेच वाढवल्याने total minimum आहे.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes and interview traps
+
+- दोन passesची directions उलटी/गहाळ करू नका.
+- Reverse updateमध्ये `max(existing, right+1)` आवश्यक.
+- Equal ratingsमध्ये candy relation लागू नाही.
+- Valleyच्या दोन्ही बाजूंच्या constraints लक्षात ठेवा.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> All 1 → left pass for rises → right pass for falls using max → sum.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Longest increasing/decreasing sequence, mountain array constraints, minimum increments for adjacent inequalities.
+
+## 14. Self-assessment
+
+1. `[1,0,2]` चे candy assignment?
+2. Reverse passमध्ये `max` का?
+3. Equal ratingsसाठी अट काय?
+4. एका दिशेचा pass अपुरा का?

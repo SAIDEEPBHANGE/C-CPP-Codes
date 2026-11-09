@@ -1,88 +1,113 @@
-# Minimum Domino Rotations For Equal Row
+# 1007. Minimum Domino Rotations For Equal Row
 
-**Problem ID:** 1007  
-**Source:** `minDominoRotations.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `1007.cpp`; two candidate-checking/counting variants.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Rotate selected dominoes so every top value or every bottom value is the same. Return the minimum rotations, or `-1` if impossible.
 
-- `int minDominoRotations_v1(vector<int>& tops, vector<int>& bottoms)`
-- `int minDominoRotations_v2(vector<int>& tops, vector<int>& bottoms)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `tops=[2,1,2,4,2,2]`, `bottoms=[5,2,6,2,3,2]`: target 2 can be made all top in 2 rotations. If a domino contains neither candidate, no solution. Already-equal row returns 0.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Try a candidate value from the first domino and count the top/bottom rotations needed.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> The common value must appear on at least one side of every domino; test only possible face values.
+> | Clue | Pattern |
+> |---|---|
+> | Values restricted to 1..6 | Enumerate candidates |
+> | Need all tops or all bottoms | Count flips both ways |
+> | One domino cannot be changed to target | Reject candidate |
 
-Try a candidate value from the first domino and count the top/bottom rotations needed.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Try a candidate value from the first domino and count the top/bottom rotations needed."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Try every rotation combination — exponential and unnecessary.**
+- **Enumerate target values 1..6 — used and optimal for this bounded domain:** `O(6n)` time, `O(1)` space.
+- `minDominoRotations_v1` uses counts and union coverage; `v2` directly validates each target and counts rotations.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start target 1]) --> B[Set top and bottom rotation counts to zero]
+    B --> C[Inspect each domino]
+    C --> D{Target appears on either side?}
+    D -- No --> E[Reject this target]
+    D -- Yes --> F[Count required top and bottom flips]
+    F --> G{More dominoes?}
+    G -- Yes --> C
+    G -- No --> H[Keep smaller flip count]
+    E --> I{More target values?}
+    H --> I
+    I -- Yes --> A
+    I -- No --> J{Any target feasible?}
+    J -- Yes --> K([Return minimum])
+    J -- No --> L([Return -1])
 ```
 
-## Core logic and invariant
+For a fixed target, each domino can be oriented independently.
 
-Try a candidate value from the first domino and count the top/bottom rotations needed.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For target `x`, it must occur in every pair (`tops[i]==x || bottoms[i]==x`). Count top flips (`tops[i]!=x`) and bottom flips (`bottoms[i]!=x`); choose the smaller. Try all 1..6.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## 7. Code explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `v1` computes top/bottom frequencies and shared positions; union coverage is `topsCount+bottomsCount-commonIndexCount == n`. `v2` uses direct per-target validation. Both return the minimum orientation count for a feasible candidate.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `int minDominoRotations_v1(vector<int>& tops, vector<int>& bottoms)`
-- `int minDominoRotations_v2(vector<int>& tops, vector<int>& bottoms)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Domino | Top has 2? | Bottom has 2? | Top flip | Bottom flip |
+> |---|---|---|---:|---:|
+> | `(2,5)` | yes | no | 0 | 1 |
+> | `(1,2)` | no | yes | 1 | 0 |
+> | `(2,6)` | yes | no | 0 | 1 |
+> | Result across all | — | — | top total 2 | bottom total 3 |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(6n)=O(n)` time and `O(1)` auxiliary space. The face domain is fixed at six.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\1007\1007.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Any uniform row must use a value that appears on at least one side of every domino. The algorithm tests every possible face value and rejects exactly those failing that condition. For a feasible value, the two counters equal the flips needed to make all tops or all bottoms equal to it; taking their minimum and then the minimum over candidates is optimal.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Check both possible uniform rows.
+- Count a rotation only when that side does not already equal target.
+- The target must occur somewhere on every domino.
+- Return `-1` if no target covers every position.
+
+## 12. Quick revision
+
+Try each face value; validate all pairs; count top/bottom flips; take min; no candidate → `-1`.
+प्रत्येक dominoमध्ये target किमान एका बाजूला असणे गरजेचे.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Minimum flips to make binary rows uniform; candidate-and-validate problems; set cover on a fixed tiny domain.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can the candidate set be restricted to values 1..6?
+2. Why is union coverage necessary?
+3. How do the two rotation counters differ?
+4. Why is there no need to test combinations of domino rotations?

@@ -1,88 +1,73 @@
-# Maximum Matrix Sum
+# Maximum Matrix Sum — LeetCode 1975
 
-**Problem ID:** 1975  
-**Source:** `maxMatrixSum.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+A move flips signs of two adjacent matrix cells. Maximize the sum after any number of moves; cells connect through the matrix's adjacency graph. Matrix has at least one cell.
+Example: `[[1,-1],[-1,1]]`: two negatives (even), all magnitudes can be positive → sum `4`. `[-1,0,2]`: odd negative parity but min magnitude is zero, so sum of magnitudes `3` is attainable.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `long long maxMatrixSumApproach1(vector<vector<int>>& matrix)`
-- `long long maxMatrixSumApproach2(vector<vector<int>>& matrix)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | operation flips a pair of signs | parity invariant |
+> | values change sign, not magnitude | sum absolute values |
+> | odd negative count forces one residual negative | smallest magnitude penalty |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Sum absolute values and use negative-count parity plus the smallest magnitude.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Sum absolute values, track negative parity and min magnitude | Selected `O(RC)` / `O(1)` |
+> | Explicitly apply flips/search states | Correct for tiny matrices, exponential and unnecessary |
+> | Always make every value positive | Incorrect when negative count odd and no zero |
+> | Track only negative count, ignore minimum magnitude | Incorrect; penalty depends on smallest absolute value |
 
-## Main flow
+## Flowchart
 
-Sum absolute values and use negative-count parity plus the smallest magnitude.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Sum absolute values and use negative-count parity plus the smallest magnitude."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[sumAbs=0; odd=false; minAbs=large] --> B[Scan each cell x]
+    B --> C[Add abs(x); update minAbs]
+    C --> D{ x negative? }
+    D -- Yes --> E[Toggle odd parity]
+    D -- No --> F[Keep parity]
+    E --> G{More cells?}
+    F --> G
+    G -- Yes --> B
+    G -- No --> H{odd negatives?}
+    H -- No --> I[Return sumAbs]
+    H -- Yes --> J[Return sumAbs - 2*minAbs]
 ```
 
-## Core logic and invariant
+Pair flips preserve negative-count parity; if odd, one value must remain negative, and the smallest magnitude minimizes loss.
 
-Sum absolute values and use negative-count parity plus the smallest magnitude.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, code, dry run
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `maxMatrixSumApproach2` accumulates `llabs(x)`, toggles `oddNegatives` for each negative, and tracks `minAbs`; final correction is `2*minAbs` only for odd parity. Approach1 counts negatives explicitly and uses `abs`; both are equivalent. `main` copies matrices for comparing methods.
+> Dry run (`[-1,0,2]`): absolute sum `3`, negative parity odd, minimum absolute value `0`; answer `3-2*0=3`.
 
-- **Time:** O(R\*C).
-- **Auxiliary space:** O(1).
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> Even negative parity needs no penalty; odd parity with a zero also has no penalty; a one-cell matrix is valid.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `long long maxMatrixSumApproach1(vector<vector<int>>& matrix)`
-- `long long maxMatrixSumApproach2(vector<vector<int>>& matrix)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(RC)` time, `O(1)` auxiliary; input is passed by reference. Correctness: each pair operation toggles sign parity of two cells so parity of total negatives is invariant; all but possibly one sign can be positive. If one remains negative, placing it on minimum magnitude maximizes total.
+> Trap: zero makes odd parity penalty zero; use `long long` for accumulated sum. Source has `abs(int)` in Approach1; constraints avoid `INT_MIN`.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: absolute sum आणि negative parity लक्षात ठेवा.
+Sum abs, parity of negatives, minimum abs; subtract twice min iff parity odd. Related: parity invariants, sign flips, greedy minimum penalty.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1975\1975.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. Why does pair flipping preserve negative parity?
+2. What is the penalty for one negative of magnitude `m`?
+3. What role does a zero play?
+4. Why is `long long` used for sum?

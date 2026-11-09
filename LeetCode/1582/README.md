@@ -1,90 +1,71 @@
-# Special Positions in a Binary Matrix
+# Special Positions in a Binary Matrix — LeetCode 1582
 
-**Problem ID:** 1582  
-**Source:** `numSpecial.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Cell `(r,c)` special तेव्हाच जेव्हा cell `1` आहे, त्या rowमध्ये इतर `1` नाहीत आणि त्या columnमध्ये इतर `1` नाहीत. Matrix binary, rectangular आणि non-empty आहे.
+Example: `[[1,0,0],[0,0,1],[1,0,0]]`: `(0,0)` columnमध्ये `(2,0)` दुसरा one आहे, म्हणून नाही; `(1,2)` row आणि columnमध्ये unique → one special position. All-zero matrix → `0`.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `bool checkCell(int r, int c, vector<vector<int>>& mat)`
-- `int numSpecialBrute(vector<vector<int>> mat)`
-- `int numSpecialCounting(vector<vector<int>> mat)`
-- `int numSpecialOptimized(vector<vector<int>> mat)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+| Clue                                    | Pattern                          |
+| --------------------------------------- | -------------------------------- |
+| row आणि column uniqueness               | frequency/counting               |
+| प्रत्येक cellची condition independently | preprocess counts, then validate |
+| binary matrix                           | row/column sums हे one-count     |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Count row and column ones, then count cells whose row and column totals are both one.
+| Method                                 | Status                                                     | Cost |
+| -------------------------------------- | ---------------------------------------------------------- | ---- |
+| प्रत्येक `1` साठी row/column rescan    | Correct brute force `O(mn(m+n))`, `O(1)` extra             |
+| Row/column count arrays, then validate | Selected `O(mn)`, `O(m+n)` auxiliary                       |
+| Source one-pass variant                | Correct, पण दोन matrix scans `O(mn)`, column counts `O(n)` |
+| Row count एकटा तपासणे                  | Incorrect; column uniquenessही आवश्यक                      |
 
-## Main flow
+Source methods matrix by value घेतात; त्यामुळे matrixची `O(mn)` copy देखील अतिरिक्त आहे.
 
-Count row and column ones, then count cells whose row and column totals are both one.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Count row and column ones, then count cells whose row and column totals are both one."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[Initialize rowCount and colCount] --> B[Scan every cell]
+    B --> C{Cell is 1?}
+    C -- Yes --> D[Increment its row and column counts]
+    C -- No --> B
+    D --> B
+    B --> E[Scan cells again]
+    E --> F{Cell=1 and rowCount=1 and colCount=1?}
+    F -- Yes --> G[Increment answer]
+    F -- No --> H[Continue]
+    G --> H
+    H --> I{More cells?}
+    I -- Yes --> E
+    I -- No --> J[Return answer]
 ```
 
-## Core logic and invariant
+Count passने candidatesचे uniqueness एका lookupमध्ये तपासता येते.
 
-Count row and column ones, then count cells whose row and column totals are both one.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, code-specific explanation, dry run
 
-## Complexity
+`numSpecialCounting` first passमध्ये `rowCount`/`colCount` fills; second pass only `1` where both counts equal 1 counts. `numSpecialBrute` rescans; `numSpecialOptimized` first identifies one-one rows and their columns, then rechecks. `main` methods compare करतो.
+Dry run (`[[1,0],[0,1]]`): row counts `[1,1]`, col counts `[1,1]`; दोन्ही one-कोशिकांसाठी counts `1,1`, answer `2`.
 
-- **Time:** O(R\*C).
-- **Auxiliary space:** O(R+C).
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> An all-zero matrix returns 0; a lone 1 is special; a row or column with multiple ones disqualifies candidates.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `int numSpecialBrute(vector<vector<int>> mat)`
-- `int numSpecialOptimized(vector<vector<int>> mat)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+Selected method `O(mn)` time, `O(m+n)` auxiliary arrays; by-value parameter copy `O(mn)`. Correctness: one at `(r,c)` special असण्यासाठी आणि फक्त त्यासाठी संबंधित row/column counts दोन्ही one असणे आवश्यक.
+Traps: `mat[r][c]==1` check ठेवा; row/column count namesची orientation गोंधळू नका; matrix value-copy spaceचा उल्लेख source-specific complexityमध्ये करा.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: row आणि column counts दोन्ही एक असावेत.
+Count rows+columns, then both counts `1`. Related: sparse matrix constraints, row/column degree, rook placement.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1582\1582.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. Row count 1 पण column count 2 असल्यास special का नाही?
+2. All-zero matrix answer?
+3. First pass व second pass काय ठरवतात?
+4. Source parameter by value असल्याने extra space किती?

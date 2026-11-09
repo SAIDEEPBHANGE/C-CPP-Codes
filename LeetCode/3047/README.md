@@ -1,88 +1,96 @@
-# Find the Largest Area of Square Inside Two Rectangles
+# 3047 — Find the Largest Area of Square Inside Two Rectangles
 
-**Problem ID:** 3047  
-**Source:** `largestSquareArea.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+For each pair of axis-aligned rectangles, find their intersection. The largest square fitting in that intersection has side equal to the smaller intersection dimension; return the greatest area. Coordinates may be negative; use 64-bit area. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `long long largestSquareAreaBruteForce( vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight`
-- `long long largestSquareAreaOptimized( vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Rectangles `[1,1]-[4,5]` and `[2,2]-[5,6]` intersect in width 2, height 3; square area is 2²=4. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Check rectangle pairs, intersect spans, and square the smaller positive overlap dimension.
+Pairwise interval intersection followed by min-dimension geometry. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on pairwise interval intersection followed by min-dimension geometry. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Check rectangle pairs, intersect spans, and square the smaller positive overlap dimension.
+Brute force over all pairs is the natural correct method (`O(n²)`). Source's optimized version prunes pairs that cannot beat the current best, but worst-case remains quadratic. Pruning must be a safe upper bound. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Check rectangle pairs, intersect spans, and square the smaller positive overlap dimension."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is the pair's intersection positive and potentially best?}
+    D -->|Yes| E[maximize best with min(width,height) squared]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Check rectangle pairs, intersect spans, and square the smaller positive overlap dimension.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Intersection lower corner is coordinate-wise max of lower bounds; upper corner is coordinate-wise min of upper bounds. Non-positive width/height means no overlap.
 
-- **Time:** O(n^2).
-- **Auxiliary space:** O(1).
+## 7. Code-specific explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3047\3047.cpp` — Both `largestSquareAreaBruteForce` and `largestSquareAreaOptimized` evaluate pairs. The optimized branch skips impossible/non-improving pairs; results use `long long`.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `long long largestSquareAreaBruteForce( vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight`
-- `long long largestSquareAreaOptimized( vector<vector<int>>& bottomLeft, vector<vector<int>>& topRight`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | Intersection widths: `min(4,5)-max(1,2)=2` |
+> | 2 | heights: `min(5,6)-max(1,2)=3` |
+> | 3 | side=min(2,3)=2 |
+> | 4 | area=4. |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Both methods are `O(n²)` worst-case time; optimized pruning improves typical work only. Extra space `O(1)` beyond the input/result.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\3047\3047.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The coordinate-wise intersection bounds describe exactly the shared region. A square fits iff its side is at most both dimensions, so the best side is their minimum. Checking every pair (or safely pruning pairs unable to improve) finds the global maximum.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Treat touching edges as zero area.
+- Use intersection dimensions, not rectangle dimensions.
+- Promote to `long long` before multiplying.
+
+## 12. Quick revision
+
+**झटपट:** Intersection lower corner is coordinate-wise max of lower bounds; upper corner is coordinate-wise min of upper bounds. Non-positive width/height means no overlap. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Interval intersection; bounding boxes; pairwise geometry.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. How are intersection bounds computed?
+2. Why is the square side the smaller dimension?
+3. Can safe pruning improve worst-case complexity?

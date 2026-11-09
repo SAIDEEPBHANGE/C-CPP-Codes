@@ -1,65 +1,100 @@
-# Find All K-Distant Indices in an Array
+# Find All K-Distant Indices in an Array — LeetCode 2200
 
-**LeetCode ID:** 2200
-**Source file(s):** `2200.cpp` (originally `findKDistantIndices.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `2200.cpp` has a direct interval-expansion method and a key-position/interval-merge method.
 
-> **Source blocker:** The original file has duplicated/interleaved code and the token `Result.bac#include`, so it is not valid C++. Bytes are preserved exactly; repairing the source was outside the requested scope.
+## 1. Understanding — समजून घ्या
 
-## Expected input/output or judge interface
+An index `i` is k-distant if some index `j` has `nums[j]==key` and `|i-j|<=k`. Return all such indices in increasing order without duplicates.
 
-Visible intended signatures: findKDistantIndices(nums,key,k), findKDistantIndices_v1/v2(...). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Worked examples and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `nums=[3,4,9,1,3,9,5], key=9, k=1`, key positions are 2 and 5, so intervals `[1,3]` and `[4,6]` give `[1,2,3,4,5,6]`. With no key, return empty. `k=0` returns only key positions.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Each key position covers `[j-k,j+k]` | Interval generation |
+> | Output must be sorted and unique | Merge overlapping intervals |
+> | Array bounds matter | Clamp to `[0,n-1]` |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> For each array index, scan all key positions: O(n·m). The source either expands each key's bounded interval while skipping already-emitted indices, or gathers key positions and merges their intervals. Interval merging is the cleanest view. Appending full intervals independently creates duplicates when they overlap.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{next key interval overlaps current interval?}
-    E -- Yes --> F[extend/merge interval]
-    E -- No --> G[emit current interval then start another]
-    F --> D
-    G --> D
+    A([Scan array for key positions]) --> B{Any key positions?}
+    B -- No --> Z([Return empty])
+    B -- Yes --> C[Create clamped interval around first key]
+    C --> D[Read next key interval]
+    D --> E{Overlaps/touches current interval?}
+    E -- Yes --> F[Extend current end]
+    E -- No --> G[Emit current interval; start new one]
+    F --> H{More keys?}
+    G --> H
+    H -- Yes --> D
+    H -- No --> I[Emit final interval]
+    I --> Z
 ```
 
-## Important branch and loop flow
+Key positions are ordered, so their intervals are ordered too. Merge overlaps before emitting indices; touching intervals can be emitted separately and still produce the same consecutive output.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{next key interval overlaps current interval?}
-    B -- Yes --> C[extend/merge interval]
-    B -- No --> D[emit current interval then start another]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Scan `nums` to collect each key index `j`. Its eligible indices form `[max(0,j-k), min(n-1,j+k)]`. Since key positions are ordered, these intervals are ordered too. Merge overlaps, then output every index in each merged interval.
 
-Contains intended interval-union scans around key indices, but source is interleaved/corrupted mid-token (`Result.bac#include`) and is not valid C++.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The direct method iterates the array, computes each interval, and starts from `Result.back()+1` when earlier output already covers part of it. The second method collects `keyPos`, merges interval bounds, and emits completed ranges.
 
-Intended result is the sorted union of clipped k-neighborhoods around key indices; source corruption prevents validating it.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `n=7`, key positions `2,5`, `k=1`: intervals `[1,3]`, `[4,6]`. They do not overlap, but emitting both in order still gives `1..6` exactly once.
 
-Intended interval merging is O(n) output-sensitive; malformed translation unit has no valid runtime complexity.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Both source methods run in **O(n + r)** time and **O(r)** output space for `r` returned indices; the interval method also stores key positions in **O(m)** space. Since `r<=n`, the bound is O(n).
 
-The repository file includes a demonstration `main()`, but the original translation unit is malformed and **cannot compile as-is**. The command below documents the intended invocation only; source repair was outside scope. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\2200\2200.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Every qualifying `i` lies in an interval centered on at least one key position. Conversely, every index emitted from such an interval is within `k` of its center key. Merging ordered overlapping intervals preserves their union and emits each member once in increasing order.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Clamp both interval ends to array bounds.
+- Avoid duplicate indices across overlapping windows.
+- “Touches” means intervals with `newStart <= end+1` can be emitted contiguously; actual overlap uses `newStart<=end`.
+- If no key exists, return empty rather than building an interval.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** प्रत्येक key भोवतीची मर्यादित रेंज जोडा आणि पुनरावृत्ती टाळा.
+> Key `j` covers `[max(0,j-k), min(n-1,j+k)]`; merge windows and enumerate.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Merge intervals; union of radius-`k` neighborhoods; return a boolean mask instead of indices; answer repeated range queries with a difference array.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What interval does one key index generate?
+2. Why are the intervals already sorted?
+3. How does merging prevent duplicate output?

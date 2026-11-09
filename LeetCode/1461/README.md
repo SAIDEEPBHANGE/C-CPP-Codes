@@ -1,63 +1,140 @@
-# Check If a String Contains All Binary Codes of Size K
+# 1461 — Check If a String Contains All Binary Codes of Size K
 
-**LeetCode ID:** 1461
-**Source file(s):** `1461.cpp` (originally `hasAllCodes.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे लांबी k चे सर्व binary codes उपस्थित आहेत का याची तपासणी.
 
-hasAllCodes_Set/Rolling/Vector(string s,int k). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Check whether every possible binary substring of length `k` occurs in `s`. There are `2^k` distinct codes to find.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत लांबी k चे सर्व binary codes उपस्थित आहेत का याची तपासणी कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> For `s="00110110", k=2`, codes `00,01,10,11` all occur, so return true. If `|s|<k`, return false.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is a **fixed-width sliding window encoded as an integer bitmask**.
+> | Need | Technique |
+> |---|---|
+> | Window of `k` bits | Rolling binary value |
+> | Keep only last `k` bits | Mask `(1<<k)-1` |
+> | All possible codes | Need `2^k` distinct windows |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Source nested-loop encoding plus `set`: correct, `O(nk)` time (building each code and set insertion are both `O(k)` here).
+- Source rolling hash with `unordered_set`: `O(n)` expected, but hash overhead.
+- Source boolean vector: `O(n+2^k)` time and `O(2^k)` space; deterministic and compact.
+- Immediate impossibility test: if windows available `<2^k`, return false.
+
+## 5. Mermaid flowchart and explanation
+
+आकृतीमध्ये rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
+> Each new bit shifts the current code, masks old bits, and records a full-size window.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{completed window has not been seen?}
-    E -- Yes --> F[mark code and increment unique count]
-    E -- No --> G[leave count unchanged]
-    F --> D
-    G --> D
+ A([Start]) --> B{String shorter than k?}
+ B -- Yes --> Z([Return false])
+ B -- No --> C[Initialize rolling code and seen set]
+ C --> D[Shift in next bit and apply mask]
+ D --> E{At least k bits read?}
+ E -- Yes --> F[Record code if unseen]
+ E -- No --> G[Wait for full window]
+ F --> H{All 2^k codes seen?}
+ G --> I{More characters?}
+ H -- Yes --> Y([Return true])
+ H -- No --> I
+ I -- Yes --> D
+ I -- No --> N([Return false])
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{completed window has not been seen?}
-    B -- Yes --> C[mark code and increment unique count]
-    B -- No --> D[leave count unchanged]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+मूळ कल्पना: rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे.
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> The rolling integer represents the last at most `k` bits. Left shift and OR append the new bit; the mask removes older bits. Once `k` bits have been read, the integer uniquely identifies that window.
 
-Encodes each length-k bit window and counts distinct values using a set, rolling bitmask hash set, or boolean vector.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+Code मधील state आणि updates हे rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे या कल्पनेशी जोडून वाचा.
 
-Rolling mask retains exactly k bits; success requires all 2^k codes. Boolean vector avoids set overhead.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> Source provides set, rolling-set, and boolean-vector methods. The rolling methods use `mask=(1<<k)-1`; vector method tracks number of newly seen codes. Problem constraints keep shifts within integer range.
 
-## Complexity
+## 8. Dry run
 
-Rolling/vector O(n) time and O(2^k) space; set variant O(nk log(2^k)).
+Dry run मध्ये rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `"0011", k=2`, windows:
+> | New bit | Rolling value | Window | New code? |
+> |---|---:|---|---|
+> | 0 | 0 | — | — |
+> | 0 | 0 | 00 | Yes |
+> | 1 | 1 | 01 | Yes |
+> | 1 | 3 | 11 | Yes |
+> Code `10` is missing, so false.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\1461\1461.cpp -o solution.exe
-.\solution.exe
-```
+rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Rolling set expected `O(n)` time, `O(min(n,2^k))` stored codes. Boolean vector `O(n+2^k)` time and `O(2^k)` space. The set-based substring conversion performs `O(k)` work per window.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> After each character, masking retains exactly the last `k` bits. Every full window is therefore recorded as its unique integer code, and every possible code corresponds to one such window. Returning true exactly when the number of distinct recorded codes is `2^k` is equivalent to having all codes.
+
+## 11. Mistakes / interview traps
+
+लक्षात ठेवा: पूर्ण k bits मिळाल्यावरच window मोजायची.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Start recording only after `k` bits arrive.
+- Apply the mask so older bits do not remain.
+- Count distinct codes, not total windows.
+- Check `n<k`; for large `k`, guard shifts/allocations if constraints differ.
+
+## 12. Quick revision
+
+थोडक्यात, rolling bit mask वापरून वेगवेगळ्या windows नोंदवणे. पूर्ण k bits मिळाल्यावरच window मोजायची.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Rolling `k`-bit value → mark each full window → need `2^k` distinct codes.
+
+## 13. Related problems / variations
+
+संबंधित प्रश्नांत लांबी k चे सर्व binary codes उपस्थित आहेत का याची तपासणी यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> Repeated DNA Sequences, sliding-window hashing, binary substring coverage; variation: count missing codes or find shortest window covering all codes.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून लांबी k चे सर्व binary codes उपस्थित आहेत का याची तपासणी याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does the rolling value identify a window?
+2. What does the mask remove?
+3. Why compare distinct count with `2^k`?
+4. When can we return false before scanning?

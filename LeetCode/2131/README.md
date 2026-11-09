@@ -1,71 +1,98 @@
-# Longest Palindrome by Concatenating Two Letter Words
+# Longest Palindrome by Concatenating Two Letter Words — LeetCode 2131
 
-**Problem ID:** 2131  
-**Source:** `longestPalindrome.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2131.cpp`; it greedily pairs a word with its reverse using a frequency map.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+Reorder the given two-letter words and concatenate selected words into the longest palindrome. Each input word can be used at most once.
 
-- `int longestPalindrome(vector<string>& words)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `"lc"` pairs with `"cl"` and contributes 4 characters. A self-reversing word such as `"gg"` can be paired with another `"gg"` for 4, or one unpaired `"gg"` can be the 2-character center. Only one center word is allowed.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Pair each two-letter word with its reverse and reserve at most one self-reversing word for the center.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Word type | Pairing rule |
+> |---|---|
+> | `ab`, where `a != b` | Pair with `ba` |
+> | `aa` | Pair two for 4; possibly keep one for center |
+> | Count-based matching | Frequency map / greedy complement |
 
-Pair each two-letter word with its reverse and reserve at most one self-reversing word for the center.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Pair each two-letter word with its reverse and reserve at most one self-reversing word for the center."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Brute force over subsets and arrangements is exponential. Counting all words then pairing opposite orientations also works. The source processes each word once and consumes an available reverse; it is linear expected time. Pairing a word with itself when letters differ is invalid.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read word; form reverse]
+    B --> C{Reverse count available?}
+    C -- Yes --> D[Consume reverse; add 4]
+    C -- No --> E[Store current word]
+    D --> F{More words?}
+    E --> F
+    F -- Yes --> B
+    F -- No --> G{Any leftover aa/bb/... ?}
+    G -- Yes --> H[Add one center: 2]
+    G -- No --> Z([Return length])
+    H --> Z
 ```
 
-## Core logic and invariant
+## 6. Algorithm and intuition
 
-Pair each two-letter word with its reverse and reserve at most one self-reversing word for the center.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For each word, if its reversed word has an unmatched occurrence, pair them and add 4. Otherwise, record this word as unmatched. After processing, any remaining identical-letter word can be used as the center; add 2 once, not once per type.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(n) expected.
-- **Auxiliary space:** O(u).
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `wordCount` stores unmatched words. For each `word`, `rev` swaps its two characters. On a positive reverse count, decrement that count; otherwise increment the current word's count. The final loop finds any leftover `aa`-style word and adds a single center.
 
-## Compile and run
+## 8. Dry run
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Input `["lc","cl","gg"]`: `"lc"` waits; `"cl"` consumes it → length 4; `"gg"` remains. It is self-reversing, so use as center → total length 6.
 
-```powershell
-g++ -std=c++17 "LeetCode\2131\2131.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For `n` words: expected **O(n)** time and **O(u)** space, where `u` is the number of distinct unmatched words.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Every non-center palindrome pair must consist of a word and its reverse, so consuming such pairs earns 4 characters per pair without conflict. A self-reversing word can be paired the same way, with at most one leftover placed at the center. The algorithm consumes each word at most once and uses exactly these allowable structures.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Only one self-reversing word can be the center.
+- Non-self-reversing words cannot be centers.
+- Decrement a matched reverse so an occurrence is not reused.
+- The final center check must happen after all pairs are consumed.
+- Return character length, not number of words.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** उलट शब्दांची जोडी करा; मध्यभागी एकच समान-अक्षरी शब्द ठेवा.
+> Pair `ab` with `ba` (+4); after all pairs, one leftover `aa` (+2 center).
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Longest palindrome from character counts; pair reverse strings; count maximum pairs plus optional center; generalize to longer fixed-length strings and their reverses.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can a non-self-reversing word not be the center?
+2. Why is at most one leftover `aa` used?
+3. What must happen to the reverse count after a match?

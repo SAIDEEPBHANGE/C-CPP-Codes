@@ -1,93 +1,97 @@
-# Plus One
+# Plus One — LeetCode 66
 
-**Problem ID:** 66  
-**Source:** `plusOne.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+Non-negative integer चे decimal digits vector मध्ये दिले आहेत; त्यात one add करून digits परत करा. Leading zero नसतो (zero स्वतः `[0]`).
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `long long getNum(const vector<int>& digits, long long sum, int i)`
-- `vector<int> numToVec(long long num)`
-- `vector<int> plusOne_Approach1(vector<int> digits)`
-- `vector<int> plusOne_Approach2(vector<int> digits)`
-- `vector<int> plusOne_Approach3(vector<int> digits)`
-- `void printVector(const vector<int>& v)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
 
-## Identification evidence
+- `[1,2,3]` → `[1,2,4]`.
+- `[1,2,9]` → `[1,3,0]`.
+- `[9,9,9]` → `[1,0,0,0]`; `[0]` → `[1]`.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Propagate a carry from the least-significant digit, with alternative numeric conversion approaches.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+| Clue                     | Pattern           | कारण                           |
+| ------------------------ | ----------------- | ------------------------------ |
+| Digit array + add one    | Carry propagation | उजवीकडून addition              |
+| Decimal digit bounds 0–9 | Local arithmetic  | प्रत्येक digit remainder/carry |
+| Leading overflow         | Grow output       | शेवटी carry उरल्यास prepend 1  |
 
-Propagate a carry from the least-significant digit, with alternative numeric conversion approaches.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Propagate a carry from the least-significant digit, with alternative numeric conversion approaches."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+- Integer conversion (`Approach1`): number बनवून +1, नंतर digits — O(n) but fixed-width overflow risk; recursion stack O(n).
+- Carry simulation (`Approach2`): O(n) time; copy/vector output O(n).
+- `Approach3`: 9 च्या run ला zero करा, पहिले `<9` digit increment करून return — O(n) worst case, O(1) extra besides returned vector; source by-value inputमुळे copy.
+- Wrong: digits ला integer मध्ये convert करणे arbitrary-length input साठी सुरक्षित नाही.
 
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Start from last digit]
+ B --> C{Digit is less than 9?}
+ C -- Yes --> D[Increment digit and return]
+ C -- No --> E[Set digit to 0]
+ E --> F{More digits to the left?}
+ F -- Yes --> B
+ F -- No --> G[Insert leading 1]
+ D --> H([End])
+ G --> H
 ```
 
-## Core logic and invariant
+9 असेल तर carry पुढे; पहिला non-9 digit मिळताच बाकी बदलत नाहीत.
 
-Propagate a carry from the least-significant digit, with alternative numeric conversion approaches.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+Rightmost digit ला 1 add करा. 9 नसल्यास काम संपते; 9 असल्यास 0 करा आणि डावीकडे carry द्या. सर्व digits 9 असतील तर सुरुवातीला 1 घाला.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(n).
+## 7. Code explanation
 
-## Approach comparison
+`plusOne_Approach1` recursive `getNum` ने `long long` बनवतो; मोठ्या input साठी unsafe. `Approach2` carry loop करतो. `Approach3` early-return optimization; `vector<int>` by value असल्याने caller inputची copy आहे.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `vector<int> plusOne_Approach1(vector<int> digits)`
-- `vector<int> plusOne_Approach2(vector<int> digits)`
-- `vector<int> plusOne_Approach3(vector<int> digits)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `[1,9,9]`:
+> | index (right→left) | digit | update | next |
+> |---:|---:|---|---|
+> | 2 | 9 | set to 0 | carry left |
+> | 1 | 9 | set to 0 | carry left |
+> | 0 | 1 | set to 2, return | `[2,0,0]` |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Carry/optimized methods O(n) worst-case; at most n digits visit. Source pass-by-value needs O(n) copy storage; carry method may prepend. Integer conversion also O(n) but `long long` limits correctness.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\66\66.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Loop right-to-left maintains the invariant that processed suffix equals the corresponding suffix of original number plus one modulo its digit place, with carry propagated left. A non-9 absorbs carry; all-9 input leaves a carry, represented by leading 1.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+- Carry right-to-left जाते.
+- 9 reset to 0; all-9 case adds a new digit.
+- Empty vector हा LeetCode contract नाही; source methods त्यासाठी सुरक्षित नाहीत.
+- Integer conversion can overflow and leading zeros are not a concern under the stated input format.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> From end: if `<9`, increment and stop; else zero. If all 9, prepend 1.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Add Binary, Add Strings, Plus One Linked List, increment arbitrary-base digit arrays.
+
+## 14. Self-assessment
+
+1. `[9,9]` कसा बदलतो?
+2. First non-9 digit मिळाल्यावर पुढे का जाऊ नये?
+3. Integer-conversion method ची मर्यादा काय?
+4. Worst-case time आणि अतिरिक्त storage काय?

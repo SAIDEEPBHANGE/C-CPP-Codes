@@ -1,63 +1,69 @@
-# Kth Smallest Product of Two Sorted Arrays
+# Kth Smallest Product of Two Sorted Arrays — LeetCode 2040
 
-**LeetCode ID:** 2040
-**Source file(s):** `2040.cpp` (originally `findCountSmallest.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Arrays are sorted ascending. Consider all `n1*n2` pair products (including duplicates); return the 1-indexed kth smallest. Values can be negative, zero, or positive, so products are not globally monotone by index for all signs.
+Example: `[1,7]`, `[3,4]` products `[3,4,21,28]`; `k=3` → `21` (not `12`; product `12` is not present). `[-1,0] × [2,3]` products `-3,-2,0,0`; `k=1` → `-3`.
 
-kthSmallestProduct(nums1,nums2,k); findCountSmallest(...). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | kth value in huge implicit product set | binary search answer |
+> | need count products `≤ mid` | monotone counting predicate |
+> | arrays sorted but multiplication changes direction for negatives | sign-aware binary search |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Binary search product value + count `≤ mid` | Selected `O(n1 log n2 log range)` |
+> | Materialize and sort every product | Correct brute force `O(n1*n2 log(n1*n2))`, huge space |
+> | Binary search partner identically for negative and positive multipliers | Incorrect; product direction reverses for negative multiplier |
+> | Use floating-point product bounds | Incorrect precision/range risk; use `long long` |
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{count of products  less than or equal to  candidate reaches k?}
-    E -- Yes --> F[save candidate and lower upper bound]
-    E -- No --> G[raise lower bound]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{count of products  less than or equal to  candidate reaches k?}
-    B -- Yes --> C[save candidate and lower upper bound]
-    B -- No --> D[raise lower bound]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A[Set low/high product bounds] --> B[Choose mid product]
+    B --> C[For each a in nums1, binary-search nums2 count with a*b <= mid]
+    C --> D{Total count >= k?}
+    D -- Yes --> E[Save mid; search lower half]
+    D -- No --> F[Search upper half]
+    E --> G{Bounds remain?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -- Yes --> B
+    G -- No --> H[Return saved answer]
 ```
 
-## Core logic and invariant
+Predicate `count(product≤mid)≥k` true झाल्यावर smaller threshold शोधून kth valueचा leftmost boundary मिळतो.
 
-Binary-searches product value; for each candidate, binary-searches each sorted array row with monotonic directions adjusted for negative multipliers.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Selected algorithm, source-specific explanation, dry run
 
-## Optimization / comparison
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `findCountSmallest` counts per `a`: for `a≥0`, products increase with sorted `nums2`, so find last `b` with product `≤mid`; for `a<0`, products decrease, so find first qualifying position and count suffix. Products use `1LL`. `kthSmallestProduct` binary-searches fixed bounds `[-1e10,1e10]`, keeping smallest feasible `mid`.
+> Dry run (`nums1=[1,7]`, `nums2=[3,4]`, `k=3`): products sorted `3,4,21,28`; predicate count is 2 at `mid=4`, and 3 at `mid=21`; first threshold with count≥3 is `21`.
 
-For fixed nums1[i], products increase with nums2 for nonnegative factors and decrease for negative factors; threshold counting avoids materializing n\*m products.
+## Edge cases
 
-## Complexity
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> k=1 and k=n1\*n2 are boundary ranks; duplicates and zero products retain their multiplicity.
 
-O(n log m log R) time; O(1) extra space.
+## Complexity, correctness, traps
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Each count costs `O(n1 log n2)`; binary search takes about `log2(2e10)` iterations, so total `O(n1 log n2 log range)`; extra space `O(1)`. Correctness: per multiplier, sign-aware binary search counts exactly the sorted-array positions meeting `a*b≤mid`; monotone total count identifies kth order statistic.
+> Trap: preserve sign-specific monotonicity; use 64-bit multiplication; `k` is 1-indexed; fixed bounds rely on LeetCode value constraints. Check source sample comments: first case `k=3` expected should be `21`, not `12`.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## Quick revision, variations, self-check
 
-```powershell
-g++ -std=c++17 LeetCode\2040\2040.cpp -o solution.exe
-.\solution.exe
-```
+पुनरावलोकन: signनुसार product countची दिशा बदलते.
+Binary search answer; count `≤mid` with direction based on sign. Related: kth pair distance, multiplication table selection, answer-space binary search.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. Why is binary search direction reversed when `a<0`?
+2. What does `count≥k` imply about mid?
+3. Why is `1LL` required?
+4. For `[1,7] × [3,4]`, what is the third product?

@@ -1,71 +1,93 @@
-# Partition Array According to Given Pivot
+# Partition Array According to Given Pivot — LeetCode 2161
 
-**Problem ID:** 2161  
-**Source:** `PivotArray.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2161.cpp`; it makes three stable passes over the input.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+Rearrange values so that elements smaller than pivot come first, then values equal to pivot, then greater values. Preserve relative order within each of the three groups.
 
-- `vector<int> pivotArray(vector<int>& n, int p)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `[9,12,5,10,14,3,10]`, pivot `10`, result is `[9,5,3,10,10,12,14]`. Equal pivot values keep their original order. If no value equals pivot, the middle section is empty.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Append values below pivot, equal, then above pivot while preserving encounter order.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Requirement | Pattern |
+> |---|---|
+> | Three value classes | Stable partition |
+> | Preserve original order | Scan in source order |
+> | Small number of buckets | Multi-pass append |
 
-Append values below pivot, equal, then above pivot while preserving encounter order.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Append values below pivot, equal, then above pivot while preserving encounter order."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Sorting is incorrect because it reorders values inside each category. A two-pointer in-place partition is tricky because it can break stability. The source's three scans are simple and optimal O(n), using an output vector. A one-pass solution can use three temporary buckets and has the same asymptotic cost.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Input array,pivot]) --> B[Scan; append values less than pivot]
+    B --> C[Scan; append values equal to pivot]
+    C --> D[Scan; append values greater than pivot]
+    D --> E{Output size equals input size?}
+    E -- Yes --> Z([Return output])
 ```
 
-## Core logic and invariant
+Three ordered scans preserve order independently within each class.
 
-Append values below pivot, equal, then above pivot while preserving encounter order.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Append every `< pivot` value in original order. Repeat for `== pivot`, then `> pivot`. Every element belongs to exactly one category, so the concatenated result is a stable partition.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(n) output.
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `pivotArray(vector<int>& n, int p)` allocates `ans`, performs one range-for scan per relation, and returns it. The input is not modified.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\2161\2161.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Input `[3,1,2,4,5]`, pivot `3`: less pass → `[1,2]`; equal pass → `[1,2,3]`; greater pass → `[1,2,3,4,5]`.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> **O(n)** time (three passes) and **O(n)** output space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Each input element satisfies exactly one of `<`, `==`, or `>`, so it is appended exactly once. Each pass visits elements in original order, preserving relative order within its category. The passes are concatenated in the required category order.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Stable partition is stronger than merely placing values in three sections.
+- Do not sort the array.
+- Preserve duplicates; each occurrence is a distinct element.
+- If an in-place approach is requested, explain the stability trade-off.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** कमी, समान, जास्त — तीन स्थिर फेऱ्यांत घटक जोडा.
+> Three stable scans: less, equal, greater.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Stable partition by predicate; Dutch National Flag (not stable); partition around a pivot with stability; group records into ordered categories.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why are three passes stable?
+2. Why can ordinary sorting violate the requirement?
+3. What is the extra-space cost?

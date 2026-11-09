@@ -1,63 +1,72 @@
-# Count Good Triplets
+# Count Good Triplets — LeetCode 1534
 
-**LeetCode ID:** 1534
-**Source file(s):** `1534.cpp` (originally `countGoodTriplets.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Distinct indices `i < j < k` निवडा. तिन्ही conditions true असतील तर triplet count करा: `|arr[i]-arr[j]|≤a`, `|arr[j]-arr[k]|≤b`, `|arr[i]-arr[k]|≤c`. Array values non-negative; अनेक indicesचे values समान असू शकतात.
+Example: `[3,0,1,1,9,7]`, `(a,b,c)=(7,2,3)`: `(0,1,2)` values `(3,0,1)` satisfy `3≤7, 1≤2, 2≤3`, so countमध्ये `1`. `a=b=c=0` असल्यास फक्त तिन्ही values equal असलेले index-triplets qualify.
 
-countGoodTripletsIterative(arr,a,b,c); countGoodTripletsRecursive(...). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+| Clue                             | Pattern                           |
+| -------------------------------- | --------------------------------- |
+| तीन ordered indices              | nested loops / combinations       |
+| pairwise threshold checks        | early pruning                     |
+| प्रत्येक valid combination मोजणे | enumeration, not greedy selection |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Correct? | Cost |
+> |---|---|---|
+> | Three nested loops + prune | Yes; selected, `O(n³)` worst, `O(1)` extra |
+> | Backtracking all 3-index combinations | Yes; source recursive method, `O(n³)` combinations, `O(1)` depth/selection |
+> | Check all pairs only / sort and greedily choose | No | all three pair constraints and original indices matter |
+> | Enumerate all subsets then inspect | Correct but more work | `O(2ⁿ)` vs only triples |
+> Source's “iterative greedy” is enumeration, not a greedy optimization.
+
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{any pairwise absolute difference exceeds its bound?}
-    E -- Yes --> F[skip the triple early]
-    E -- No --> G[count only if all three bounds pass]
+    A[Choose i from 0 to n-3] --> B[Choose j greater than i]
+    B --> C{abs(arr[i]-arr[j]) <= a?}
+    C -- No --> B
+    C -- Yes --> D[Choose k greater than j]
+    D --> E{Other two bounds pass?}
+    E -- Yes --> F[Increment answer]
+    E -- No --> D
     F --> D
-    G --> D
+    D --> G{More j or i?}
+    G -- Yes --> B
+    G -- No --> H[Return answer]
 ```
 
-## Important branch and loop flow
+First bound fail झाला तर त्या `i,j` साठी कोणताही `k` उपयोगी नसल्यामुळे inner loop skip करता येतो.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{any pairwise absolute difference exceeds its bound?}
-    B -- Yes --> C[skip the triple early]
-    B -- No --> D[count only if all three bounds pass]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, code आणि dry run
 
-## Core logic and invariant
+`countGoodTripletsIterative` वापरा. `i<j<k` uniqueness राखते; `abs(i-j)` fail झाल्यास `continue`; उरलेल्या दोन checks pass झाल्यावर count वाढतो. Recursive alternative `selected` मध्ये indices push/pop करून हाच triplet set बनवतो; `ak,bk,ck` parameters save करतो. `main` paired hard-coded cases चालवतो.
+Dry run (`[3,0,1]`, limits `7,2,3`):
+| `(i,j,k)` | Checks | Result |
+|---|---|---|
+| `(0,1,2)` | `3≤7`, `1≤2`, `2≤3` | count = 1 |
 
-Enumerates triples i<j<k and counts those satisfying all three absolute-difference bounds; recursion chooses triples by backtracking.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> Fewer than three elements gives 0; zero thresholds allow only equal-valued triples.
 
-The iterative loops can prune later work early; recursion explores the same combination set with more overhead.
+## Complexity, correctness, traps
 
-## Complexity
+Iterative worst-case `O(n³)` time, `O(1)` extra; recursive enumerator also `O(n³)` time and constant-sized chosen list (depth 3). Correctness: every legal index triple appears once in increasing order; count only when all required inequalities pass.
+Mistakes: value-distinct triplets मोजू नका; conditionमध्ये `≤` आहे, `<` नाही; तीन pair checksपैकी एक विसरू नका. Absolute differenceचा क्रम signsवर अवलंबून नसतो.
 
-O(n^3) time; O(1) iterative auxiliary space, constant-depth selection recursion.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: ordered indices निवडा आणि तिन्ही bounds तपासा.
+Loop `i<j<k`; filter `ij`, then validate `jk,ik`. Related: 3Sum enumeration, k-combinations, threshold pair counting.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\1534\1534.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. Equal values but different indices count होऊ शकतात का?
+2. `i<j<k` का आवश्यक?
+3. `ij` bound fail झाल्यावर `k` loop का skip?
+4. Recursive methodचे `selected` किती indices ठेवते?

@@ -1,72 +1,95 @@
-# Find Resultant Array After Removing Anagrams
+# Find Resultant Array After Removing Anagrams — LeetCode 2273
 
-**Problem ID:** 2273  
-**Source:** `removeAnagrams.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2273.cpp`; it keeps the first word and removes each subsequent word anagrammatic to the last retained word.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+Given words in order, remove a word if it is an anagram of the previous word in the original sequence. Keep the remaining words in original order.
 
-- `vector<string> removeAnagrams(vector<string>& words)`
-- `void printVector(const vector<string>& vec)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `["abba","baba","bbaa","cd","cd"]` → `["abba","cd"]`: the first two later words are anagrams of the preceding retained word; the last `"cd"` is also an adjacent anagram. A singleton list is unchanged. The source assumes `words` is nonempty.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare each word's character-frequency signature with the last retained word and skip adjacent anagrams.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Compare adjacent words by anagram class | Canonical signature |
+> | Preserve first in each consecutive run | Scan and filter |
+> | Small words | Sort a copy as signature |
 
-Compare each word's character-frequency signature with the last retained word and skip adjacent anagrams.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare each word's character-frequency signature with the last retained word and skip adjacent anagrams."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Sorting each word copy gives a simple canonical form; the source does this on the previous retained word and current word. Counting letters can avoid sorting, especially for longer words. Comparing each word with every earlier result is unnecessary. Do not remove all anagrams globally—the task removes only consecutive anagram groups.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Keep first word]) --> B[Take next input word]
+    B --> C[Sort copies of previous kept and current]
+    C --> D{Signatures equal?}
+    D -- Yes --> E[Skip current]
+    D -- No --> F[Append current]
+    E --> G{More words?}
+    F --> G
+    G -- Yes --> B
+    G -- No --> Z([Return result])
 ```
 
-## Core logic and invariant
+## 6. Algorithm and intuition
 
-Compare each word's character-frequency signature with the last retained word and skip adjacent anagrams.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Anagrams have the same sorted-character signature. Compare each current word's signature with the last retained word's signature; if equal, the current word belongs to the same consecutive run and can be dropped, otherwise retain it.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(total characters).
-- **Auxiliary space:** O(alphabet) per comparison.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `removeAnagrams` seeds `result` with `words[0]`. For each remaining word it copies `result.back()` and `words[i]`, sorts both copies, and appends the original current word only when signatures differ. Original spellings are preserved.
 
-## Compile and run
+## 8. Dry run
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `["listen","silent","google"]`: signatures of `listen` and `silent` are equal → skip `silent`; compare `google` with retained `listen`, signatures differ → keep. Result `["listen","google"]`.
 
-```powershell
-g++ -std=c++17 "LeetCode\2273\2273.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For total character count `S` and maximum word length `L`, time is **O(Σ |word| log |word|)**, bounded by **O(S log L)**; result storage is **O(number of kept words)**, plus copied/sorted temporary words.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Sorting preserves the multiset of characters, so two sorted copies are equal exactly when their words are anagrams. Comparing against the last kept word represents the preceding word in the reduced sequence; within a consecutive anagram run, all signatures match. Appending only on a signature change keeps exactly the first word of each run.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Remove only consecutive anagrams, not all repeated signatures globally.
+- Compare to the last retained word, not a stale original index.
+- Sort copies so input spellings remain unchanged.
+- For empty input, this source would access `words[0]`; judge guarantees nonempty.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** शेवटच्या ठेवलेल्या शब्दाशी anagram signature तुलना करा.
+> Keep first; compare sorted signatures with last kept; skip equal, append different.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Group anagrams; canonicalize strings; remove consecutive duplicate runs; use a 26-count signature instead of sorting.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can comparison use the last retained word?
+2. How does a sorted signature detect anagrams?
+3. Does this remove non-adjacent anagrams?

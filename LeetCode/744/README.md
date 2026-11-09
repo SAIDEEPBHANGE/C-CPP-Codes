@@ -1,73 +1,108 @@
-# Find Smallest Letter Greater Than Target
+# 744. Find Smallest Letter Greater Than Target
 
-**Problem ID:** 744  
-**Source:** `nextGreatestLetter.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `744.cpp`; manual binary search, linear scan, and `upper_bound` variants.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Given sorted letters, return the smallest letter strictly greater than target. If none exists, wrap to the first letter.
 
-- `char nextGreatestLetter_BinarySearch(vector<char>& letters, char target)`
-- `char nextGreatestLetter_Linear(vector<char>& letters, char target)`
-- `char nextGreatestLetter_STL(vector<char>& letters, char target)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `['c','f','j']`, target `'c'` → `'f'` (strictly greater). Target `'z'` wraps to `'c'`. Duplicates are fine; singleton returns its only letter. Input must be nonempty and sorted.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Use ordered-letter search to return the first letter strictly greater than target, with wraparound.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Need first element `> target`, i.e. upper bound, plus circular wrap.
+> | Need | Tool/pattern |
+> |---|---|
+> | First value strictly greater | Upper bound |
+> | Sorted array | Binary search |
+> | No match | Wrap to index zero |
 
-Use ordered-letter search to return the first letter strictly greater than target, with wraparound.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Use ordered-letter search to return the first letter strictly greater than target, with wraparound."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Linear scan (`nextGreatestLetter_Linear`) — simplest, `O(n)`.**
+- **Manual binary search — used, `O(log n)` and optimal for sorted input.**
+- **STL `upper_bound` — concise `O(log n)` alternative.**
+- Lower bound is wrong when target itself is present; strict greater means skip equal values.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Set left and right bounds]
+    B --> C{Search interval nonempty?}
+    C -- No --> F[Wrap index with modulo array length]
+    C -- Yes --> D[Inspect midpoint]
+    D --> E{Letter at mid greater than target?}
+    E -- Yes --> G[Keep mid as candidate and search left]
+    E -- No --> H[Search right of mid]
+    G --> C
+    H --> C
+    F --> I([Return letter])
 ```
 
-## Core logic and invariant
+Binary search insertion point is the first index satisfying `letter > target`.
 
-Use ordered-letter search to return the first letter strictly greater than target, with wraparound.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Use upper-bound search: if `letters[mid] <= target`, move `left=mid+1`; otherwise move `right=mid-1`. At termination `left` is the answer index, or `n` if it wraps; source uses `left % n`.
 
-- **Time:** O(log n).
-- **Auxiliary space:** O(1).
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `nextGreatestLetter_BinarySearch` returns `letters[left % letters.size()]`. The linear version returns on the first strict match, else index 0. STL variant checks whether `upper_bound` reached end.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\744\744.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | `letters` | target | Search outcome | answer |
+> |---|---|---|---|
+> | `c,f,j` | `c` | equal `c` skipped; first greater index 1 | `f` |
+> | `c,f,j` | `z` | insertion point `3` | `c` |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Binary/STL: `O(log n)` time, `O(1)` extra space. Linear: `O(n)` time, `O(1)` space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> At each step, the discarded half cannot contain the first letter greater than target: when middle is `<= target`, all indices through middle fail; otherwise middle and later may qualify. The final insertion index is the first qualifying index, and modulo handles the no-match case.
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Condition is `>` not `>=`.
+- Wrap when all letters are `<= target`.
+- Duplicates do not change the upper-bound logic.
+- The code assumes `letters` is nonempty.
+
+## 12. Quick revision
+
+Upper bound: `<= target` → right; `> target` → left. Return `letters[left % n]`.
+Target equal असेल तरी पुढचा strictly greater अक्षर हवा.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Lower Bound; Search Insert Position; first element greater than or equal to target; circular next-greater query.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does equality move the left boundary?
+2. What index does upper bound return if every letter qualifies?
+3. Why is modulo safe under the input constraints?
+4. How does `upper_bound` differ from `lower_bound`?

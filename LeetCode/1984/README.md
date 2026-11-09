@@ -1,90 +1,74 @@
-# Minimum Difference Between Highest and Lowest of K Scores
+# Minimum Difference Between Highest and Lowest of K Scores — LeetCode 1984
 
-**Problem ID:** 1984  
-**Source:** `minimumDifference.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Choose any `k` scores; minimize highest minus lowest among chosen scores. `1≤k≤n`.
+Example: `[9,4,1,7]`, `k=2`: sort `[1,4,7,9]`; adjacent windows differences `3,3,2`, answer `2` from `[7,9]`. `k=1` always gives `0`.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int minimumDifference_sorting(vector<int> nums, int k)`
-- `int minimumDifference_bruteforce(vector<int>& nums, int k)`
-- `int minimumDifference_twoPointers(vector<int> nums, int k)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | minimize range of chosen values | sort then sliding window |
+> | selected group has k elements | contiguous sorted window |
+> | only max-min matters | compare window endpoints |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Sort scores and minimize the range over every consecutive k-value window.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Sort and scan length-k windows | Selected, `O(n log n)` time |
+> | Enumerate all k-subsets | Correct brute force, `O(C(n,k)*k)` time, exponential in general |
+> | Sort and two pointers | Same correct approach, `O(n log n)` |
+> | Choose k arbitrary adjacent original elements | Incorrect; best set need not be adjacent before sorting |
+> Source sorting methods take vector by value, so input-copy storage is `O(n)`; brute uses a recursive subset selection.
 
-## Main flow
-
-Sort scores and minimize the range over every consecutive k-value window.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Sort scores and minimize the range over every consecutive k-value window."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A{ k <= 1?} -->|Yes| Z[Return 0]
+    A -->|No| B[Sort scores]
+    B --> C[Set best=large; scan left endpoints]
+    C --> D[range = nums[left+k-1]-nums[left]]
+    D --> E[Update best]
+    E --> F{More windows?}
+    F -- Yes --> C
+    F -- No --> G[Return best]
 ```
 
-## Core logic and invariant
+Sorted निवडलेल्या कोणत्याही `k` valuesची min/max एका contiguous windowमध्ये मिळतात; त्यामुळे फक्त `n-k+1` windows तपासा.
 
-Sort scores and minimize the range over every consecutive k-value window.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, source-specific explanation, dry run
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `minimumDifference_sorting` early-returns for `k≤1`, sorts its copy, then minimizes `nums[i+k-1]-nums[i]`. `minimumDifference_twoPointers` compares `right-left` while both advance. `minimumDifference_bruteforce` picks/skips values and evaluates every size-k subset. `main` skips brute for large arrays.
+> Dry run (`[9,4,1,7]`, `k=2`):
+> | Sorted window | Difference |
+> |---|---:|
+> | `[1,4]` | 3 |
+> | `[4,7]` | 3 |
+> | `[7,9]` | 2 |
 
-- **Time:** O(n log n).
-- **Auxiliary space:** O(1) beyond sorting.
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> k=1 returns 0; k=n uses the full sorted range; duplicate scores can make the minimum 0.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `int minimumDifference_sorting(vector<int> nums, int k)`
-- `int minimumDifference_bruteforce(vector<int>& nums, int k)`
-- `int minimumDifference_twoPointers(vector<int> nums, int k)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Selected `O(n log n)` time; `O(n)` copied input, `O(1)` scan extra. Correctness: for a chosen minimum and maximum, any selected values between them can be represented by sorted contiguous window; scanning every k-window includes a range no worse than any selected set.
+> Trap: sort first; endpoint difference, not sum; `k=1` answer zero. Brute recursion depth is `O(n)` and evaluates combinations.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: sorted arrayमधील प्रत्येक k-window तपासा.
+Sort, check `nums[i+k-1]-nums[i]`. Related: smallest range, sliding windows after sorting, k closest values.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1984\1984.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. Why are selected items contiguous after sorting?
+2. What is answer for `k=1`?
+3. How many windows are tested?
+4. Why does source sorting method use `O(n)` memory?

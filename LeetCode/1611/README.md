@@ -1,71 +1,69 @@
-# Minimum One Bit Operations to Make Integers Zero
+# Minimum One Bit Operations to Make Integers Zero — LeetCode 1611
 
-**Problem ID:** 1611  
-**Source:** `minimumOneBitOperations.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Allowed moveमध्ये integerच्या rightmost `1` bitला `0` करता येतो; पुढील bit बदलता येतो फक्त त्याच्या उजवीकडील सर्व bits zero असताना. `n` ला zero करण्यासाठी minimum moves return करा. `n≥0`.
+Example: `n=3 (11₂)` → `11→01→00`, answer `2`. `n=6 (110₂)` → answer `4`; `n=0` → `0`.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int minimumOneBitOperations(int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Gray-code-like restricted bit transitions | inverse Gray-code transform |
+> | answer grows from high bits down | prefix XOR / bit manipulation |
+> | direct state BFS branches exponentially | exploit mathematical bit structure |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Use the recursive Gray-code relation to map n to its minimum one-bit operation count.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | XOR with successive right shifts | Selected, correct `O(log n)` time, `O(1)` space |
+> | BFS over all reachable states | Correct for tiny `n`, exponential states |
+> | Count set bits / popcount | Incorrect; operation count is not Hamming weight |
+> | Greedy clear low bit each step | Incorrect unless move legality is modelled exactly |
 
-## Main flow
-
-Use the recursive Gray-code relation to map n to its minimum one-bit operation count.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Use the recursive Gray-code relation to map n to its minimum one-bit operation count."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[mask = n] --> B{mask nonzero?}
+    B -- No --> E[Return transformed n]
+    B -- Yes --> C[Shift mask right once]
+    C --> D[n XOR= mask]
+    D --> B
 ```
 
-## Core logic and invariant
+Each iteration highest remaining prefix contribution XOR करून resultला inverse Gray-code valueकडे नेतं.
 
-Use the recursive Gray-code relation to map n to its minimum one-bit operation count.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, intuition आणि source
 
-## Complexity
+`minimumOneBitOperations` मध्ये `mask=n`; प्रत्येक loop `mask >>= 1`, नंतर `n ^= mask`. हे `n ^ (n>>1) ^ (n>>2) ...` म्हणजे Gray codeचे inverse prefix XOR. Sourceमध्ये फक्त हाच method आहे; `main` काही sample values print करतो.
+Dry run (`n=6`, binary `110`):
+| mask before | mask after shift | n after XOR |
+|---:|---:|---:|
+| `110` | `011` | `101` |
+| `011` | `001` | `100` |
+| `001` | `000` | `100` |
+Answer `4`.
 
-- **Time:** O(log n).
-- **Auxiliary space:** O(log n) recursion.
+## Edge cases
 
-## Compile and run
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> n=0 returns 0; powers of two are useful checks because they are not answered by popcount.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## Complexity, correctness, traps
 
-```powershell
-g++ -std=c++17 "LeetCode\1611\1611.cpp" -o solution.exe
-.\solution.exe
-```
+`O(log n)` iterations, `O(1)` extra. Correctness: reflected Gray-code sequenceच्या inverseमध्ये output bit `i` हा inputच्या bit `i` पासून सर्व higher bitsपर्यंत XOR असतो; loop हेच संचयी XOR काढतो.
+Trap: loopमध्ये shift केलेला `mask` आणि बदललेला `n` वेगळे समजा; `n` वर bit count लागू होत नाही. Signed shift/overflow टाळण्यासाठी constraintsप्रमाणे integer type ठेवा.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## Quick revision, variations, self-check
+
+पुनरावलोकन: right-shifted prefixesचा XOR घ्या.
+Repeated `n ^= n>>1` then continue shifts. Related: Gray code, XOR prefixes, bitwise sequence inversion.
+
+1. `n=0` साठी loop किती वेळा?
+2. `n=3` चे उत्तर `popcount` का नाही?
+3. प्रत्येक stepमध्ये कोणता variable shift होतो?
+4. Inverse Gray codeमध्ये XOR कुठून कुठपर्यंत असतो?

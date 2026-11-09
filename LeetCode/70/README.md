@@ -1,63 +1,92 @@
-# Climbing Stairs
+# Climbing Stairs — LeetCode 70
 
-**LeetCode ID:** 70
-**Source file(s):** `70.cpp` (originally `climbStairs.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+`n` पायऱ्यांपर्यंत 1 किंवा 2 steps घेऊन जाण्याचे किती distinct मार्ग आहेत ते मोजा. Source iterative Fibonacci आणि vector DP देतो.
 
-climbStairsIterative(int n); climbStairsDP(int n). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Worked examples and edges
 
-## Main flow
+- `n=1` → 1; `n=2` → 2; `n=3` → 3.
+- `n=0` source दोन्ही methods मध्ये 1 देतो (empty climb चे एक मार्ग); LeetCode constraints साधारण `n>=1`.
+- मोठ्या `n` वर `int` overflow होऊ शकतो; judge boundsमध्ये result बसतो.
+
+## 3. Pattern identification + cheat sheet
+
+| Clue                        | Pattern              | कारण                          |
+| --------------------------- | -------------------- | ----------------------------- |
+| Count ways to reach step    | Dynamic programming  | शेवटचा move 1 किंवा 2         |
+| Two previous states suffice | Fibonacci recurrence | `ways[i]=ways[i-1]+ways[i-2]` |
+| Need only final count       | State compression    | दोन variables पुरेसे          |
+
+## 4. Approaches
+
+- Naive recursion: O(2^n) time, O(n) stack; repeated subproblems.
+- Vector DP (`climbStairsDP`): O(n) time/O(n) space.
+- `climbStairsIterative`: O(n) time/O(1) space; source चे optimized approach.
+- Greedy step choices valid नाहीत; प्रत्येक partial choice independent paths मोजतो.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{more stair counts remain?}
-    E -- Yes --> F[advance the two recurrence values]
-    E -- No --> G[return current count]
-    F --> D
-    G --> D
+ A([Start]) --> B{n <= 1?}
+ B -- Yes --> C[Return 1]
+ B -- No --> D[Set previous states a=1, b=1]
+ D --> E[Compute next=a+b]
+ E --> F[Shift a=b and b=next]
+ F --> G{All n steps processed?}
+ G -- No --> E
+ G -- Yes --> H[Return b]
 ```
 
-## Important branch and loop flow
+DP table मधील शेवटच्या दोन values ठेवून memory कमी केली आहे.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{more stair counts remain?}
-    B -- Yes --> C[advance the two recurrence values]
-    B -- No --> D[return current count]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm / intuition
 
-## Core logic and invariant
+Step `i` वर येण्यासाठी `i-1` वरून 1-step किंवा `i-2` वरून 2-step येता येते; म्हणून sum. Base `ways[0]=ways[1]=1`.
 
-Computes ways(n)=ways(n-1)+ways(n-2) using either two rolling values or a DP array.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+`climbStairsIterative` starts `a=b=1`, decrements `n`, then shifts Fibonacci states; returns `b`. `climbStairsDP` stores full `dp` vector. `main()` both outputs compare करून assert करतो.
 
-Rolling state stores only the two preceding counts instead of a full DP array.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `n=4`: `ways[0]=1`, `ways[1]=1`.
+> | step | recurrence | ways |
+> |---:|---|---:|
+> | 2 | 1+1 | 2 |
+> | 3 | 2+1 | 3 |
+> | 4 | 3+2 | 5 |
 
-Both O(n) time; rolling O(1) space, array O(n) space.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Iterative O(n) time/O(1) auxiliary space. Vector DP O(n) time/O(n) space. Recursive naive O(2^n), stack O(n).
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\70\70.cpp -o solution.exe
-.\solution.exe
-```
+प्रत्येक valid path चा शेवटचा move 1 किंवा 2 steps असतो; या disjoint cases ची संख्या अनुक्रमे `ways[i-1]`, `ways[i-2]`. त्यामुळे recurrence सर्व आणि फक्त valid paths मोजतो; base cases योग्य आहेत.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes and interview traps
+
+- `ways[0]=1` हा recurrence सुसंगत base case.
+- `n=1` handling करून loop boundaries काळजीपूर्वक ठेवा.
+- Result type limits तपासा.
+- Stairs problemची recurrence Fibonacci शी related आहे; पण indexing एक step offset असू शकतो.
+
+## 12. Quick revision
+
+`dp[i]=dp[i-1]+dp[i-2]`, base 1,1. दोन variablesमध्ये rolling DP.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Fibonacci Number, Min Cost Climbing Stairs, Tribonacci, count ways with 1/2/3 steps.
+
+## 14. Self-assessment
+
+1. `ways[4]` किती?
+2. `ways[0]=1` का?
+3. Rolling DP ला O(1) space का?
+4. Naive recursion repeated work कुठे करतो?

@@ -1,94 +1,93 @@
-# Longest Palindromic Substring
+# Longest Palindromic Substring — LeetCode 5
 
-**Problem ID:** 5  
-**Source:** `longestPalindrome5.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+दिलेल्या string मधील सर्वात लांब contiguous palindrome परत करा. Code मध्ये तीन brute-force checks आणि center expansion आहे; equal-length answers पैकी कोणताही वैध आहे.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `bool isPalindromeIter(const string &s, int l, int r)`
-- `bool isPalindromeRec(const string &s, int l, int r)`
-- `bool isPalindromeMemo(const string &s, int l, int r)`
-- `int expandFromCenter(const string &s, int l, int r)`
-- `string longestPalindrome_BruteForceIter(string s)`
-- `string longestPalindrome_BruteForceRec(string s)`
-- `string longestPalindrome_Memo(string s)`
-- `string longestPalindrome_CenterExpand(string s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `"babad"` → `"bab"` किंवा `"aba"`.
+- `"cbbd"` → `"bb"` (even-length केंद्र).
+- `"a"` → `"a"`; `""` → `""`; `"ac"` → length 1 पैकी एक.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare brute-force, recursive, memoized palindrome tests with expansion around odd and even centers.
+| Clue                                | Pattern              | कारण                              |
+| ----------------------------------- | -------------------- | --------------------------------- |
+| Palindrome substring                | Two-ended comparison | बाहेरील chars समान असले पाहिजेत   |
+| प्रत्येक possible palindrome center | Expand around center | Odd आणि even centers तपासता येतात |
+| सर्व substrings enumerate           | Brute force / DP     | तुलना करून वेळ वाचवता येतो        |
 
-## Main flow
+## 4. Approaches
 
-Compare brute-force, recursive, memoized palindrome tests with expansion around odd and even centers.
+- Brute force + iterative/recursive palindrome check: O(n³) time, O(1) extra (recursive stack O(n)).
+- Memoized interval checks: O(n²) time/space; source मध्ये प्रत्येक `(l,r)` check cache होतो.
+- `CenterExpand`: O(n²) time, O(1) extra; practical optimal simple solution.
+- चुकीचा उपाय: फक्त `i,i` center तपासल्यास `"bb"` सारखे even palindrome सुटतात.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare brute-force, recursive, memoized palindrome tests with expansion around odd and even centers."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B{String empty?}
+ B -- Yes --> C[Return empty string]
+ B -- No --> D[Set best interval]
+ D --> E[Choose each character boundary]
+ E --> F[Expand odd center]
+ F --> G[Expand even center]
+ G --> H[Keep longer palindrome interval]
+ H --> I{More centers?}
+ I -- Yes --> E
+ I -- No --> J[Return best substring]
 ```
 
-## Core logic and invariant
+प्रत्येक character आणि प्रत्येक adjacent pair center म्हणून तपासला जातो.
 
-Compare brute-force, recursive, memoized palindrome tests with expansion around odd and even centers.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+Palindrome चे दोन्ही टोक center पासून बाहेर वाढतात. Characters समान असताना expand करा; थांबल्यावर त्या center ची length काढून global best राखा.
 
-- **Time:** O(n^2) center expansion; slower variants up to O(n^3).
-- **Auxiliary space:** O(1) center expansion; O(n^2) memo.
+## 7. Code explanation
 
-## Approach comparison
+`expandFromCenter(s,l,r)` ला odd (`i,i`) किंवा even (`i,i+1`) center दिला जातो. `CenterExpand` length वरून `start/end` बदलतो. इतर methods `isPalindromeIter`, `isPalindromeRec`, `isPalindromeMemo` वापरून substrings enumerate करतात. Empty input साठी optimized method explicit return करतो.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `string longestPalindrome_BruteForceIter(string s)`
-- `string longestPalindrome_BruteForceRec(string s)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `"cbbd"`:
+> | center | kind | expansion | length | best |
+> |---:|---|---|---:|---|
+> | 1 | even (1,2) | `"bb"` then mismatch | 2 | `"bb"` |
+> | 0,1,2,3 | odd/even others | single chars or empty | ≤1 | `"bb"` |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Center expansion O(n²) time, O(1) auxiliary space. Memoized approach O(n²) time and O(n²) memory; uncached brute force O(n³), recursive check stack up to O(n).
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\5\5.cpp" -o solution.exe
-.\solution.exe
-```
+प्रत्येक palindrome ला एक center असतो: odd length साठी मध्य अक्षर, even साठी दोन मध्य अक्षरांमधील जागा. दोन्ही center types पूर्णपणे expand केल्याने प्रत्येक संभाव्य palindrome तपासला जातो; maximum interval उत्तर आहे.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+- Even centers विसरू नका.
+- `r-l-1` ही expansion नंतरची length आहे; mismatch indices समाविष्ट नसतात.
+- Tie असताना code `>` वापरतो, त्यामुळे पहिला longest interval राहतो.
+- Longest palindrome substring शोधायचा, palindrome subsequence नाही.
+
+## 12. Quick revision
+
+प्रत्येक index वर odd आणि gap वर even expansion; best interval update. Time O(n²), extra O(1).
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Palindromic Substrings, palindrome partitioning, longest palindromic subsequence, Manacher’s algorithm.
+
+## 14. Self-assessment
+
+1. `"cbbd"` साठी even center कुठे?
+2. प्रत्येक center मधून विस्तार का पुरेसा?
+3. Code कसा tie resolve करतो?
+4. Memoization ची time/space trade-off काय?

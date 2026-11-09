@@ -1,63 +1,93 @@
-# Adjacent Increasing Subarrays Detection I
+# 3349 — Adjacent Increasing Subarrays Detection I
 
-**LeetCode ID:** 3349
-**Source file(s):** `3349.cpp` (originally `hasIncreasingSubarrays.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Problem understanding and constraints
 
-## Expected input/output or judge interface
+Determine whether there are two adjacent subarrays of length k and each is strictly increasing. They must be consecutive blocks: first `[i,i+k)` and second `[i+k,i+2k)`. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-hasIncreasingSubarrays(const vector<int>& nums,int k) (free function). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Stepwise example and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `nums=[2,3,1,4], k=2`: `[2,3]` and `[1,4]` are both increasing, so true. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
+
+## 3. Pattern identification — clue table
+
+Fixed-size adjacent windows plus monotonic-run validation. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on fixed-size adjacent windows plus monotonic-run validation. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
+
+## 4. Multiple approaches
+
+Checking every pair directly is correct but `O(nk)`. The source helper checks increasing order for both blocks; run-based preprocessing could reduce it to O(n), but is not what the code does. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{both adjacent windows strictly increase?}
-    E -- Yes --> F[return true]
-    E -- No --> G[continue; return false if no start works]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{both adjacent windows strictly increase?}
-    B -- Yes --> C[return true]
-    B -- No --> D[continue; return false if no start works]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{are both length-k blocks strictly increasing?}
+    D -->|Yes| E[return true on the first matching adjacent pair]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Tries each start where two adjacent length-k windows fit and checks both windows for strict increase.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 6. Selected algorithm and intuition
 
-## Optimization / comparison
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Slide the start of the first block; for each start verify both length-k ranges and return on the first valid pair.
 
-Windows are adjacent, non-overlapping, equal length; precomputed increasing-run lengths could reduce repeated checks to O(n).
+## 7. Code-specific explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3349\3349.cpp` — `isStrictlyIncreasing(nums,start,k)` checks neighboring pairs; `hasIncreasingSubarrays` tries each adjacent-block start.
 
-O(nk) time and O(1) auxiliary space.
+## 8. Dry run
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | For `[2,3,1,4]`, start 0: first pair 2<3, second pair 1<4 → true. |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\3349\3349.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Source approach `O(nk)` time and `O(1)` auxiliary space. A precomputed increasing-run length can achieve `O(n)`.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The loop visits every possible starting index for the first block. The helper accepts exactly when every adjacent pair inside that block is strictly increasing; applying it to both adjacent blocks matches the definition.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The second subarray starts exactly at `start+k`.
+- Strictly increasing uses `<`, not `<=`.
+- Ensure both blocks fit within the array.
+
+## 12. Quick revision
+
+**झटपट:** Slide the start of the first block; for each start verify both length-k ranges and return on the first valid pair. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Sliding windows; increasing runs; monotonic arrays.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Where does the second block begin?
+2. Does equality preserve increasing order?
+3. How can run lengths improve time?

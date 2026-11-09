@@ -1,63 +1,95 @@
-# Solving Questions With Brainpower
+# Solving Questions With Brainpower — LeetCode 2140
 
-**LeetCode ID:** 2140
-**Source file(s):** `2140.cpp` (originally `FindMaxPointsmostPoints.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `2140.cpp` uses recursive memoization in `mostPoints`.
 
-## Expected input/output or judge interface
+## 1. Understanding — समजून घ्या
 
-long long mostPoints(vector<vector<int>>& questions). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+Each question gives points and a brainpower skip count. Solve it to earn points, then skip the next `brainpower` questions; or skip it and consider the next question. Maximize total points.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> At index `i`, if question is `(3,2)`, taking it earns 3 and resumes at `i+3`; skipping it resumes at `i+1`. At the last question, the answer is its points. If taking a question jumps past the end, the remaining score is zero.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Choice | Next state |
+> |---|---|
+> | Skip question `i` | `i+1` |
+> | Take `(points, brainpower)` | `i+brainpower+1` |
+> | Overlapping choices, optimal score | 1D DP / memoized recursion |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Trying every subset is exponential. Plain recursion repeats states and is exponential. Memoizing by index makes each state compute once; bottom-up DP is also O(n) and avoids recursion depth. Greedy choice by highest points is incorrect because brainpower affects future opportunities.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{take question or skip it?}
-    E -- Yes --> F[add points and recurse at i+brainpower+1]
-    E -- No --> G[recurse at i+1]
-    F --> D
-    G --> D
+    A([State i]) --> B{i beyond questions?}
+    B -- Yes --> Z[Return 0]
+    B -- No --> C{Memoized?}
+    C -- Yes --> M[Return memo i]
+    C -- No --> D[Compute skip: solve i+1]
+    D --> E[Compute take: points i + solve i+brainpower+1]
+    E --> F[Store max of take and skip]
+    F --> M
 ```
 
-## Important branch and loop flow
+## 6. Algorithm and intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{take question or skip it?}
-    B -- Yes --> C[add points and recurse at i+brainpower+1]
-    B -- No --> D[recurse at i+1]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Define `dp(i)` as the maximum points obtainable starting at `i`. The recurrence is `max(dp(i+1), points[i] + dp(i+brainpower[i]+1))`, with `dp(i)=0` past the last question. The memo table avoids recomputing suffix decisions.
 
-## Core logic and invariant
+## 7. Code explanation
 
-Memoized recursion chooses skipping a question or taking its points then jumping past the brainpower cooldown.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `FindMaxPoints` handles the out-of-range base case, returns `remaing[position]` when cached, recursively calculates both choices, and stores their maximum. `mostPoints` creates an `n`-element `long long` memo initialized to `-1`.
 
-## Optimization / comparison
+## 8. Dry run
 
-memo[i] stores best score from suffix i onward; memoization computes each index once.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For questions `[(3,2),(4,3),(4,4),(2,5)]`: index 0 take = `3 + dp(3) = 5`; skip = `dp(1)`. At index 1 take = `4 + dp(5)=4`; skip eventually yields 2. The maximum is 5, selecting questions 0 and 3.
 
-## Complexity
+## 9. Complexity
 
-O(n) time and O(n) memo plus recursion-stack space.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> **O(n)** time because each index is memoized once; **O(n)** memo space plus **O(n)** worst-case recursion stack.
 
-## Compile and run
+## 10. Correctness
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Any valid strategy from index `i` either skips question `i`, leaving the optimal subproblem `i+1`, or takes it and must resume at `i+brainpower+1`. These choices cover every legal strategy. Taking their maximum is optimal; memoization changes only repeated computation.
 
-```powershell
-g++ -std=c++17 LeetCode\2140\2140.cpp -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes and interview traps
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The next index after taking is `i + brainpower + 1`.
+- Use `long long` for accumulated points.
+- Check the out-of-range base case before indexing the memo.
+- A `-1` memo sentinel is safe because point totals are nonnegative.
+- Recursive depth may be O(n); bottom-up DP avoids that risk.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** प्रश्न सोडवा किंवा वगळा; दोन्ही पर्यायांतील जास्त गुण निवडा.
+> `dp[i] = max(dp[i+1], points[i] + dp[i+brainpower[i]+1])`; memoize or fill backward.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> House Robber; weighted interval scheduling; skip-cost choice DP; convert this recurrence to bottom-up or reconstruct which questions were solved.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is the take transition `i+b+1`, not `i+b`?
+2. What does `dp(i)` represent?
+3. How does memoization change the recursive complexity?

@@ -1,63 +1,108 @@
-# Binary Gap
+# 868. Binary Gap
 
-**LeetCode ID:** 868
-**Source file(s):** `868.cpp` (originally `binaryGap.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `868.cpp`; bitset, right-shift bitwise, and binary-string variants.
 
-## Expected input/output or judge interface
+## 1. Understanding
 
-binaryGap_bitset(int), binaryGap_bitwise(int), binaryGap_string(int). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Return the largest distance between consecutive `1` bits in the binary representation of positive integer `n`. Fewer than two set bits gives 0.
 
-## Main flow
+## 2. Worked examples and edges
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `22 = 10110₂`: gaps are 2 and 1, so answer 2. `8 = 1000₂` has only one `1`, answer 0. `9 = 1001₂` has distance 3.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Scan set-bit positions and compare consecutive positions.
+> | Need | Pattern |
+> |---|---|
+> | Visit bits | Shift and mask |
+> | Consecutive set-bit distance | Remember previous index |
+> | Fixed 32-bit bound | Bitset scan |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- **Bitset (`binaryGap_bitset`) — fixed-width scan, `O(1)` for 32 bits.**
+- **Right shift (`binaryGap_bitwise`) — used efficient approach, `O(log n)` time, `O(1)` space.**
+- **Build binary string — easiest to visualize, `O(log n)` time/space.**
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{current bit is 1 and a previous 1 exists?}
-    E -- Yes --> F[update maximum gap and last-one index]
-    E -- No --> G[advance bit position]
-    F --> D
+    A([Start at least significant bit]) --> B{More bits?}
+    B -- No --> E([Return maximum gap])
+    B -- Yes --> C{Current bit is one?}
+    C -- No --> D[Advance bit index]
+    C -- Yes --> F{Have a previous one?}
+    F -- No --> G[Store current index]
+    F -- Yes --> H[Update max with current minus previous]
+    H --> I[Store current index]
     G --> D
+    I --> D
+    D --> B
 ```
 
-## Important branch and loop flow
+Zero bits are skipped; only pairs of neighboring set-bit positions matter.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{current bit is 1 and a previous 1 exists?}
-    B -- Yes --> C[update maximum gap and last-one index]
-    B -- No --> D[advance bit position]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Scan from least significant bit upward. Each time `n & 1` is one, compute `index-last`, update maximum, and remember the index; then shift right.
 
-Tracks consecutive set-bit positions and maximizes their distance; compares fixed bitset, right-shift, and binary-string versions.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `last=-1` indicates no prior one. The bitwise variant maintains `index` while shifting. The bitset variant scans high to low but calculates the same distance. The string variant constructs and reverses the binary digits.
 
-Bitwise scanning avoids allocating and reversing the binary string; bitset cost is fixed for 32-bit input.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Value `22` scan (LSB index) | Set-bit indices | Gap |
+> |---|---|---:|
+> | `10110₂` | 1, 2, 4 | 1, then 2 |
+> | maximum | — | 2 |
 
-Bitwise O(log n) time/O(1) space; bitset O(32); string version O(log n) space.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Bitwise/string: `O(log n)` time; bitwise `O(1)` space, string `O(log n)` space. Bitset scan is `O(32)=O(1)` for fixed width.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\868\868.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The scan visits every bit position in order. Whenever it sees a 1 after another 1, their index difference is the distance for that consecutive pair; updating the maximum over every such pair returns the largest gap. If fewer than two are seen, maximum remains zero.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Distance is index difference, not number of zeros between (e.g. `1001` gives 3).
+- Ignore leading zeros; they cannot create a gap.
+- Keep previous set-bit index, not previous bit position.
+- `bitset<32>` assumes a 32-bit representation; the shifting method is more width-flexible for positive inputs.
+
+## 12. Quick revision
+
+Shift through bits; on each 1, update `max(index-last)`; advance index; return zero if no pair.
+Gap म्हणजे bit-position मधला फरक, मधल्या zerosची संख्या नव्हे.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Number of 1 Bits; Counting Bits; Hamming distance; longest run of set bits.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does `1001₂` have gap 3?
+2. What does `last=-1` represent?
+3. How does `n &= n-1` differ from shifting?
+4. Why is the string method not constant space?

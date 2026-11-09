@@ -1,88 +1,133 @@
-# Minimum Sum of Mountain Triplets I
+# 2908 — Minimum Sum of Mountain Triplets I
 
-**Problem ID:** 2908  
-**Source:** `minimumSum.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+या प्रश्नाचा गाभा म्हणजे मधला घटक मोठा असलेल्या triplet ची किमान बेरीज.
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Choose indices `i<j<k` such that `nums[i] < nums[j]` and `nums[k] < nums[j]`. Return the smallest possible sum of the three values, or `-1` if no mountain exists.
 
-- `int minimumSumBruteForce(vector<int>& nums)`
-- `int minimumSumOptimized(vector<int>& nums)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+उदाहरणे आणि सीमाप्रकरणांत मधला घटक मोठा असलेल्या triplet ची किमान बेरीज कशी लागू होते ते पाहा.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare brute-force triples with prefix minima and a running right minimum for strict valleys.
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> For `[8,6,1,5,3]`, peak 5 has left candidate 1 and right candidate 3, sum 9. Strict inequalities matter: equal side and peak values do not qualify. A strictly increasing or decreasing array has no valid mountain.
 
-## Main flow
+## 3. Pattern identification + cheat sheet
 
-Compare brute-force triples with prefix minima and a running right minimum for strict valleys.
+येथे मुख्य pattern म्हणजे प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **fix the peak + best feasible side values**.
+> | Fixed center `j` | Need |
+> |---|---|
+> | Left side | Minimum value before `j` that is `< nums[j]` |
+> | Right side | Minimum value after `j` that is `< nums[j]` |
+> | Candidate | `leftMin + nums[j] + rightMin` |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> The source includes brute force over all triples (`O(n³)`) and an improved scan of both sides for every peak (`O(n²)`). Prefix/suffix minima can reduce this further to `O(n)` by precomputing best valid side candidates.
+
+## 5. Flowchart
+
+आकृतीमध्ये प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
 
 ```mermaid
 flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare brute-force triples with prefix minima and a running right minimum for strict valleys."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
+    A[Initialize answer to infinity] --> B[Choose peak index j]
+    B --> C[Find minimum valid value on left]
+    C --> D[Find minimum valid value on right]
+    D --> E{Both sides found?}
+    E -->|yes| F[Update answer with left + peak + right]
+    E -->|no| G[Skip this peak]
+    F --> H{More peak indices?}
+    G --> H
+    H -->|yes| B
+    H -->|no| I{Any candidate found?}
+    I -->|yes| J[Return minimum sum]
+    I -->|no| K[Return -1]
 ```
 
-## Important branch and loop flow
+Only the best smaller value on each side is needed for a fixed peak because the peak value is fixed.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 6. Algorithm and intuition
 
-```mermaid
-flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
-```
+मूळ कल्पना: प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे.
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Enumerate the middle index. Find the smallest value to its left that is strictly below the peak and the smallest value to its right that is strictly below the peak. These minimize the sum for that peak. Keep the global minimum.
 
-Compare brute-force triples with prefix minima and a running right minimum for strict valleys.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 7. Code explanation
 
-## Complexity
+Code मधील state आणि updates हे प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे या कल्पनेशी जोडून वाचा.
 
-- **Time:** O(n) optimized; O(n^2) brute.
-- **Auxiliary space:** O(n).
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `minimumSumBruteForce` checks every `i<j<k`. `minimumSumOptimized` fixes `j`, scans left and right, applies strict `<` tests, and updates `result` when both candidates exist. Both return `-1` if the sentinel `INT_MAX` remains.
 
-## Approach comparison
+## 8. Dry run
 
-The source contains multiple implementations for comparison:
+Dry run मध्ये प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-- `int minimumSumBruteForce(vector<int>& nums)`
-- `int minimumSumOptimized(vector<int>& nums)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `[8,6,1,5,3]`, peak index 3 (value 5):
+> | Side | Values inspected | Smallest value `<5` |
+> |---|---|---:|
+> | Left | 8, 6, 1 | 1 |
+> | Right | 3 | 3 |
+> | Candidate | `1+5+3` | 9 |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Brute force `O(n³)` time; optimized source `O(n²)` time. Both use `O(1)` extra space.
 
-```powershell
-g++ -std=c++17 "LeetCode\2908\2908.cpp" -o solution.exe
-.\solution.exe
-```
+## 10. Correctness
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+योग्यतेचा युक्तिवाद प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Every valid mountain has a unique middle index `j`, so it is considered by the optimized loop. For that peak, replacing either side element with a smaller qualifying value preserves index order and strict inequality while reducing sum. Thus the scans find the minimum candidate for that peak; taking the minimum over all peaks gives the global optimum. No candidate means no valid triplet.
+
+## 11. Mistakes and interview traps
+
+लक्षात ठेवा: दोन्ही बाजूंची मूल्ये मधल्या मूल्यापेक्षा काटेकोरपणे लहान असावीत.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Require strict `<` on both sides.
+- Keep index order: left index before peak, right index after.
+- Use minimum qualifying values, not simply overall minimum if it is not below the peak.
+- Distinguish source's `O(n²)` optimization from possible `O(n)` prefix/suffix improvement.
+
+## 12. Quick revision
+
+थोडक्यात, प्रत्येक मधल्या स्थानासाठी दोन्ही बाजूंची किमान पात्र मूल्ये शोधणे. दोन्ही बाजूंची मूल्ये मधल्या मूल्यापेक्षा काटेकोरपणे लहान असावीत.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Fix each peak; get smallest smaller value on each side; minimize sum; return `-1` if absent.
+
+## 13. Related problems and variations
+
+संबंधित प्रश्नांत मधला घटक मोठा असलेल्या triplet ची किमान बेरीज यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> LeetCode 2874 (ordered triplet); 121 (prefix minimum); variations: maximum mountain sum, non-strict sides, or linear prefix/suffix minima.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून मधला घटक मोठा असलेल्या triplet ची किमान बेरीज याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can each peak be solved independently?
+2. Why must a side value be strictly smaller?
+3. How could you reduce the source's `O(n²)` method to `O(n)`?

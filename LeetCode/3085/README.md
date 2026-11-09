@@ -1,95 +1,94 @@
-# Minimum Deletions to Make String K-Special
+# 3085 — Minimum Deletions to Make String K-Special
 
-**Problem ID:** 3085  
-**Source:** `minimumDeletions.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Problem understanding and constraints
 
-## Expected input and output / judge signature
+After deletions, every present character's frequency must differ from every other present character's frequency by at most `k`. Deletions may remove a character entirely. The source assumes lowercase English letters. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-Solution-facing declarations extracted from the source:
+## 2. Stepwise example and edge cases
 
-- `int minDel_V1(const string& word, int k)`
-- `int minDel_V2(const string& word, int k)`
-- `int minDel_V3(const string& word, int k)`
-- `int minDel_V4(const string& word, int k)`
-- `int minDel_V5(const string& word, int k)`
-- `int minimumDeletions(string word, int k, int version = 5)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For frequencies `a:5,b:2` and `k=1`, keep `a:5` and delete b entirely (cost 2), or keep both with a reduced to 3 (cost 2). **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
 
-## Identification evidence
+## 3. Pattern identification — clue table
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Count letter frequencies and choose a baseline, deleting characters outside a k-wide retained-frequency range.
+Frequency histogram; enumerate a retained minimum frequency and cap others. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on frequency histogram | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
 
-## Main flow
+## 4. Multiple approaches
 
-Count letter frequencies and choose a baseline, deleting characters outside a k-wide retained-frequency range.
+Trying all deletion subsets is exponential. Source offers naive frequency-base scans, prefix/binary-search variants, and a 26-letter greedy. The fixed-alphabet version is the practical choice; the methods should agree on valid lowercase input. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Count letter frequencies and choose a baseline, deleting characters outside a k-wide retained-frequency range."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is frequency below base, within range, or above base+k?}
+    D -->|Yes| E[delete it entirely, keep it, or trim to base+k]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
+    F --> G
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Count letter frequencies and choose a baseline, deleting characters outside a k-wide retained-frequency range.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Selected algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Choose a minimum frequency `base`. A character below base is deleted completely; a character above `base+k` is reduced to that cap; frequencies in between stay.
 
-- **Time:** O(26^2) fixed alphabet.
-- **Auxiliary space:** O(26).
+## 7. Code-specific explanation
 
-## Approach comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3085\3085.cpp` — `minimumDeletions(word,k,version)` dispatches to five implementations; `minDel_V5` is the greedy practical variant. Count characters once, then compare candidate bases across the 26-letter frequency set.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `int minDel_V1(const string& word, int k)`
-- `int minDel_V2(const string& word, int k)`
-- `int minDel_V3(const string& word, int k)`
-- `int minDel_V4(const string& word, int k)`
-- `int minDel_V5(const string& word, int k)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | Frequencies `[5,2]`, k=1: choose base=2 → keep 2, delete `5-(2+1)=2` |
+> | 2 | base=5 → delete the 2-count character entirely (2). Minimum is 2. |
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For alphabet size σ=26, greedy/base enumeration is `O(n+σ²)` time and `O(σ)` space. Frequency sorting variants add `O(σ log σ)`; all are linear in string length.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\3085\3085.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> For a fixed minimum retained frequency, every lower positive frequency violates the chosen minimum and is cheapest to remove entirely; every frequency above `base+k` must be trimmed to that cap. Enumerating possible bases includes an optimum, so taking the minimum cost is correct.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The allowed difference is at most k, not exactly k.
+- Deleting a character entirely is allowed.
+- Include base=0/empty result cases; do not reduce a high frequency below the allowed cap unnecessarily.
+
+## 12. Quick revision
+
+**झटपट:** Choose a minimum frequency `base`. A character below base is deleted completely; a character above `base+k` is reduced to that cap; frequencies in between stay. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Frequency counting; histogram optimization; enumerate a threshold and clamp.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can a character below base be deleted entirely?
+2. What is the maximum kept frequency for a fixed base?
+3. Why is the alphabet size useful?

@@ -1,90 +1,93 @@
-# Power of Four
+# Power of Four — LeetCode 342
 
-**Problem ID:** 342  
-**Source:** `isPowerOfFour.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+दिलेला integer `4^k` (k≥0) आहे का ते ठरवा. Positive powers: `1,4,16,64,...`.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `bool checkPowerOfFourRecursive(long long n, long long k)`
-- `bool isPowerOfFourBitwise(int n)`
-- `bool isPowerOfFourRecursive(int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `1`, `16`, `256` → true.
+- `8` power of two आहे पण power of four नाही; `5`, `0`, `-4` → false.
+- `1024=2^10` → false कारण exponent odd.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Check positivity, the one-set-bit property, and that the bit is in an even position; also compare recursion.
+| Clue                      | Pattern          | कारण                             |
+| ------------------------- | ---------------- | -------------------------------- |
+| Power of four             | Bit manipulation | One set bit at even bit position |
+| Repeated multiply by base | Recursion        | Compare sequence 1,4,16...       |
+| Power-of-two prerequisite | Bit test         | Exactly one set bit              |
 
-## Main flow
+## 4. Approaches
 
-Check positivity, the one-set-bit property, and that the bit is in an even position; also compare recursion.
+- Source `isPowerOfFourBitwise`: power-of-two check plus even-position mask — O(1), O(1).
+- Source recursive multiply by 4 — O(log₄ n) time, O(log₄ n) stack.
+- Repeated divide by 4 — O(log n), O(1), simple alternative.
+- Power-of-two test alone चुकीचा; `8` पास होईल.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Check positivity, the one-set-bit property, and that the bit is in an even position; also compare recursion."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B{n positive and one set bit?}
+ B -- No --> C[Return false]
+ B -- Yes --> D{Set bit in odd position?}
+ D -- Yes --> C
+ D -- No --> E[Return true]
 ```
 
-## Core logic and invariant
+एकच set bit असणे पुरेसे नाही; bit positions 0,2,4,... पैकी असावा.
 
-Check positivity, the one-set-bit property, and that the bit is in an even position; also compare recursion.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+`n&(n-1)==0` single set bit तपासतो. `0xAAAAAAAA` मध्ये odd-index bit positionsचे mask आहे; त्यांच्याशी AND शून्य असेल तर set bit even positionवर आहे, म्हणजे 4 ची power.
 
-- **Time:** O(1) bitwise.
-- **Auxiliary space:** O(1) bitwise; O(log n) recursion.
+## 7. Code explanation
 
-## Approach comparison
+`isPowerOfFourBitwise` positive check, power-of-two check आणि mask check combine करतो. `isPowerOfFourRecursive` helper `k=1` पासून multiply-by-4 करतो, equality किंवा overshootवर थांबतो.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `bool checkPowerOfFourRecursive(long long n, long long k)`
-- `bool isPowerOfFourBitwise(int n)`
-- `bool isPowerOfFourRecursive(int n)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `n=16 (10000₂)`:
+> | Check | Value | Result |
+> |---|---|---|
+> | positive | yes | continue |
+> | `n&(n-1)` | `10000 & 01111 = 0` | one bit |
+> | `n&0xAAAAAAAA` | 0 | bit even-positioned |
+> | final | | true |
+> `n=8 (1000₂)` mask hits bit 3 → false.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Bitwise method O(1) time/O(1) space. Recursive method O(log₄ n) time and recursion stack.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\342\342.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> First bit condition ensures exactly one set bit, so n is a power of two. The mask rejects that sole bit if it occupies an odd position; powers of four have their sole bit at even positions (`4^k=2^(2k)`). Thus both conditions together are necessary and sufficient.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+- Positive guard आवश्यक: zero bit test पास करू शकतो.
+- `8` power of two आहे, पण fourची नाही.
+- Mask positionsची indexing bit 0 पासून करा.
+- Recursive helper negative/zero valuesला `k=1` ओलांडल्यावर false देतो.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> `n>0 && (n&(n-1))==0 && (n&0xAAAAAAAA)==0`.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Power of Two, Power of Three, count set bits, check one set bit at a selected parity.
+
+## 14. Self-assessment
+
+1. `8` दुसरी condition का fail करतो?
+2. `0xAAAAAAAA` कोणते positions mark करतो?
+3. Power-of-two check काय निश्चित करतो?
+4. `n=1` power of four का?

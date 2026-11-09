@@ -1,72 +1,96 @@
-# Design a Number Container System
+# Design a Number Container System — LeetCode 2349
 
-**Problem ID:** 2349  
-**Source:** `NumberContainers.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `2349.cpp`; it stores index-to-number mappings and an ordered set of indices for each number.
 
-## Expected input and output / judge signature
+## 1. Understanding — समजून घ्या
 
-Solution-facing declarations extracted from the source:
+Support `change(index,number)` and `find(number)`. A change overwrites any existing number at that index. Find returns the smallest index currently storing the requested number, or `-1`.
 
-- `void change(int index, int number)`
-- `int find(int number)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> After `change(2,10)`, `change(1,10)`, `find(10)` returns 1. Then `change(1,20)` removes index 1 from number 10's set, so `find(10)` returns 2. Finding a number never assigned returns `-1`.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Maintain index-to-number assignments and an ordered set of indices for each number.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Operation | Data structure |
+> |---|---|
+> | Overwrite by index | Index → current value map |
+> | Find smallest index for value | Value → ordered set of indices |
+> | Remove stale association | Update both directions |
 
-Maintain index-to-number assignments and an ordered set of indices for each number.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Maintain index-to-number assignments and an ordered set of indices for each number."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Scanning every index on each `find` is O(n) per query. A number-to-min-heap with lazy deletion can also work, but needs stale-entry cleanup. The source uses ordered sets, giving direct access to the smallest current index; remember to erase the old mapping on change.
 
-## Important branch and loop flow
+## 5. Flowchart
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Operation]) --> B{change or find?}
+    B -- change --> C{Index already assigned?}
+    C -- Yes --> D[Erase index from old number set]
+    C -- No --> E[Skip erase]
+    D --> F[Update index map and insert in new set]
+    E --> F
+    B -- find --> G{Number set exists and nonempty?}
+    G -- Yes --> H[Return smallest set element]
+    G -- No --> I[Return -1]
 ```
 
-## Core logic and invariant
+## 6. Algorithm and intuition
 
-Maintain index-to-number assignments and an ordered set of indices for each number.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Maintain two synchronized views: `indexToNumber` tells what an index currently stores; `numberToIndices` lists all indices currently storing each number in sorted order. A change removes the old association before inserting the new one. The set's first element is the smallest index.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(log n) change/find.
-- **Auxiliary space:** O(n).
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The source uses `map<int,int>` for index assignments and `unordered_map<int,set<int>>` for number buckets. `change` is a no-op if the same value is assigned again. `find` returns `*begin()` only when the bucket exists and is nonempty.
 
-## Compile and run
+## 8. Dry run
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `change(2,10)` → set 10 is `{2}`. `change(1,10)` → `{1,2}`. `find(10)` → 1. `change(1,20)` → remove 1 from 10, add to 20; `find(10)` → 2.
 
-```powershell
-g++ -std=c++17 "LeetCode\2349\2349.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `change`: **O(log n)** due to `map` update and ordered-set insert/erase; hash bucket lookup is expected O(1). `find`: **O(1)** to access the set's first element on average, plus expected hash lookup. Space is **O(n)** stored assignments.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> After every change, the index map records the latest value and each value's set contains exactly the indices currently assigned to it: old membership is erased, new membership inserted. Since each set is ordered, its first element is exactly the smallest matching index; empty/missing sets correctly return `-1`.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Remove an index from its old value's set before inserting its new value.
+- Do not duplicate an index on repeated same-value changes.
+- Empty sets may remain in the hash map; `find` must check emptiness.
+- Returning any matching index is insufficient—the smallest is required.
+- Keep both mappings consistent across overwrites.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** जुनी नोंद काढा, नवीन जोडा; set मधील पहिला index सर्वात लहान.
+> Two-way state: index→number, number→ordered indices. Change erases old and inserts new; find returns set minimum.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Design indexed maps; maintain minimum key per category; lazy-deletion heaps; add `remove(index)` or return all indices for a number.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why are two mappings needed?
+2. What must `change` do when an index is reassigned?
+3. How does the set ensure `find` returns the minimum index?

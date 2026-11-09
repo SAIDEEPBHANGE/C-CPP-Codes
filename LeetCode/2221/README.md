@@ -1,58 +1,93 @@
-﻿# Find Triangular Sum of an Array — LeetCode 2221
+# Find Triangular Sum of an Array — LeetCode 2221
 
-## Problem and judge interface
+Source: `2221.cpp`; `triangularSum` overwrites the input with each row of pairwise sums modulo 10.
 
-int triangularSum(vector<int>& nums); repeatedly replace adjacent values by their sum modulo 10 until one remains.
+## 1. Understanding — समजून घ्या
 
-## Identification evidence
+Repeatedly replace each adjacent pair by their sum modulo 10 until one number remains. Return that number.
 
-In-place adjacent-pair modulo-10 reduction uniquely matches problem 2221.
+## 2. Worked examples and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[1,2,3,4,5]` → `[3,5,7,9]` → `[8,2,6]` → `[0,8]` → `[8]`. A one-element input returns itself. The judge guarantees a nonempty array.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Repeated adjacent reductions | In-place simulation |
+> | Modulo at each combine step | Local recurrence |
+> | Row shrinks by one | Triangular O(n²) process |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Direct simulation mirrors the definition and uses O(1) extra space. A binomial-coefficient formula can reduce operation count only with careful modulo-10 arithmetic; ordinary modular division is unsafe because 10 is composite. Recomputing a separate array every round is correct but uses O(n) extra space.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
- A([Start]) --> B[Set active length to input size]
- B --> C[Reduce adjacent pairs modulo ten]
- C --> D{Is active length greater than zero?}
- D -- Yes --> E[Combine adjacent entries and shorten prefix]
- D -- No --> F[Return nums[0]]
- E --> G{More work remains?}
- F --> G
- G -- Yes --> C
- G -- No --> H([Return result])
+    A([Set active length n]) --> B{n greater than 1?}
+    B -- No --> Z[Return nums[0]]
+    B -- Yes --> C[For i=1..n-1 set nums[i-1]=(nums[i-1]+nums[i]) mod 10]
+    C --> D[Decrease n by 1]
+    D --> B
 ```
 
-## Important branch / loop
+Only the active prefix is needed for the next row.
 
-```mermaid
-flowchart TD
- A[Visit each adjacent pair in active prefix] --> B{Are more pairs in this level?}
- B -- Yes --> C[Write pair sum modulo ten]
- B -- No --> D[Shorten active prefix]
- C --> E([Continue or return as indicated])
- D --> E
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariants
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For each row, update left-to-right: write the pair result into the left slot. The next pair still reads the untouched right slot. Then reduce the active length by one and repeat.
 
-For each active prefix, replace nums[i-1] with (nums[i-1]+nums[i])%10, then shorten the active length. The first element is the final result. Input is modified and must be nonempty.
+## 7. Code explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `triangularSum` sets `n=nums.size()`, loops while `n>0`, computes each adjacent sum modulo 10 into `nums[i-1]`, then decrements `n`. It mutates its argument; only `nums[0]` is returned.
 
-O(n^2) time and O(1) auxiliary space.
+## 8. Dry run
 
-## Comparison and optimization
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `[1,2,3]`: first row writes `3,5` → active `[3,5]`; next writes `8` → answer `8`.
 
-In-place reduction avoids allocating a new row at each level.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> **O(n²)** time from `n-1 + n-2 + ... + 1` updates and **O(1)** extra space. The input array is modified.
 
-The `.cpp` is the original standalone source, including its local `main()` demonstration where present. Compile and run from the repository root with a C++17 compiler:
+## 10. Correctness
 
-```text
-g++ -std=c++17 LeetCode\2221\2221.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Each update stores exactly the required next-row value `(nums[i-1]+nums[i])%10`. Left-to-right order does not overwrite `nums[i]` before it is read. Repeating for the shrinking active prefix performs every reduction row, leaving the specified final value.
 
-For LeetCode, adapt the implementation to the required class/method signature and omit the local `main()` and demonstration helpers; use the judge-provided node types. Notes above identify method-name or behavior differences. The moved source bytes have not been edited.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Apply `%10` at every pair combination.
+- Iterate left-to-right so the right operand remains from the old row.
+- Track the shrinking prefix; stale suffix values are irrelevant.
+- Empty input would access `nums[0]`; judge constraints guarantee nonempty input.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** शेजारच्या संख्यांची बेरीज mod 10 करून active भाग कमी करा.
+> Update left neighbor with pair sum mod 10; shrink the active length until one remains.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Pascal-triangle reduction; repeated adjacent transforms; compute the final value with binomial coefficients; in-place rolling-array simulation.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is left-to-right update safe in place?
+2. How many pair updates occur overall?
+3. Why is simple modular division by binomial coefficients risky modulo 10?

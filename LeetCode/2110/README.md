@@ -1,63 +1,103 @@
-# Number of Smooth Descent Periods of a Stock
+# Number of Smooth Descent Periods of a Stock — LeetCode 2110
 
-**LeetCode ID:** 2110
-**Source file(s):** `2110.cpp` (originally `getDescentPeriods.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `2110.cpp`. `getDescentPeriods` uses a rolling count; `getDescentPeriodsDP` stores the same state per index.
 
-## Expected input/output or judge interface
+## 1. Understanding — समजून घ्या
 
-getDescentPeriods(vector<int>& prices); getDescentPeriodsDP(...). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+A descent period is a contiguous nonempty range where each next price is exactly one less than the previous price. Count all such ranges.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `[3,2,1,4]`, the run `[3,2,1]` contributes `3+2+1=6`; `[4]` adds one, total `7`. Equal prices break a run. A single price contributes one.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Contiguous subarrays | Consecutive-run counting |
+> | Each step follows a local relation | Rolling DP |
+> | Need count all subarrays ending here | Add current run length |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Enumerating every subarray and checking every adjacent pair is O(n²) or worse. A DP array tracks valid descent periods ending at each day in O(n) time/O(n) space. The source's rolling version is optimal in auxiliary space.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{previous price minus one equals current?}
-    E -- Yes --> F[extend run length]
-    E -- No --> G[reset run length to one]
-    F --> D
-    G --> D
+    A([Start]) --> B[Set run=1, answer=1]
+    B --> C{Next price is previous minus 1?}
+    C -- Yes --> D[Increment run]
+    C -- No --> E[Reset run to 1]
+    D --> F[Add run to answer]
+    E --> F
+    F --> G{More prices?}
+    G -- Yes --> C
+    G -- No --> Z([Return answer])
 ```
 
-## Important branch and loop flow
+Each day contributes all valid descent subarrays that end on that day.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{previous price minus one equals current?}
-    B -- Yes --> C[extend run length]
-    B -- No --> D[reset run length to one]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Keep `dp` as the length of the exact-step-down suffix ending at the current day. If `prices[i] == prices[i-1]-1`, extend it; otherwise reset to 1. Add that count to the answer because every suffix length from 1 through `dp` is a valid descent period ending at `i`.
 
-Tracks the current run where each price is one lower than its predecessor and adds that run length per endpoint.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `getDescentPeriods` initializes `ans=dp=1` for the first day, updates `dp`, and accumulates into `long long`. `getDescentPeriodsDP` expresses the same recurrence with a vector. Both assume the problem's nonempty input constraint.
 
-A run of length L contributes L\*(L+1)/2 subarrays; adding current run length counts those ending here.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Price | Relation to previous | `dp` | Answer |
+> |---:|---|---:|---:|
+> | 3 | first | 1 | 1 |
+> | 2 | 3−1 | 2 | 3 |
+> | 1 | 2−1 | 3 | 6 |
+> | 4 | broken | 1 | 7 |
 
-O(n) time; rolling O(1) space, DP-array O(n).
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Rolling implementation: **O(n)** time, **O(1)** extra space. DP-array variant: **O(n)** time and **O(n)** extra space. The answer uses 64-bit storage.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\2110\2110.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> At each index, the recurrence gives exactly the number of valid contiguous descent subarrays ending there: one singleton, plus all extensions of the previous valid suffix when the adjacent difference is one. Summing these per-ending-index counts counts every valid subarray exactly once.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Descent means difference exactly `1`, not merely decreasing.
+- Reset to one, not zero: the current day alone is always valid.
+- Count every ending suffix, not just maximal runs.
+- Use `long long`; the number of subarrays can be quadratic.
+- Source assumes `prices` is nonempty, as the judge guarantees.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** सलग घसरणीची लांबी वाढवा; प्रत्येक टप्प्याला ती उत्तरात जोडा.
+> `dp = (prev-current==1) ? dp+1 : 1`; add `dp` each day.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count arithmetic subarrays; count monotone runs; longest smooth descent; generalize the allowed step to a fixed difference.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does a run of length `r` contribute `r` new periods at its end?
+2. What should the recurrence do on equal adjacent prices?
+3. Why is the answer type 64-bit?

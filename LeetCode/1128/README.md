@@ -1,71 +1,101 @@
-# Number of Equivalent Domino Pairs
+# 1128 — Number of Equivalent Domino Pairs
 
-**Problem ID:** 1128  
-**Source:** `numEquivDominoPairs.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count unordered pairs of dominoes equal after flipping either one: `[a,b]` equals `[b,a]`. Each pair must be counted once.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edge cases
 
-- `int numEquivDominoPairs(vector<vector<int>>& dominoes)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[[1,2],[2,1],[1,2]]` has three pairs. A group of `k` equivalent dominoes contributes `k(k-1)/2`; identical sides such as `[2,2]` need no special case.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Normalize each domino by unordered endpoint pair and add the count of prior equivalents.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Canonicalize each item, then count prior occurrences with a hash map.
+> | Situation | Technique |
+> |---|---|
+> | Order-insensitive pair | Sort/canonicalize endpoints |
+> | Count all matching pairs | Add previous frequency |
+> | Fixed small key domain | Array counter can replace map |
 
-## Main flow
+## 4. Approaches
 
-Normalize each domino by unordered endpoint pair and add the count of prior equivalents.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Normalize each domino by unordered endpoint pair and add the count of prior equivalents."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+- Compare every two dominoes: correct, `O(n²)`.
+- Sort each domino and count equivalent pairs: correct, `O(n log n)` if sorting all.
+- Source packs ordered ends into an integer key and accumulates prior counts: expected `O(n)`.
 
-## Important branch and loop flow
+## 5. Mermaid flowchart and explanation
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
+> The frequency is read before incrementing, so it counts only earlier partners.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Initialize key frequencies and answer]
+ B --> C[Canonicalize next domino]
+ C --> D[Add its previous frequency to answer]
+ D --> E[Increment its frequency]
+ E --> F{More dominoes?}
+ F -- Yes --> C
+ F -- No --> G([Return pair count])
 ```
 
-## Core logic and invariant
+## 6. Algorithm / intuition
 
-Normalize each domino by unordered endpoint pair and add the count of prior equivalents.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+For `[a,b]`, form `(min(a,b), max(a,b))`; source encodes it as `min*10+max` (valid for the problem's 1–9 labels). If `f` identical canonical dominoes appeared earlier, current one forms `f` new pairs. त्यामुळे combination formula incremental होते.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1) bounded pair key.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `unordered_map<int,int> count` stores frequencies. `result += count[key]` precedes `count[key]++`. `main()` only demonstrates examples; judge expects `Solution::numEquivDominoPairs`.
 
-## Compile and run
+## 8. Dry run
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Input `[[1,2],[2,1],[1,2]]`:
+> | Domino | Key | Prior count | Added pairs | New count |
+> |---|---:|---:|---:|---:|
+> | `[1,2]` | 12 | 0 | 0 | 1 |
+> | `[2,1]` | 12 | 1 | 1 | 2 |
+> | `[1,2]` | 12 | 2 | 2 | 3 |
 
-```powershell
-g++ -std=c++17 "LeetCode\1128\1128.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Expected `O(n)` time and `O(u)` extra space for `u` distinct domino types; hash worst case can degrade. Key encoding assumes digit labels 1–9, as in the problem.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Canonicalization maps both orientations to the same key and distinct equivalence classes to distinct keys under the label constraints. At each step, every earlier match forms exactly one pair with the current item; no pair is counted again later except when its later endpoint is processed.
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Do not count ordered pairs or count each pair twice.
+- Normalize endpoints before making the key.
+- Use a collision-safe pair key if label bounds change; `min*10+max` is not universal.
+- Add frequency before incrementing.
+
+## 12. Quick revision
+
+Normalize → add old count → increment. `k` matches total to `k(k−1)/2`. लक्षात ठेवा: unordered pair.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Two Sum multiplicity, equal pairs in an array, tuple counting; variation: canonicalize unordered edges or pairs before frequency counting.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why do we add the prior frequency rather than one?
+2. How many pairs does a group of five contribute?
+3. When can the packed integer key collide?
+4. Why is the pair unordered?

@@ -1,63 +1,132 @@
-# Count the Number of Complete Components
+# 2685 — Count the Number of Complete Components
 
-**LeetCode ID:** 2685
-**Source file(s):** `2685.cpp` (originally `countCompleteComponents.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे पूर्ण connected components ची मोजणी.
 
-int countCompleteComponents(int n, vector<vector<int>>& edges). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> An undirected graph component is complete when every pair of its distinct vertices has an edge. Count complete connected components.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत पूर्ण connected components ची मोजणी कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> A single isolated vertex is complete: it needs zero edges. A component of four vertices is complete when it has `4*3/2=6` undirected edges. A path of three vertices is connected but not complete.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे DFS ने vertices आणि त्यांचे एकूण degrees मोजणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **connected components + degree/edge count invariant**.
+> | Component fact | Expected in complete graph |
+> |---|---|
+> | `v` vertices | `v*(v-1)/2` undirected edges |
+> | Sum of adjacency-list degrees | `v*(v-1)` |
+> | Source DFS edge counter | Counts both directions |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना DFS ने vertices आणि त्यांचे एकूण degrees मोजणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> For each component, check every pair for an edge: correct but can be expensive. The source counts vertices and adjacency incidences during DFS; compare against `v*(v-1)`. A degree check (`degree==v-1` for every vertex) is another linear solution.
+
+## 5. Flowchart
+
+आकृतीमध्ये DFS ने vertices आणि त्यांचे एकूण degrees मोजणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{component adjacency-entry total equals nodes*(nodes-1)?}
-    E -- Yes --> F[increment complete-component count]
-    E -- No --> G[leave count unchanged]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{component adjacency-entry total equals nodes*(nodes-1)?}
-    B -- Yes --> C[increment complete-component count]
-    B -- No --> D[leave count unchanged]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A[Build undirected adjacency list] --> B[Find unvisited vertex]
+    B --> C[DFS component; count vertices and adjacency entries]
+    C --> D{adjacency count == vertices*(vertices-1)?}
+    D -->|yes| E[Increment complete count]
+    D -->|no| F[Do not increment]
+    E --> G{Unvisited vertices remain?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -->|yes| B
+    G -->|no| H[Return count]
 ```
 
-## Core logic and invariant
+Each undirected edge contributes two adjacency entries, which explains the factor of two.
 
-Builds an undirected adjacency list, DFSes each component, counts vertices and directed adjacency entries, then checks entries == v\*(v-1).
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 6. Algorithm and intuition
 
-## Optimization / comparison
+मूळ कल्पना: DFS ने vertices आणि त्यांचे एकूण degrees मोजणे.
 
-Each undirected edge contributes two adjacency entries, so a complete component has v(v-1) entries.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Build adjacency lists, DFS from each unvisited vertex, and accumulate component size `v` and total adjacency entries `d`. In a complete undirected component, every vertex has degree `v-1`, hence `d=v(v-1)`.
 
-## Complexity
+## 7. Code explanation
 
-O(n+m) time and O(n+m) space.
+Code मधील state आणि updates हे DFS ने vertices आणि त्यांचे एकूण degrees मोजणे या कल्पनेशी जोडून वाचा.
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `dfsAlgo` marks each vertex, increments node count, and increments edge count once for each neighbor entry. `countCompleteComponents` starts a DFS for each unvisited node and applies the formula. Its `main` demonstrates two graphs.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 LeetCode\2685\2685.cpp -o solution.exe
-.\solution.exe
-```
+Dry run मध्ये DFS ने vertices आणि त्यांचे एकूण degrees मोजणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For a complete 3-node component:
+> | Quantity | Value |
+> |---|---:|
+> | vertices | 3 |
+> | adjacency entries | 6 |
+> | expected `3*(3-1)` | 6 |
+> | complete? | yes |
+
+## 9. Complexity
+
+DFS ने vertices आणि त्यांचे एकूण degrees मोजणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Adjacency construction and DFS: `O(V+E)` time; adjacency list and visited state use `O(V+E)` space. Recursive DFS stack is up to `O(V)`.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद DFS ने vertices आणि त्यांचे एकूण degrees मोजणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> DFS visits exactly one connected component and counts all its vertices and adjacency entries. For a simple undirected graph, a component is complete iff every vertex has degree `v-1`, equivalent to total degree `v(v-1)`. Therefore the equality check accepts exactly complete components.
+
+## 11. Mistakes and interview traps
+
+लक्षात ठेवा: प्रत्येक undirected edge degree बेरजेत दोनदा येते.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- An undirected edge appears twice in adjacency lists.
+- Compare against `v*(v-1)`, not `v*(v-1)/2`, for this source's counter.
+- Isolated vertices qualify.
+- Assumes a simple graph without self-loops or duplicate edges, as specified.
+- Recursive DFS may need an iterative stack for very deep graphs in other constraints.
+
+## 12. Quick revision
+
+थोडक्यात, DFS ने vertices आणि त्यांचे एकूण degrees मोजणे. प्रत्येक undirected edge degree बेरजेत दोनदा येते.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> DFS components, count vertices `v` and degree sum `d`; complete iff `d==v*(v-1)`.
+
+## 13. Related problems and variations
+
+संबंधित प्रश्नांत पूर्ण connected components ची मोजणी यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> LeetCode 323 (Number of Connected Components); 547 (Number of Provinces); variations: test completeness by every vertex degree or count missing edges.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून पूर्ण connected components ची मोजणी याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does the edge counter see each undirected edge twice?
+2. Why is an isolated node complete?
+3. What is the degree of every vertex in a complete component of size `v`?

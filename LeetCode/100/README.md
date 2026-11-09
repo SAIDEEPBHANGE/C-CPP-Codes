@@ -1,73 +1,95 @@
-# Same Tree
+# Same Tree — LeetCode 100
 
-**Problem ID:** 100  
-**Source:** `isSameTree.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+दोन binary trees ची structure आणि प्रत्येक corresponding node value समान आहेत का ते ठरवा. दोन्ही null trees समान.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `bool getAllNode(TreeNode* p, TreeNode* q)`
-- `bool isSameTree(TreeNode* p, TreeNode* q)`
-- `void testCaseResult(int index, bool result)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- समान `[1,2,3]` trees → true.
+- Left child विरुद्ध right child → false (structure वेगळी).
+- एकाच positionवर values वेगळ्या → false; `(nullptr,nullptr)` → true.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Recursively compare corresponding nodes, values, and both child pairs.
+| Clue                         | Pattern              | कारण                           |
+| ---------------------------- | -------------------- | ------------------------------ |
+| Compare two tree nodes       | Paired recursion     | Corresponding children compare |
+| Shape and values both matter | Structural traversal | Null positionsही महत्त्वाच्या  |
+| Null base cases              | Recursive tree DP    | Subtree equality composition   |
 
-## Main flow
+## 4. Approaches
 
-Recursively compare corresponding nodes, values, and both child pairs.
+- Recursive paired DFS: O(n) time, O(h) stack; source method.
+- Iterative queue of node pairs: O(n) time, O(w) space.
+- Serialize both trees then compare — valid but extra O(n) storage.
+- फक्त inorder values compare करणे चुकीचे; वेगवेगळ्या shapesचे inorder समान होऊ शकतात.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Recursively compare corresponding nodes, values, and both child pairs."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Compare p and q]) --> B{Both null?}
+ B -- Yes --> C[Return true]
+ B -- No --> D{Exactly one null?}
+ D -- Yes --> E[Return false]
+ D -- No --> F{Values equal?}
+ F -- No --> E
+ F -- Yes --> G[Compare left children]
+ G --> H{Left comparison true?}
+ H -- No --> E
+ H -- Yes --> I[Compare right children]
+ I --> J[Return right comparison]
 ```
 
-## Core logic and invariant
+प्रत्येक subtreeमध्ये null, value, left आणि right या चारही बाबी तपासल्या जातात.
 
-Recursively compare corresponding nodes, values, and both child pairs.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+Pairwise nodes compare करा. दोन्ही null म्हणजे त्या positionवर agreement; एकच null किंवा value mismatch म्हणजे false; अन्यथा left आणि right recursively दोन्ही true हवेत.
 
-- **Time:** O(N).
-- **Auxiliary space:** O(H) recursion.
+## 7. Code explanation
 
-## Compile and run
+`getAllNode(p,q)` base casesनंतर values तपासतो आणि `left && right` वापरतो. `isSameTree` helper call परतवतो. Source मध्ये local `TreeNode` आणि demonstration `main()` आहेत.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\100\100.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `p=1(left=2)`, `q=1(right=2)`:
+> | pair | null/value check | result |
+> |---|---|---|
+> | `(1,1)` | values equal | compare children |
+> | `(2,null)` | exactly one null | false |
+> | root | left result false | false; right recursion unnecessary |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+O(n) time, `n` म्हणजे दोन्ही treesमध्ये भेटलेल्या nodesची संख्या. Recursion O(h) stack, worst-case skewed treeमध्ये O(n).
+
+## 10. Correctness
+
+दोन trees समान असण्यासाठी root presence/value समान आणि दोन्ही corresponding subtrees समान असणे आवश्यक. Helper हेच cases तपासतो; induction ने base null subtree पासून संपूर्ण tree equality सिद्ध होते.
+
+## 11. Mistakes and interview traps
+
+- Null structure तपासल्याशिवाय values पुरेसे नाहीत.
+- `left && right` short-circuit केल्याने false आल्यावर पुढचा subtree आवश्यक नाही.
+- Empty pair true आहे.
+- Tree recursion depth skewed treeमध्ये मोठी असू शकते.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Both null→true; one null/value mismatch→false; else compare left and right.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Symmetric Tree, Subtree of Another Tree, Same Tree iteratively, serialize/deserialize binary tree.
+
+## 14. Self-assessment
+
+1. `(nullptr,nullptr)` चे उत्तर?
+2. Inorder equality पुरेशी का नाही?
+3. Worst-case recursion stack किती?
+4. Iterative पर्यायात कोणती data structure वापराल?

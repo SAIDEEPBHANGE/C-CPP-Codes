@@ -1,72 +1,67 @@
-# Water Bottles
+# Water Bottles — LeetCode 1518
 
-**Problem ID:** 1518  
-**Source:** `numWaterBottles.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+`numBottles` full bottles प्या; प्रत्येक `numExchange` empty bottles देऊन एक full bottle मिळतो. जास्तीत जास्त किती bottles पिता येतील ते मोजा. LeetCode मध्ये exchange rate `> 1` आहे.
+Example: `9, 3`: 9 प्या → 9 empties; exchange 3+3+3 → 3 नवीन full, प्या; नंतर 3 empties → 1 नवीन bottle; total `9+3+1=13`. `5, 5` → `6`; `2,3` → `2` (no exchange).
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int numWaterBottles(int numBottles, int numExchange)`
-- `int numWaterBottles(int bottles, int exchange)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+| Clue                                           | Pattern                    |
+| ---------------------------------------------- | -------------------------- |
+| resource बदलून पुन्हा त्याच नियमाने process    | simulation                 |
+| प्रत्येक exchange मध्ये quotient आणि remainder | integer division invariant |
+| finite number of exchanges                     | loop until threshold       |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Drink full bottles and exchange each group of empties for more full bottles.
+| Method                                           | Status               | Notes                                        |
+| ------------------------------------------------ | -------------------- | -------------------------------------------- |
+| Repeated exchange simulation                     | Correct / selected   | `O(log_e B)` rounds, `O(1)` space            |
+| Try every possible exchange sequence / recursion | Correct but needless | Same deterministic state; no branching       |
+| Add only `bottles / exchange` once               | Incorrect            | Newly emptied bottlesही exchangeable आहेत    |
+| Formula / geometric sum                          | Possible, less clear | Loop better handles remainder at every round |
 
-## Main flow
-
-Drink full bottles and exchange each group of empties for more full bottles.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Drink full bottles and exchange each group of empties for more full bottles."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[Start: total = initial bottles] --> B{Empty bottles >= exchange rate?}
+    B -- No --> E[Return total]
+    B -- Yes --> C[New full = empty / rate]
+    C --> D[Total += new full; empties = new full + remainder]
+    D --> B
 ```
 
-## Core logic and invariant
+Each iterationमध्ये exchanged empties आणि न exchange झालेले empties जोडून पुढील state बनते.
 
-Drink full bottles and exchange each group of empties for more full bottles.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, intuition आणि code-specific notes
 
-## Complexity
+दोन्ही source versions योग्य आहेत: `SolutionOriginal::numWaterBottles` आणि `SolutionOptimized::numWaterBottles`. `Result/totalDrank` हे आतापर्यंत प्यायलेल्या bottlesचे total; `numBottles/bottles` म्हणजे सध्याचे empties. `getFilled = bottles / numExchange`; remainder पुढच्या roundला carry होतो. `main` अनेक input pairs वर दोन्ही outputs तुलना करतो.
+Dry run (`9,3`):
+| Round | Empties before | New full | Remainder | Total drank |
+|---|---:|---:|---:|---:|
+| Start | 9 | — | — | 9 |
+| 1 | 9 | 3 | 0 | 12 |
+| 2 | 3 | 1 | 0 | 13 |
+| Stop | 1 | 0 | 1 | 13 |
 
-- **Time:** O(log n) exchanges.
-- **Auxiliary space:** O(1).
+## Edge cases
 
-## Compile and run
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> No exchange when empties are below the rate; exact multiples and a final nonzero remainder both occur. Rate 1 is excluded by constraints.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## Complexity, correctness, traps
 
-```powershell
-g++ -std=c++17 "LeetCode\1518\1518.cpp" -o solution.exe
-.\solution.exe
-```
+Per-iteration emptied count roughly rateने कमी होते: `O(log_exchange(numBottles))` rounds, `O(1)` space. Correctness: प्रत्येक loop exactly शक्य exchanges करतो आणि remainderसह पुढील empties मोजतो; stop झाल्यावर अजून exchange शक्य नाही.
+Trap: full bottle पिल्यावर एक empty मिळतो हे विसरू नका; `bottles = newBottles + oldRemainder` आवश्यक. Rate `1` असेल तर loop संपणार नाही, पण input constraintमध्ये ते नसते.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## Quick revision, variations, self-check
+
+पुनरावलोकन: प्रत्येक exchangeनंतर उरलेले empties carry करा.
+Total initial full + प्रत्येक roundचे exchanges; remainder carry करा. Related: coin exchange simulation, repeated division processes.
+
+1. `15,4` साठी rounds कसे बदलतात?
+2. Remainder पुढच्या roundमध्ये का ठेवतो?
+3. Exchange rate `1` हा code handle करतो का?
+4. Loop कधी थांबतो?

@@ -1,63 +1,111 @@
-# Partition Equal Subset Sum
+# 416. Partition Equal Subset Sum
 
-**LeetCode ID:** 416
-**Source file(s):** `416.cpp` (originally `canPartition.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+Source: `416.cpp`; `canPartition(vector<int>& nums)`.
 
-## Expected input/output or judge interface
+## 1. Understanding
 
-bool canPartition(vector<int>& nums). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Can the numbers be divided into two disjoint groups with equal sums? This is equivalent to finding a subset summing to half the total. Mhanje subset-sum decision.
 
-## Main flow
+## 2. Worked examples and edges
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[1,5,11,5]` has total 22 and subset `{11}` → true. `[1,2,3,5]` has odd total 11 → false immediately. The original constraints use positive values.
+
+## 3. Pattern identification + cheat sheet
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Equal partition is a 0/1 subset-sum problem.
+> | Clue | Pattern |
+> |---|---|
+> | Choose each number zero or one time | 0/1 knapsack |
+> | Reach a target sum | Boolean subset DP |
+> | Compress memory | 1D DP, iterate downward |
+
+## 4. Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- **Try all subsets — correct but exponential:** `O(2^n)`.
+- **2D subset DP — correct:** `O(n·target)` time and space.
+- **1D descending DP — used and space-optimal:** `O(n·target)` time, `O(target)` space.
+- An ascending loop is incorrect for 0/1 use because it can reuse the current number.
+
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{dp at j-num is reachable?}
-    E -- Yes --> F[mark dp at j reachable]
-    E -- No --> G[leave dp at j unchanged]
-    F --> D
-    G --> D
+    A([Start]) --> B[Compute total]
+    B --> C{Total odd?}
+    C -- Yes --> X([Return false])
+    C -- No --> D[Set target to total divided by 2 and dp 0 true]
+    D --> E[Take next number]
+    E --> F[Visit sums from target down to number]
+    F --> G[Set dp sum if sum minus number was reachable]
+    G --> H{More numbers?}
+    H -- Yes --> E
+    H -- No --> I([Return dp target])
 ```
 
-## Important branch and loop flow
+Descending sums ensure the current number contributes at most once.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{dp at j-num is reachable?}
-    B -- Yes --> C[mark dp at j reachable]
-    B -- No --> D[leave dp at j unchanged]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `dp[s]` means some processed subset totals `s`. `dp[0]=true`; for each value `x`, update `dp[s] |= dp[s-x]` from high to low. Odd total means equal halves ashakya.
 
-Rejects odd total sums; otherwise runs 0/1 subset-sum DP toward half the total.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `accumulate` computes total; the method rejects odd totals, allocates `target+1` booleans, then performs the in-place 0/1 transition. It returns reachability of `target`.
 
-Descending sums prevent reusing the current number; one-dimensional DP compresses the table.
+## 8. Dry run
 
-## Complexity
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Number processed | Reachable sums up to 11 |
+> |---|---|
+> | Start | `{0}` |
+> | 1 | `{0,1}` |
+> | 5 | `{0,1,5,6}` |
+> | 11 | target 11 becomes reachable |
+> | final 5 | remains true; answer `true` |
 
-O(n\*target) time and O(target) space.
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Let `target=total/2`: `O(n·target)` time and `O(target)` auxiliary space.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 LeetCode\416\416.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Initially only sum zero is reachable. For each number `x`, every new reachable sum either was already reachable or is an old reachable sum plus `x`; descending order prevents reusing `x`. Hence `dp[target]` exactly signals a half-total subset, whose complement has the same sum.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Reject odd totals first.
+- Iterate `s` downward; ascending is unbounded-knapsack behavior.
+- `dp[0]` must start true.
+- Complexity depends on numeric target (pseudo-polynomial), not only `n`.
+
+## 12. Quick revision
+
+Odd sum → false. Else target half; boolean DP; each `x` updates target-to-`x` descending; return `dp[target]`. One-dimensional trick विसरू नका.
+Descending update मुळे एक number पुन्हा वापरला जात नाही.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Subset Sum; Target Sum; 0/1 Knapsack; minimum difference partition; count subsets reaching a target.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is equal partition equivalent to target `total/2`?
+2. What goes wrong with ascending updates?
+3. Why is this pseudo-polynomial?
+4. How would you return an actual partition, not just a boolean?

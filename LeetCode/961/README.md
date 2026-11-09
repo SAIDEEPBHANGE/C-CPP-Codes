@@ -1,73 +1,107 @@
-# N-Repeated Element in Size 2N Array
+# 961. N-Repeated Element in Size 2N Array
 
-**Problem ID:** 961  
-**Source:** `repeatedNTimes.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `961.cpp`; frequency map, neighbor-check, and set variants.
 
-## Expected input and output / judge signature
+## 1. Understanding
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> An array has length `2N`; one value occurs `N` times and all other values are distinct. Return the repeated value.
 
-- `int repeatedNTimes_freqMap(vector<int>& nums)`
-- `int repeatedNTimes_neighborCheck(vector<int>& nums)`
-- `int repeatedNTimes_set(vector<int>& nums)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edges
 
-## Identification evidence
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[2,1,2,5,3,2]` has length 6 (`N=3`); 2 appears three times. The repeated copies need not all be adjacent. Valid problem inputs guarantee such an element.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Find the value appearing more than once using frequency, neighbor comparison, or a set.
+## 3. Pattern identification + cheat sheet
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Use the strong frequency guarantee to find a repeat early.
+> | Clue | Pattern |
+> |---|---|
+> | Need value occurring N times | Frequency map |
+> | Any duplicate is guaranteed | Seen set |
+> | Repeated N times among 2N positions | Check local distance at most 3 |
 
-Find the value appearing more than once using frequency, neighbor comparison, or a set.
+## 4. Approaches
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Find the value appearing more than once using frequency, neighbor comparison, or a set."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-## Important branch and loop flow
+- **Frequency map (`repeatedNTimes_freqMap`) — direct and correct:** stop at count `N`; `O(n)` expected time/space.
+- **Set (`repeatedNTimes_set`) — correct under the guarantee:** return first already-seen value; `O(n)` expected time/space.
+- **Neighbor check — used constant-space trick:** compare offsets 1, 2, and 3; `O(n)` time, `O(1)` space.
+- Searching only adjacent pairs is incorrect because repeats may be separated.
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
+    A([Start at index i]) --> B{Next value equals current?}
+    B -- Yes --> Y([Return current value])
+    B -- No --> C{Value two positions ahead equals current?}
+    C -- Yes --> Y
+    C -- No --> D{Value three positions ahead equals current?}
+    D -- Yes --> Y
+    D -- No --> E[Advance i]
+    E --> F{More candidate indices?}
     F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    F -- No --> Z([Fallback -1])
 ```
 
-## Core logic and invariant
+If one value fills half the array, some two occurrences must be within three positions.
 
-Find the value appearing more than once using frequency, neighbor comparison, or a set.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm and intuition
 
-## Complexity
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> The constant-space variant checks `nums[i]` against the next three entries where in bounds. The pigeonhole argument guarantees a pair within distance 3; the other two methods explicitly track seen counts/values.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(n) frequency/set.
+## 7. Code explanation
 
-## Compile and run
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> The map increments frequency and returns at `n`. The neighbor method uses safe boundary checks for offsets 2 and 3. The set method returns at the first duplicate. `-1` is a fallback unreachable for valid inputs.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\961\961.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Index `i` | Compare | Outcome |
+> |---:|---|---|
+> | 0 (`2`) | next 1, +2 is 2 | return 2 |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Neighbor: `O(n)` time, `O(1)` extra space. Map/set: expected `O(n)` time, `O(n)` space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The map returns once a value reaches its guaranteed frequency `N`; the set returns a repeated value, which under the input guarantee must be the N-repeated element. For the neighbor method, if all copies were at least distance 4 apart, `N` copies would require at least `4N-3` array positions, exceeding length `2N` for `N>1`; hence a checked pair exists (smallest case also has adjacent copies).
+
+## 11. Mistakes / interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- The neighbor trick depends on the exact `N`-of-`2N` guarantee.
+- Check bounds before reading offsets.
+- First duplicate is safe only because other values are distinct.
+- Do not assume duplicates are adjacent.
+
+## 12. Quick revision
+
+Guaranteed repeated half-size value; count, set, or compare next 1/2/3 positions for O(1) space.
+Neighbor trick हा inputच्या विशेष guarantee वर अवलंबून आहे.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Find the Duplicate Number; first repeated element; majority element; pigeonhole-based array guarantees.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is any first duplicate the answer?
+2. Why are offsets through 3 sufficient?
+3. What guarantee would make the neighbor trick invalid?
+4. Which variant uses least extra memory?

@@ -1,75 +1,99 @@
-# K-Mirror Numbers
+# Sum of k-Mirror Numbers — LeetCode 2081 (variant)
 
-**Problem ID:** 2081  
-**Source:** `isPalindrome.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+Source: `isPalindrome-variant.cpp`. This implementation generates decimal palindromes by length and uses `kMirror(k,n)`; unlike the sibling file's V1, it visits lengths in order.
 
-> **Collision handling:** kMirror.cpp is a second verified implementation of problem 2081. This source is kept in a named variant subfolder so the required 2081.cpp is not overwritten.
+## 1. Understanding — समजून घ्या
 
-## Expected input and output / judge signature
+Find the sum of the first `n` positive numbers that are palindromes in decimal and base `k`.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edge cases
 
-- `bool isPalindrome(string baseK)`
-- `string convertToBaseK(long long num, int k)`
-- `long long kMirror(int k, int n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For `k=2`, `n=1`, candidate `1` is palindrome in both bases, so the sum is `1`. A decimal palindrome such as `11` may fail the base-`k` check. Length one uses the same prefix for both halves but drops its mirrored center.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Generate decimal palindromes by length and accumulate those whose base-k digits are also palindromic.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | Palindromic decimal candidates | Half-prefix mirroring |
+> | Second base has a different digit string | Convert, then two-pointer check |
+> | Need earliest `n` matches | Increase decimal length monotonically |
+> Pattern: **structured generation + validation**.
 
-## Main flow
+## 4. Approaches
 
-Generate decimal palindromes by length and accumulate those whose base-k digits are also palindromic.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> Brute force checks every positive integer and both representations. This variant prunes candidates by generating only decimal palindromes. The `isPalindrome` helper checks both ends; `convertToBaseK` stores remainders in reverse order, but that is safe because reversing a string does not change whether it is a palindrome.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Generate decimal palindromes by length and accumulate those whose base-k digits are also palindromic."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+## 5. Flowchart
 
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A([Begin with length L]) --> B[Enumerate half prefixes]
+    B --> C[Mirror prefix into decimal palindrome]
+    C --> D[Build base-k digit string]
+    D --> E{Palindrome?}
+    E -- Yes --> F[Add value; n decreases]
+    E -- No --> G[Continue]
+    F --> H{n equals zero?}
+    G --> I{Length candidates remain?}
+    H -- Yes --> Z([Return sum])
+    H -- No --> I
+    I -- Yes --> B
+    I -- No --> J[Increase L] --> B
 ```
 
-## Core logic and invariant
+## 6. Algorithm and intuition
 
-Generate decimal palindromes by length and accumulate those whose base-k digits are also palindromic.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> For decimal length `L`, enumerate every prefix of length `ceil(L/2)`. Append its reverse for even `L`; for odd `L`, omit the duplicated center. Convert the candidate to base `k`. Add it only if the resulting digits read the same in either direction. Stop as soon as `n` matches have been found.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(C \* d), where C is the number of decimal-palindrome candidates tested and d is the candidate digit length.
-- **Auxiliary space:** O(d) for the current candidate and its base-k representation.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `convertToBaseK` repeatedly takes `% k` and `/= k`, so its string is least-significant digit first. `isPalindrome` is direction-independent. `kMirror` computes prefix bounds using `pow`, constructs each palindrome with `stoll`, and tracks `sum` and remaining `n`.
 
-## Compile and run
+## 8. Dry run
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `k=2,n=1`: `L=1`, prefix `1` → decimal `1` → base-2 string `"1"` → accepted → sum `1`, remaining count `0` → return.
 
-```powershell
-g++ -std=c++17 "LeetCode\2081\isPalindrome-variant\isPalindrome-variant.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> For `C` candidates and at most `D` digits per candidate: **O(C·D)** time and **O(D)** temporary space.
+
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Every positive decimal palindrome has a unique prefix of the chosen half-length, so the generator visits all such numbers once in increasing length and value. The base conversion produces the candidate's digits (in reverse order), and palindrome status is invariant under reversal. Thus exactly the qualifying values are summed.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Do not mirror the middle digit twice for odd lengths.
+- The base conversion string is reversed; this is okay only because the check is palindrome-symmetric.
+- Avoid integer overflow when forming palindromes; the implementation uses `long long` and problem constraints.
+- `pow` uses floating point; for larger length limits, use integer powers.
+
+## 12. Quick revision — झटपट उजळणी
+
+> **मराठी सारांश:** अर्धा भाग उलटवून संख्या बनवा आणि दोन्ही bases तपासा.
+> Prefix → mirror → convert → palindrome test → sum. Increase decimal length; stop at the `n`th accepted value.
+
+## 13. Related problems and variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Palindrome generation; palindromes in two bases; count qualifying numbers in a range; replace the sum with a list of the first `n` matches.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why can a reversed base-k digit string still be palindrome-tested?
+2. How is the center handled for odd length?
+3. Why is enumeration by length increasing?

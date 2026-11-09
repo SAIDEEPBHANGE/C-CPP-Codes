@@ -1,89 +1,108 @@
-# Minimum Absolute Difference
+# 1200 — Minimum Absolute Difference
 
-**Problem ID:** 1200  
-**Source:** `minimumAbsDifference.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Return every pair with the smallest absolute difference, with values in ascending order and result pairs lexicographically ordered.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edge cases
 
-- `vector<vector<int>> minimumAbsDifference_Map(vector<int> arr)`
-- `vector<vector<int>> minimumAbsDifference_Optimized(vector<int> arr)`
-- `void printResult(const vector<vector<int>>& res)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `[4,2,1,3]` sorts to `[1,2,3,4]`; all adjacent gaps are `1`, so return `[[1,2],[2,3],[3,4]]`. Duplicates yield gap `0` and must all be included.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Sort values and collect adjacent pairs with the smallest gap.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Sorting makes nearest values adjacent; scan adjacent gaps.
+> | Goal | Technique |
+> |---|---|
+> | Minimum pair difference | Sort then adjacent scan |
+> | Keep all ties | Clear on a new minimum; append on equal |
+> | Sorted output | Scan sorted input order |
 
-## Main flow
+## 4. Approaches
 
-Sort values and collect adjacent pairs with the smallest gap.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Sort values and collect adjacent pairs with the smallest gap."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
+- Compare every pair: correct `O(n²)` then sort output if needed.
+- Source map-based method: sort, store every adjacent pair by gap, then return the minimum-gap bucket; correct but extra storage.
+- Source optimized method: sort and maintain only the current minimum and its pairs; preferred.
 
-## Important branch and loop flow
+## 5. Mermaid flowchart and explanation
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
+> When a smaller gap appears, previous pairs cannot be answers and are discarded.
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Sort values]
+ B --> C[Set minDiff to infinity]
+ C --> D[Compute next adjacent gap]
+ D --> E{Gap smaller than minDiff?}
+ E -- Yes --> F[Set new minimum and clear result]
+ E -- No --> G{Gap equals minimum?}
+ G -- Yes --> H[Append adjacent pair]
+ G -- No --> I[Ignore pair]
+ F --> J{More adjacent pairs?}
+ H --> J
+ I --> J
+ J -- Yes --> D
+ J -- No --> K([Return result])
 ```
 
-## Core logic and invariant
+## 6. Algorithm / intuition
 
-Sort values and collect adjacent pairs with the smallest gap.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> After sorting, any closest pair must be adjacent; a value between a non-adjacent pair can only reduce or tie the distance. Scan once, resetting the result when a strictly smaller gap appears and appending ties.
 
-## Complexity
+## 7. Code explanation
 
-- **Time:** O(n log n).
-- **Auxiliary space:** O(n) output.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `minimumAbsDifference_Optimized` uses `minDiff`, `result.clear()`, and adjacent pair insertion. `minimumAbsDifference_Map` stores pairs by gap. Both take the vector by value, so sorting does not alter the caller's vector.
 
-## Approach comparison
+## 8. Dry run
 
-The source contains multiple implementations for comparison:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Sorted input `[1,2,4,6]`:
+> | Pair | Gap | Action |
+> |---|---:|---|
+> | `(1,2)` | 1 | New minimum; save |
+> | `(2,4)` | 2 | Ignore |
+> | `(4,6)` | 2 | Ignore |
 
-- `vector<vector<int>> minimumAbsDifference_Map(vector<int> arr)`
-- `vector<vector<int>> minimumAbsDifference_Optimized(vector<int> arr)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+## 9. Complexity
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Sorting is `O(n log n)`; scan is `O(n)`. Optimized extra storage is `O(k)` for `k` returned pairs (plus sorting implementation); map version stores all adjacent pairs, `O(n)`.
 
-## Compile and run
+## 10. Correctness
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> In sorted order, for any indices `i<j` with `j>i+1`, the gap `a[j]-a[i]` is at least one adjacent gap inside that interval. Therefore a global minimum occurs among adjacent pairs. The scan records exactly all pairs attaining the smallest such gap.
 
-```powershell
-g++ -std=c++17 "LeetCode\1200\1200.cpp" -o solution.exe
-.\solution.exe
-```
+## 11. Mistakes / interview traps
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Do not compare only original neighbors before sorting.
+- Keep every tie; do not overwrite equal minima.
+- Clear old answers only when the minimum gets strictly smaller.
+- Duplicate values correctly give zero.
+
+## 12. Quick revision
+
+Sort → scan `a[i]-a[i-1]` → reset on `<`, append on `==`. सगळी ties जपायची.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> 3Sum Closest, Minimum Difference Between Largest and Smallest Value in Three Moves, closest pair; variation: return one pair or count all minimum-gap pairs.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is a closest pair adjacent after sorting?
+2. What happens when a new smaller gap is found?
+3. Why are duplicate values important?
+4. What extra work does the map approach do?

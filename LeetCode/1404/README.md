@@ -1,73 +1,132 @@
-# Number of Steps to Reduce a Number in Binary Representation to One
+# 1404 — Number of Steps to Reduce a Number in Binary Representation to One
 
-**Problem ID:** 1404  
-**Source:** `numSteps.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+या प्रश्नाचा गाभा म्हणजे binary संख्येला एक करण्यासाठी लागणाऱ्या पायऱ्या.
 
-Solution-facing declarations extracted from the source:
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> For a positive binary string, repeatedly divide an even value by two or add one to an odd value; count steps until one.
 
-- `int numSteps_simulation(string s)`
-- `int numSteps_optimized(string s)`
-- `int numSteps_bigint(string s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+## 2. Worked examples and edge cases
 
-## Identification evidence
+उदाहरणे आणि सीमाप्रकरणांत binary संख्येला एक करण्यासाठी लागणाऱ्या पायऱ्या कशी लागू होते ते पाहा.
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Simulate odd increment and even halving, with carry-based optimized variants.
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> `"1101"` (`13`) takes 6 steps. `"1"` takes 0. The input may be too long for a built-in integer, so process the string directly.
 
-## Main flow
+## 3. Pattern identification + cheat sheet
 
-Simulate odd increment and even halving, with carry-based optimized variants.
+येथे मुख्य pattern म्हणजे उजवीकडून bits आणि carry तपासणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **binary arithmetic by scanning bits with carry**.
+> | Effective low bit | Operation | Steps |
+> |---|---|---:|
+> | 0 | Divide by 2 | 1 |
+> | 1 | Add 1, then divide | 2 |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना उजवीकडून bits आणि carry तपासणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Source direct string simulation: correct but worst-case `O(n²)` due to edits/carry propagation.
+- Source `numSteps_bigint`: manual simulation, also `O(n²)` worst case.
+- Source optimized carry scan: `O(n)` time, `O(1)` extra space; use for long inputs.
+
+## 5. Mermaid flowchart and explanation
+
+आकृतीमध्ये उजवीकडून bits आणि carry तपासणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
+> Scan from least significant bit toward the leading one; carry records the effect of prior increments.
 
 ```mermaid
 flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Simulate odd increment and even halving, with carry-based optimized variants."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
+ A([Start at last bit]) --> B{More bits before leading bit?}
+ B -- No --> C[Add final carry to steps]
+ B -- Yes --> D{Current bit plus carry equals 1?}
+ D -- Yes --> E[Odd: add two steps and set carry]
+ D -- No --> F[Even: add one step]
+ E --> G[Move one bit left]
+ F --> G
+ G --> B
+ C --> H([Return steps])
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+मूळ कल्पना: उजवीकडून bits आणि carry तपासणे.
 
-```mermaid
-flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
-```
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> At a bit position, `bit+carry` determines whether the current value is odd. Odd requires `+1` then `/2` (two operations) and leaves carry one; even needs only `/2`. The leading bit is already the final one except possibly for its carry.
 
-## Core logic and invariant
+## 7. Code explanation
 
-Simulate odd increment and even halving, with carry-based optimized variants.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+Code मधील state आणि updates हे उजवीकडून bits आणि carry तपासणे या कल्पनेशी जोडून वाचा.
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `numSteps_optimized` loops from `s.size()-1` down to index `1`; it adds two and sets carry for effective one, otherwise adds one. The result is `steps+carry`. Simulation methods mutate a string. `main()` compares all approaches.
 
-- **Time:** O(n) optimized.
-- **Auxiliary space:** O(1) carry.
+## 8. Dry run
 
-## Compile and run
+Dry run मध्ये उजवीकडून bits आणि carry तपासणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `"10"`:
+> | Bit processed | Carry in | Effective bit | Steps added | Carry out |
+> |---|---:|---:|---:|---:|
+> | index 1 (`0`) | 0 | 0 | 1 | 0 |
+> | leading bit | — | — | final 0 | — |
+> Answer `1` (`10` → `1`).
 
-```powershell
-g++ -std=c++17 "LeetCode\1404\1404.cpp" -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+उजवीकडून bits आणि carry तपासणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Optimized scan `O(n)` time, `O(1)` extra space. The source's string simulations can take `O(n²)` time due to shifting or repeated character edits.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद उजवीकडून bits आणि carry तपासणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> For every non-leading bit, the effective bit after carry completely determines parity. If odd, incrementing then dividing costs two steps and propagates a carry; if even, division costs one and no carry. Processing from right to left accounts for every operation, and the final carry handles the leading overflow case.
+
+## 11. Mistakes / interview traps
+
+लक्षात ठेवा: शेवटी उरलेला carry विसरू नये.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Stop before processing the leading bit as an ordinary position.
+- Remember an odd state costs two operations, not one.
+- `"1"` must return zero.
+- Do not parse a potentially huge binary string into an integer.
+
+## 12. Quick revision
+
+थोडक्यात, उजवीकडून bits आणि carry तपासणे. शेवटी उरलेला carry विसरू नये.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Right-to-left carry: effective 1 → `+2 steps, carry=1`; effective 0 → `+1`; final answer `steps+carry`.
+
+## 13. Related problems / variations
+
+संबंधित प्रश्नांत binary संख्येला एक करण्यासाठी लागणाऱ्या पायऱ्या यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> Add Binary, Number of Steps to Reduce a Number to Zero, binary increment; variation: explain each operation on arbitrary-precision binary input.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून binary संख्येला एक करण्यासाठी लागणाऱ्या पायऱ्या याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why does an odd value cost two steps?
+2. What does carry represent?
+3. Why is the leading bit not processed in the loop?
+4. Why can direct simulation be quadratic?

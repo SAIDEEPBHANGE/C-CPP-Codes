@@ -1,91 +1,97 @@
-# Reverse Linked List
+# Reverse Linked List — LeetCode 206
 
-**Problem ID:** 206  
-**Source:** `reverseList.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+Singly linked listचे `next` links उलटून नवीन head परत करा. Nodesची values किंवा identities बदलायच्या नाहीत.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `ListNode* reverseListIterative(ListNode* head)`
-- `ListNode* reverseListRecursive(ListNode* head)`
-- `ListNode* vectorToList(const vector<int>& vals)`
-- `vector<int> listToVector(ListNode* head)`
-- `void linked_list_test_cases()`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `1→2→3→4→5` → `5→4→3→2→1`.
+- Empty list → null; single node तसाच.
+- Source iterative आणि recursive implementationsची तुलना करतो.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Rewire each next pointer iteratively or recursively and return the former tail.
+| Clue                      | Pattern             | कारण                     |
+| ------------------------- | ------------------- | ------------------------ |
+| Reverse pointer direction | Pointer rewiring    | प्रत्येक edge उलट        |
+| Singly linked list        | Save-next traversal | पुढचा node हरवू नये      |
+| Tail becomes head         | Iterative invariant | Previous reversed prefix |
 
-## Main flow
+## 4. Approaches
 
-Rewire each next pointer iteratively or recursively and return the former tail.
+- Iterative three-pointer: O(n) time/O(1) space; preferred and source method.
+- Recursive: O(n) time/O(n) call stack; source method, concise.
+- Values copy करून reverse करणे required node topology बदलत नाही; judge node links अपेक्षित ठेवतो.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Rewire each next pointer iteratively or recursively and return the former tail."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Set prev=null, curr=head]
+ B --> C{curr exists?}
+ C -- No --> G[Return prev]
+ C -- Yes --> D[Save curr next]
+ D --> E[Point curr next to prev]
+ E --> F[Advance prev and curr]
+ F --> C
 ```
 
-## Core logic and invariant
+`nextTemp` ने उरलेली chain जपून मग pointer reverse करतो.
 
-Rewire each next pointer iteratively or recursively and return the former tail.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+तीन pointers: `prev` reversed prefix, `curr` current node, `nextTemp` untouched suffix. प्रत्येक iteration edge उलटा करून pointers पुढे न्या.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1) iterative; O(n) recursive.
+## 7. Code explanation
 
-## Approach comparison
+`reverseListIterative` loop संपल्यावर `prev` नवीन head परत करतो. `reverseListRecursive` base case last node/null; recursive returnनंतर `head->next->next=head` आणि `head->next=nullptr`. Source helper methods test harnessसाठी आहेत.
 
-The source contains multiple implementations for comparison:
+## 8. Dry run
 
-- `ListNode* reverseListIterative(ListNode* head)`
-- `ListNode* reverseListRecursive(ListNode* head)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `1→2→3`:
+> | curr | saved next | rewire | prev/curr after |
+> |---:|---:|---|---|
+> | 1 | 2 | `1→null` | `1 / 2` |
+> | 2 | 3 | `2→1` | `2 / 3` |
+> | 3 | null | `3→2` | `3 / null` |
+> Return 3.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## 9. Complexity
 
-## Compile and run
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Both O(n) time. Iterative O(1) auxiliary space; recursive O(n) stack.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 10. Correctness
 
-```powershell
-g++ -std=c++17 "LeetCode\206\206.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Iterative invariant: `prev` points to the fully reversed processed prefix and `curr` to untouched suffix. Saving `next` preserves suffix; rewiring adds exactly one reversed edge. On termination, all nodes are in reversed order and `prev` is new head.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Save `curr->next` before overwriting it.
+- New tail must point to null.
+- Return `prev`, not old head.
+- Recursive version uses stack and can overflow for very long lists.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> `next=curr->next; curr->next=prev; prev=curr; curr=next`.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Reverse Linked List II, Reverse Nodes in k-Group, palindrome linked list, reorder list.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why save next before rewiring?
+2. What does `prev` represent?
+3. Iterative vs recursive space?
+4. What is the new tail's `next`?

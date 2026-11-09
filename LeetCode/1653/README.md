@@ -1,89 +1,69 @@
-# Minimum Deletions to Make String Balanced
+# Minimum Deletions to Make String Balanced — LeetCode 1653
 
-**Problem ID:** 1653  
-**Source:** `minimumDeletions1653.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Stringमध्ये फक्त `a,b`. Balanced म्हणजे कोणताही `b` हा कोणत्याही `a`च्या आधी येत नाही; रूप `aaa...bbb...` असते. Minimum characters delete करा.
+Example: `aababbab`: split नंतर left-side `b`s आणि right-side `a`s मोजल्यास best deletion `2`. `aaaa`, `bbbb`, empty string यांना `0` deletions.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int minimumDeletionsGreedy(const string &s)`
-- `int minimumDeletionsPrefixSuffix(const string &s)`
-- `int minimumDeletionsDP(const string &s)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | final string is `a* b*` | choose split point |
+> | delete misplaced chars on either side | prefix/suffix counts |
+> | scan can retain best prefix state | one-pass DP/greedy |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Compare running b-deletion cost with deleting preceding b or following a characters.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Prefix `b` count + suffix `a` count for every split | Correct `O(n)` / `O(n)` |
+> | One-pass DP/greedy (`b_count`, `deletions`) | Selected `O(n)` / `O(1)` |
+> | Full DP array | Correct `O(n)` / `O(n)` |
+> | Delete first encountered `ba` pair repeatedly | Can be correct with iteration, but inefficient; arbitrary single deletion is not necessarily optimal |
 
-## Main flow
-
-Compare running b-deletion cost with deleting preceding b or following a characters.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Compare running b-deletion cost with deleting preceding b or following a characters."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[deletions=0, b_count=0] --> B{More characters?}
+    B -- No --> E[Return deletions]
+    B -- Yes --> C{Current char is b?}
+    C -- Yes --> D[Increment b_count]
+    C -- No, current is a --> F[deletions = min(deletions+1, b_count)]
+    D --> B
+    F --> B
 ```
 
-## Core logic and invariant
+`a` आल्यावर दोन पर्याय: हे `a` delete करा, किंवा आधीचे सर्व `b` delete करा.
 
-Compare running b-deletion cost with deleting preceding b or following a characters.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, code आणि dry run
 
-## Complexity
+`minimumDeletionsGreedy` हे recurrence लागू करतो. `minimumDeletionsPrefixSuffix` प्रत्येक splitचा `prefixB+suffixA`; `minimumDeletionsDP` हाच recurrence arrayमध्ये ठेवतो. `main` तीन पद्धती compare करतो.
+Dry run (`s="ba"`):
+| char | `b_count` before | decision | deletions after |
+|---|---:|---|---:|
+| `b` | 0 | keep, increment b count | 0 |
+| `a` | 1 | min(delete `a`:1, delete prior `b`:1) | 1 |
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1) greedy; O(n) prefix/suffix.
+## Edge cases
 
-## Approach comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> All-a, all-b, and empty strings need 0 deletions; alternating patterns exercise both choices.
 
-The source contains multiple implementations for comparison:
+## Complexity, correctness, traps
 
-- `int minimumDeletionsGreedy(const string &s)`
-- `int minimumDeletionsDP(const string &s)`
-  The approach described above is the primary strategy; where a direct/brute-force alternative is present, the optimized version reduces repeated work by reusing the state, ordering, or invariant described above. Complexity is qualified by variant where known.
+Greedy `O(n)` time, `O(1)` space. Correctness: प्रत्येक prefixचा optimal cost राखतो; `b` जोडल्याने cost बदलत नाही, `a` जोडल्यावर optimal उपाय फक्त `a` delete करणे किंवा preceding `b`s delete करणे यांपैकी एक.
+Trap: balanced म्हणजे all `a` before all `b`; counts equal असणे नव्हे. Prefix/suffix split endpoints `0` आणि `n` समाविष्ट करा.
 
-```mermaid
-flowchart LR
-    A[Direct or brute-force alternative] --> B[Repeated candidate work]
-    A --> C[Compare with optimized alternative]
-    C --> D[Reuse the problem-specific state or invariant]
-    D --> E[Obtain the same result with less repeated work]
-```
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: `a` आल्यावर delete it किंवा आधीचे `b`s delete करा.
+On `b`: count; on `a`: `min(cost+1,b_count)`. Related: partitioning strings, prefix/suffix minima, sequence editing DP.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
-
-```powershell
-g++ -std=c++17 "LeetCode\1653\1653.cpp" -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+1. `ba` चा minimum किती?
+2. `a` आल्यावर दोन पर्याय कोणते?
+3. `b` आल्यावर deletions का बदलत नाहीत?
+4. Prefix-suffix पद्धतीत split `n` काय दर्शवतो?

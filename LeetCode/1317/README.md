@@ -1,63 +1,130 @@
-# Convert Integer to the Sum of Two No-Zero Integers
+# 1317 — Convert Integer to the Sum of Two No-Zero Integers
 
-**LeetCode ID:** 1317
-**Source file(s):** `1317.cpp` (originally `getNoZeroIntegers.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे शून्य अंक नसलेल्या दोन संख्यांची बेरीज.
 
-vector<int> getNoZeroIntegers(int n). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Find positive `A` and `B` with `A+B=n`, where neither decimal representation contains digit zero.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत शून्य अंक नसलेल्या दोन संख्यांची बेरीज कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> For `n=11`, the first valid split is `2+9`; for `n=2`, it is `1+1`. The loop checks candidates in increasing order and returns the first valid pair.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is a **bounded search with a digit predicate**.
+> | Task | Technique |
+> |---|---|
+> | Enumerate decompositions | Try `i` from 1 to `n-1` |
+> | Check no zero digits | Decimal string search |
+> | Need any valid answer | Stop at first valid split |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Check all positive splits: source approach, `O(n·d)` with string conversion.
+- Check digits arithmetically: same search without temporary strings.
+- There is no need to test every ordered pair; `B=n-i` is determined.
+
+## 5. Mermaid flowchart and explanation
+
+आकृतीमध्ये प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
+> The search stops as soon as both sides pass the no-zero test.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{neither addend contains digit zero?}
-    E -- Yes --> F[return the pair]
-    E -- No --> G[continue testing]
-    F --> D
-    G --> D
+ A([Start]) --> B[Set i to 1]
+ B --> C{Is i less than n?}
+ C -- No --> Z([No pair found])
+ C -- Yes --> D{Do i and n-i contain zero?}
+ D -- No --> E[Return i and n-i]
+ D -- Yes --> F[Increment i]
+ F --> C
 ```
 
-## Important branch and loop flow
+## 6. Algorithm / intuition
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{neither addend contains digit zero?}
-    B -- Yes --> C[return the pair]
-    B -- No --> D[continue testing]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+मूळ कल्पना: प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे.
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Every valid answer has some first addend `i` between `1` and `n-1`; its partner is forced to be `n-i`. Test both numbers for digit zero until a valid split appears.
 
-Tests candidate splits i and n-i in increasing order and returns the first pair whose decimal strings contain no zero.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 7. Code explanation
 
-## Optimization / comparison
+Code मधील state आणि updates हे प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे या कल्पनेशी जोडून वाचा.
 
-The positive addends sum to n and are independently checked for zero digits.
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `CheckZero` converts its argument to a string and searches for `'0'`. `getNoZeroIntegers` loops, appends the two values and breaks on a match. The source returns an empty vector only if no split is found; constraints guarantee one.
 
-## Complexity
+## 8. Dry run
 
-O(n\*d) time and O(d) temporary string space.
+Dry run मध्ये प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `n=11`:
+> | `i` | `n-i` | Contains zero? | Result |
+> |---:|---:|---|---|
+> | 1 | 10 | Yes | Continue |
+> | 2 | 9 | No | Return `[2,9]` |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\1317\1317.cpp -o solution.exe
-.\solution.exe
-```
+प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> At most `n-1` candidates and `O(log n)` digit checks per candidate: `O(n log n)` time, `O(log n)` temporary string space.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> The loop visits every possible positive first addend in ascending order, and computes the only partner that sums to `n`. It returns only after both numbers have no zero digit, so the returned pair satisfies all requirements; the problem guarantees the search succeeds.
+
+## 11. Mistakes / interview traps
+
+लक्षात ठेवा: दोन्ही संख्यांमधील प्रत्येक अंक तपासायचा.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Exclude zero addends: start at `1`, stop before `n`.
+- Check both numbers; one valid number is not enough.
+- Use `n-i`, not another independent guess.
+- Return exactly two values.
+
+## 12. Quick revision
+
+थोडक्यात, प्रत्येक उमेदवार आणि त्याचा पूरक तपासणे. दोन्ही संख्यांमधील प्रत्येक अंक तपासायचा.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Try `i=1..n-1`; validate `i` and `n-i`; first valid split wins. Check string for `'0'`.
+
+## 13. Related problems / variations
+
+संबंधित प्रश्नांत शून्य अंक नसलेल्या दोन संख्यांची बेरीज यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> Two Sum, split integer under digit constraints, digit DP; variation: count all valid splits instead of returning the first.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून शून्य अंक नसलेल्या दोन संख्यांची बेरीज याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is the partner determined once `i` is chosen?
+2. Why must `i` start at one?
+3. What does `CheckZero` test?
+4. What is the worst-case number of candidate checks?

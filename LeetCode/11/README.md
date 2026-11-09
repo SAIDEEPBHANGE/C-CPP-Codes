@@ -1,71 +1,93 @@
-# Container With Most Water
+# Container With Most Water — LeetCode 11
 
-**Problem ID:** 11  
-**Source:** `maxArea.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+`height` मधील दोन lines निवडून सर्वाधिक पाणी धारण करणारे container area शोधा. Area = smaller height × indices मधील अंतर.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `int maxArea(vector<int>& height)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `[1,8,6,2,5,4,8,3,7]` → 49 (`height 8,7`, width 7).
+- `[1,1]` → 1; `[4,3,2,1,4]` → 16.
+- रिकामी/एक-element list असल्यास valid pair नाही; typical platformsवर source loop skip करून 0 देतो. Robust implementationने empty input आधी handle करावा (`size()-1` unsigned arithmetic आहे).
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Move the pointer at the shorter boundary and track width times the limiting height.
+| Clue                                | Pattern              | कारण                       |
+| ----------------------------------- | -------------------- | -------------------------- |
+| Pair of indices, width shrinks      | Two pointers         | दोन्ही टोकांपासून सुरू     |
+| Area min of pair heights × distance | Greedy discard       | कमी उंचीची line bottleneck |
+| Maximize pair objective             | Brute force baseline | सर्व pairs तपासून optimal  |
 
-## Main flow
+## 4. Approaches
 
-Move the pointer at the shorter boundary and track width times the limiting height.
+- Brute force सर्व `i<j` pairs — O(n²), O(1).
+- Source चा `maxArea` two pointers वापरतो — O(n), O(1), optimal.
+- कमी उंचीऐवजी जास्त उंचीची pointer हलवणे सुरक्षित नाही; width कमी होताना संभाव्य उंची वाढवण्याची संधी वाया जाते.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Move the pointer at the shorter boundary and track width times the limiting height."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Set left=0, right=n-1, best=0]
+ B --> C{left < right?}
+ C -- No --> G[Return best]
+ C -- Yes --> D[Compute min height times width]
+ D --> E[Update best]
+ E --> F{Which side is shorter?}
+ F -- Left --> H[Increment left]
+ F -- Right or equal --> I[Decrement right]
+ H --> C
+ I --> C
 ```
 
-## Core logic and invariant
+Shorter side हलवतो; त्याच बाजूचा height bottleneck असल्याने दुसरा side तसाच ठेवून मोठी area मिळणार नाही.
 
-Move the pointer at the shorter boundary and track width times the limiting height.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+प्रत्येक pair चे area पाहा. Width नेहमी कमी होणार; म्हणून कमी height असलेली line काढून टाका आणि तिच्यापेक्षा उंच line शोधा.
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## 7. Code explanation
 
-## Compile and run
+`maxArea` मध्ये `left`, `right`, `maxWater` राखले आहेत. `h=min(height[left],height[right])`, `w=right-left`; area update नंतर छोटा height असलेला pointer हलतो (equal असता right).
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\11\11.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `[1,8,6,2,5,4,8,3,7]`:
+> | left height | right height | width | area | best / move |
+> |---:|---:|---:|---:|---|
+> | 1 | 7 | 8 | 8 | 8; left++ |
+> | 8 | 7 | 7 | 49 | 49; right-- |
+> | 8 | 3 | 6 | 18 | 49; right-- |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Two pointers O(n) time, O(1) auxiliary space. Brute force O(n²), O(1).
+
+## 10. Correctness
+
+समजा सध्याच्या pair मध्ये left height लहान आहे. Left ला right पेक्षा आतल्या कोणत्याही index शी जोडल्यास width कमी आणि limiting height जास्तीत जास्त जुन्या left height इतकाच; त्यामुळे area सध्याच्या pair पेक्षा चांगला होऊ शकत नाही. म्हणून left discard सुरक्षित; symmetric case right साठी.
+
+## 11. Mistakes and interview traps
+
+- Area मध्ये height minimum असतो, maximum नाही.
+- Width `right-left`.
+- फक्त छोटा pointer हलवायचा; equal असता कुठलाही एक हलवता येतो.
+- Source `int` वापरतो; problem constraints मधील area `int` मध्ये बसतो हे गृहीत.
+
+## 12. Quick revision
+
+Ends पासून scan, area काढा, best राखा, shorter wall move करा. O(n)/O(1).
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Trapping Rain Water, Two Sum II, maximum distance/area with two pointers.
+
+## 14. Self-assessment
+
+1. कमी height असलेली बाजूच का हलवतो?
+2. Width कशी बदलते?
+3. `[1,1]` चा area किती?
+4. Brute-force pair count आणि complexity काय?

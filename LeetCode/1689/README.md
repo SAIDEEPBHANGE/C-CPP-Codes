@@ -1,73 +1,73 @@
-# Partitioning Into Minimum Number Of Deci-Binary Numbers
+# Partitioning Into Minimum Number Of Deci-Binary Numbers — LeetCode 1689
 
-**Problem ID:** 1689  
-**Source:** `minPartitions.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## Problem, constraints आणि examples
 
-## Expected input and output / judge signature
+Decimal string `n` ला फक्त decimal digit `0` किंवा `1` असलेल्या positive integersच्या बेरजेत लिहा; किमान किती numbers लागतात? `n` मोठी असू शकते, म्हणून stringवरच काम करा.
+Example: `32 = 10+11+11`, answer `3`; `82734` answer `8`. कारण digit `8` ला 8 unit contributions लागतात; digit `2`-ला त्याच आठ numbersपैकी दोनमध्ये `1` पुरते.
 
-Solution-facing declarations extracted from the source:
+## Pattern clues
 
-- `int minPartitions_Linear(string n)`
-- `int minPartitions_EarlyExit(string n)`
-- `int minPartitions_STL(string n)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | each position digit independently needs unit contributions | greedy lower bound |
+> | deci-binary digit max is 1 | maximum digit determines count |
+> | input may exceed integer range | scan string, no parsing |
 
-## Identification evidence
+## Approaches
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Return the largest digit in the decimal string, with early exit at nine.
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Complexity |
+> |---|---|---|
+> | Scan and take maximum digit | Selected, correct `O(L)` / `O(1)` |
+> | Early exit when digit `9` appears | Correct same asymptotic; small constant optimization |
+> | `max_element` over chars | Correct `O(L)` / `O(1)` |
+> | Convert whole string to integer then process | Unsafe for long input and unnecessary |
+> | Return sum of digits | Incorrect; one deci-binary number contributes multiple positions simultaneously |
 
-## Main flow
-
-Return the largest digit in the decimal string, with early exit at nine.
-
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Return the largest digit in the decimal string, with early exit at nine."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+    A[best=0] --> B{More digits?}
+    B -- No --> E[Return best]
+    B -- Yes --> C[Convert current char to digit]
+    C --> D[best = max(best,digit)]
+    D --> F{best is 9?}
+    F -- Yes --> G[Return 9]
+    F -- No --> B
 ```
 
-## Core logic and invariant
+Maximum possible digit `9` मिळाल्यावर पुढील scan उत्तर बदलू शकत नाही.
 
-Return the largest digit in the decimal string, with early exit at nine.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## Selected algorithm, intuition आणि code
 
-## Complexity
+`minPartitions_Linear` प्रत्येक digitसाठी `result=max(result,c-'0')`. Lower bound: digit `d` असलेल्या positionवर `d` वेगळे `1`s लागतात; upper bound: प्रत्येक digitच्या rankपर्यंत एक deci-binary number तयार करता येतो. `minPartitions_EarlyExit` 9 वर थांबतो; STL version `max_element`. `main` तिन्ही compare करतो.
+Dry run (`82734`):
+| Digit | Current maximum |
+|---:|---:|
+| 8 | 8 |
+| 2 | 8 |
+| 7 | 8 |
+| 3 | 8 |
+| 4 | 8 |
 
-- **Time:** O(n).
-- **Auxiliary space:** O(1).
+## Edge cases
 
-## Compile and run
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> All zeros require 0 numbers; a digit 9 fixes the answer at 9; long inputs must stay strings.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## Complexity, correctness, traps
 
-```powershell
-g++ -std=c++17 "LeetCode\1689\1689.cpp" -o solution.exe
-.\solution.exe
-```
+Each method `O(L)` time, `O(1)` auxiliary; string by value असल्यामुळे source-level parameter copy `O(L)` असू शकतो. Correctness lower-bound + construction argumentवर आधारित: maximum digit इतके layers पुरे आणि त्याहून कमी शक्य नाही.
+Trap: मोठा string integerमध्ये convert करू नका; answer maximum digit आहे, digit sum नाही. Leading zeros असल्यास maximumवर परिणाम नाही.
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## Quick revision, variations, self-check
+
+पुनरावलोकन: उत्तर म्हणजे stringमधील maximum digit.
+Answer `max digit`; 9 आढळल्यावर exit. Related: digit-wise greedy lower bounds, layer decomposition.
+
+1. `273` साठी answer?
+2. digit `0` ला किती `1`s हवेत?
+3. digit sum किमान संख्या का देत नाही?
+4. `9` मिळाल्यावर early return का सुरक्षित?

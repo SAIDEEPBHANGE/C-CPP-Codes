@@ -1,63 +1,93 @@
-# Find Closest Person
+# 3516 — Find Closest Person
 
-**LeetCode ID:** 3516
-**Source file(s):** `3516.cpp` (originally `findClosest.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Problem understanding and constraints
 
-## Expected input/output or judge interface
+Compare distances from people at x and y to a meeting point z; return 1, 2, or 0 if tied. **थोडक्यात:** काय मोजायचे/निवडायचे ते आधी स्पष्ट करा; मगच code निवडा.
 
-findClosest/findClosestOptimal/findClosestOneLine(int x,int y,int z). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## 2. Stepwise example and edge cases
 
-## Main flow
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> `x=2,y=7,z=4`: distances 2 and 3, so person 1 is closer. **Edge cases:** check smallest valid input, ties/boundaries, and empty/no-match outcomes where constraints allow them.
+
+## 3. Pattern identification — clue table
+
+Absolute-distance comparison. हा मुख्य pattern आहे.
+| Clue | What it suggests |
+|---|---|
+| Output depends on absolute-distance comparison. | Keep only the relevant state; avoid unrelated recomputation |
+| Need to preserve the stated condition | State an invariant before coding |
+| Input scan/order matters | Update once per item and test boundaries |
+
+## 4. Multiple approaches
+
+The source has original, optimal, and one-line versions; all are correct. More elaborate geometry is unnecessary on a number line. **योग्य निवड:** source मध्ये असलेली method आणि तिच्या मर्यादा वेगळ्या ओळखा.
+
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{distance to x is less, greater, or equal to distance to y?}
-    E -- Yes --> F[return corresponding person ID]
-    E -- No --> G[none; all cases return immediately]
-    F --> D
-    G --> D
-```
-
-## Important branch and loop flow
-
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{distance to x is less, greater, or equal to distance to y?}
-    B -- Yes --> C[return corresponding person ID]
-    B -- No --> D[none; all cases return immediately]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
+    A([Start]) --> B[Read input and initialize state]
+    B --> C[Process the next candidate]
+    C --> D{is d1 less than, greater than, or equal to d2?}
+    D -->|Yes| E[return 1, 2, or 0 respectively]
+    D -->|No| F[Keep state unchanged]
+    E --> G{More candidates?}
     F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
+    G -->|Yes| C
+    G -->|No| H[Return the result]
+    H --> I([End])
 ```
 
-## Core logic and invariant
+Flow समजताना decision condition आणि update invariant शी जुळतात का ते तपासा.
 
-Compares absolute distances from x and y to z and returns 1, 2, or 0 for person 1, person 2, or tie.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## 6. Selected algorithm and intuition
 
-## Optimization / comparison
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Compute `abs(x-z)` and `abs(y-z)` and compare.
 
-Only the absolute distance to the destination affects the result; the three methods express the same comparison.
+## 7. Code-specific explanation
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `LeetCode\3516\3516.cpp` — `findClosest`, `findClosestOptimal`, and `findClosestOneLine` return the same label; tie must return 0.
 
-O(1) time and space.
+## 8. Dry run
 
-## Compile and run
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> | Step | State / action |
+> |---:|---|
+> | 1 | x=2,y=7,z=4 → d1=2,d2=3 → 1. |
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+## 9. Complexity
 
-```powershell
-g++ -std=c++17 LeetCode\3516\3516.cpp -o solution.exe
-.\solution.exe
-```
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O(1)` time and `O(1)` space.
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+## 10. Correctness
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> Absolute differences are precisely the two distances. Their three possible comparisons map directly to the requested result labels.
+
+## 11. Mistakes and interview traps
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Use absolute distances, not signed subtraction.
+- Handle equality explicitly.
+- Verify label 1 refers to x and label 2 to y.
+
+## 12. Quick revision
+
+**झटपट:** Compute `abs(x-z)` and `abs(y-z)` and compare. Pattern ओळखा, condition तपासा, आणि answer एकदाच योग्य पद्धतीने update करा.
+
+## 13. Related patterns and variations
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> Absolute value; comparisons; number-line distance.
+
+## 14. Self-assessment
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. What does a tie return?
+2. Why is signed subtraction wrong?
+3. Which distance maps to person 1?

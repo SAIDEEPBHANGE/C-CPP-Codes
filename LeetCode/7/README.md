@@ -1,73 +1,93 @@
-# Reverse Integer
+# Reverse Integer — LeetCode 7
 
-**Problem ID:** 7  
-**Source:** `reverse.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+32-bit signed integer चे decimal digits उलटवा; reversed value range बाहेर गेल्यास `0` द्या. Source मध्ये arithmetic, `long long`, आणि string methods आहेत.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `int reverseMath(int x)`
-- `int reverseUsingLongLong(int x)`
-- `int reverseUsingString(int x)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `123` → `321`; `-123` → `-321`; `120` → `21`.
+- `1534236469` reverse केल्यास overflow → 0.
+- `0` → 0; `INT_MIN` absolute value edge case आहे.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Consume decimal digits and append them in reverse order while checking signed 32-bit overflow.
+| Clue                      | Pattern                  | कारण                                 |
+| ------------------------- | ------------------------ | ------------------------------------ |
+| Decimal digits क्रम बदलणे | `%10`, `/10`             | शेवटचा digit काढतो                   |
+| Fixed-width signed result | Overflow guard           | प्रत्येक append सुरक्षित ठेवा        |
+| String conversion         | Alternate representation | सोपे, पण parsing/range checks आवश्यक |
 
-## Main flow
+## 4. Approaches
 
-Consume decimal digits and append them in reverse order while checking signed 32-bit overflow.
+- `reverseMath`: digit-by-digit; O(d) time/O(1), पण source guard फक्त `rev` limit तपासतो—last digit boundary तपासत नाही, म्हणून signed overflow boundary पूर्णपणे सुरक्षित नाही.
+- `reverseUsingLongLong`: widened accumulator नंतर range check; O(d), O(1), सामान्य int input साठी योग्य.
+- String: O(d) time/O(d) space; source चे `abs(x)` `INT_MIN` वर int overflow करतो, त्यामुळे हा implementation त्या input साठी सुरक्षित नाही.
+- Correct robust math check: append करण्याआधी `rev > INT_MAX/10` किंवा equality आणि digit `>7`; negative साठी `rev < INT_MIN/10` किंवा equality आणि digit `<-8`.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Consume decimal digits and append them in reverse order while checking signed 32-bit overflow."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B[Set reverse=0]
+ B --> C{Input has digits?}
+ C -- Yes --> D[Extract digit with remainder]
+ D --> E{Appending digit fits 32-bit?}
+ E -- No --> F[Return 0]
+ E -- Yes --> G[Append digit and remove it from input]
+ G --> C
+ C -- No --> H[Return reversed integer]
 ```
 
-## Core logic and invariant
+Boundary check append करण्याआधी करा; overflow झाल्यावर value आधीच corrupt होऊ शकते.
 
-Consume decimal digits and append them in reverse order while checking signed 32-bit overflow.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+`digit=x%10`, मग `x/=10`; accumulator `rev=rev*10+digit`. Sign remainder मध्येच टिकतो. प्रत्येक append नंतर result 32-bit range मध्ये असणे आवश्यक.
 
-- **Time:** O(d).
-- **Auxiliary space:** O(1).
+## 7. Code explanation
 
-## Compile and run
+Source चे public methods `reverseMath`, `reverseUsingLongLong`, `reverseUsingString`. Widened version अंतिम range तपासतो; इतर दोनमधील वर नमूद केलेले boundary defects समजून घ्या. `main()` test values तिन्ही implementations शी तुलना करतो.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\7\7.cpp" -o solution.exe
-.\solution.exe
-```
+`x=-120`:
+| digit | rev आधी | rev नंतर | x नंतर |
+|---:|---:|---:|---:|
+| 0 | 0 | 0 | -12 |
+| -2 | 0 | -2 | -1 |
+| -1 | -2 | -21 | 0 |
+| | | return `-21` | |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `d` digits: arithmetic O(d) time/O(1) space; string method O(d) time/O(d) space. Overflow check constant per digit.
+
+## 10. Correctness
+
+प्रत्येक iteration नंतर `rev` हा आतापर्यंत घेतलेल्या input digits चा उलटा prefix असतो आणि `x` मध्ये न घेतलेले digits उरतात. सर्व digits घेतल्यावर तोच reversed number; तो range बाहेर असल्यास spec नुसार 0.
+
+## 11. Mistakes and interview traps
+
+- फक्त `rev > INT_MAX/10` तपासणे अपुरे; अंतिम digit boundary देखील तपासा.
+- `INT_MIN` चे `abs(int)` सुरक्षित नाही.
+- Negative modulo digit C++ मध्ये negativeच राहू शकतो; ते योग्य आहे.
+- Leading zeros उलटल्यावर स्वाभाविकपणे नाहीसे होतात.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Digit extract → overflow precheck → append → divide. Final 32-bit range; overflow means 0.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Palindrome Number, String to Integer (atoi), reverse digits in arbitrary base, checked arithmetic.
+
+## 14. Self-assessment
+
+1. `x%10` आणि `x/10` काय देतात?
+2. `INT_MAX` चा शेवटचा digit 7 का महत्त्वाचा?
+3. `INT_MIN` साठी `abs` trap काय?
+4. Overflow precheck append च्या आधी का?

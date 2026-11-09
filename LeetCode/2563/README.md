@@ -1,63 +1,133 @@
-# Count the Number of Fair Pairs
+# 2563 — Count the Number of Fair Pairs
 
-**LeetCode ID:** 2563
-**Source file(s):** `2563.cpp` (originally `countFairPairs.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## 1. Understanding
 
-## Expected input/output or judge interface
+या प्रश्नाचा गाभा म्हणजे दिलेल्या समावेशक मर्यादेत बेरीज असलेल्या index जोड्यांची मोजणी.
 
-long long countFairPairs(vector<int>& nums,int lower,int upper). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Count index pairs `i<j` whose sum lies in the inclusive interval `[lower, upper]`. Equal values at different indices are valid separate choices.
 
-## Main flow
+## 2. Worked examples and edge cases
+
+उदाहरणे आणि सीमाप्रकरणांत दिलेल्या समावेशक मर्यादेत बेरीज असलेल्या index जोड्यांची मोजणी कशी लागू होते ते पाहा.
+
+> **मराठी:** उदाहरणातील input पासून output पर्यंत प्रत्येक बदल समजून घ्या.
+> For `[5,5,5,5]`, range `[10,10]`, all `4 choose 2 = 6` pairs qualify. For sorted `[1,3,5]` and range `[4,6]`, pairs `(1,3)` and `(1,5)` qualify; endpoints are included.
+
+## 3. Pattern identification + cheat sheet
+
+येथे मुख्य pattern म्हणजे sorted array मध्ये योग्य partner ची सीमा शोधणे; वरील तुलना लक्षात घ्या.
+
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> This is **sort + binary search over valid partner ranges**.
+> | Need for each `i` | Search |
+> |---|---|
+> | First partner sum `>= lower` | `lower_bound(lower-nums[i])` |
+> | First partner sum `> upper` | `upper_bound(upper-nums[i])` |
+> | Keep `i<j` | Search only suffix beginning at `i+1` |
+
+## 4. Approaches
+
+पद्धतींची तुलना करताना sorted array मध्ये योग्य partner ची सीमा शोधणे याचा वेळ आणि जागेवरील परिणाम पाहा.
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+
+- Check every pair: brute force `O(n²)`.
+- Sort and use two pointers to count sums `<=X`, then subtract counts for `<lower`.
+- The source sorts and performs two binary searches per `i`, `O(n log n)`.
+
+## 5. Flowchart
+
+आकृतीमध्ये sorted array मध्ये योग्य partner ची सीमा शोधणे ही प्रक्रिया क्रमाने दाखवली आहे.
+
+> **मराठी:** Flowchart मध्ये प्रत्येक decision, loop आणि loop कधी थांबतो ते पाहा.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{partner sum lies in ()lower,upper()?}
-    E -- Yes --> F[add upper-bound index minus lower-bound index]
-    E -- No --> G[advance i]
-    F --> D
-    G --> D
+    A[Sort nums] --> B[Choose i]
+    B --> C[Search suffix i+1..end for lower-nums[i]]
+    C --> D[Search suffix for first value > upper-nums[i]]
+    D --> E[Add iterator distance to count]
+    E --> F{More i?}
+    F -->|yes| B
+    F -->|no| G[Return long long count]
 ```
 
-## Important branch and loop flow
+The interval of acceptable partners is `[left,right)`, so its length gives the number of partners.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{partner sum lies in ()lower,upper()?}
-    B -- Yes --> C[add upper-bound index minus lower-bound index]
-    B -- No --> D[advance i]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## 6. Algorithm and intuition
 
-## Core logic and invariant
+मूळ कल्पना: sorted array मध्ये योग्य partner ची सीमा शोधणे.
 
-Sorts values; for each i, binary-searches the allowable partner range [lower-nums[i], upper-nums[i]] among later indices.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> Sorting makes partner values monotonic. For each `nums[i]`, valid partners satisfy `lower-nums[i] <= nums[j] <= upper-nums[i]`. `lower_bound` finds the first inclusive lower endpoint; `upper_bound` finds the first value past the inclusive upper endpoint. Restricting searches to `i+1...` prevents using an index twice or counting a pair twice.
 
-## Optimization / comparison
+## 7. Code explanation
 
-Searching only j>i counts each unordered pair once; sorting plus binary search replaces quadratic enumeration.
+Code मधील state आणि updates हे sorted array मध्ये योग्य partner ची सीमा शोधणे या कल्पनेशी जोडून वाचा.
 
-## Complexity
+> **मराठी:** Code मधील variable आणि condition यांचा algorithm मधील उद्देश समजून घ्या.
+> `countFairPairs` sorts the input in place, initializes a `long long` count, then adds `right-left` iterator distance per `i`. The bounds are computed from the current value; the answer can be quadratic, hence `long long`.
 
-O(n log n) time and O(1) extra space apart from sorting.
+## 8. Dry run
 
-## Compile and run
+Dry run मध्ये sorted array मध्ये योग्य partner ची सीमा शोधणे कसे घडते ते प्रत्येक टप्प्यावर तपासा.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> For `[1,3,5]`, bounds `[4,6]`:
+> | `i`, value | acceptable partner values | Added |
+> |---|---|---:|
+> | 0, 1 | `[3,5]` | 2 |
+> | 1, 3 | `[1,3]` in suffix `[5]`: none | 0 |
+> | 2, 5 | no suffix | 0 |
+> Total `2`.
 
-```powershell
-g++ -std=c++17 LeetCode\2563\2563.cpp -o solution.exe
-.\solution.exe
-```
+## 9. Complexity
 
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+sorted array मध्ये योग्य partner ची सीमा शोधणे यासाठी लागणारा वेळ आणि अतिरिक्त जागा वरील bounds मध्ये दिली आहेत.
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Sorting `O(n log n)` plus `n` pairs of binary searches: `O(n log n)` time. `O(1)` extra space apart from sorting implementation stack.
+
+## 10. Correctness
+
+योग्यतेचा युक्तिवाद sorted array मध्ये योग्य partner ची सीमा शोधणे यावर आधारित आहे; वरील अटी तपासा.
+
+> **मराठी:** Invariant किंवा तर्क वापरून algorithm योग्य उत्तर देतो हे समजून घ्या.
+> For fixed `i`, the suffix contains exactly candidates with `j>i`. Since it is sorted, all values satisfying the inclusive sum bounds form one contiguous interval. The two binary searches return precisely its start and end, so `right-left` counts exactly the valid partners. Every pair is counted once at its smaller index.
+
+## 11. Mistakes and interview traps
+
+लक्षात ठेवा: lower आणि upper दोन्ही सीमा समाविष्ट आहेत.
+
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+
+- Use `upper_bound` for inclusive upper bound.
+- Search from `i+1`, not from the full array.
+- Preserve duplicates; equal values at distinct indices count.
+- Sorting mutates `nums`; use a copy if input preservation is required.
+- Return/count in 64-bit type.
+
+## 12. Quick revision
+
+थोडक्यात, sorted array मध्ये योग्य partner ची सीमा शोधणे. lower आणि upper दोन्ही सीमा समाविष्ट आहेत.
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Sort; for each `i`, count suffix values in `[lower-a[i],upper-a[i]]` using `lower_bound` and `upper_bound`.
+
+## 13. Related problems and variations
+
+संबंधित प्रश्नांत दिलेल्या समावेशक मर्यादेत बेरीज असलेल्या index जोड्यांची मोजणी यासारखी अट बदलल्यास योग्य पद्धतही तपासा.
+
+> **मराठी:** Related problem मध्ये constraints बदलल्यास approach कसा बदलेल ते विचारा.
+> LeetCode 1 (Two Sum); 167 (Two Sum II); 327 (Count of Range Sum); variations: count pairs `<=X` with two pointers.
+
+## 14. Self-assessment
+
+वरील प्रश्न स्वतः सोडवून दिलेल्या समावेशक मर्यादेत बेरीज असलेल्या index जोड्यांची मोजणी याची उजळणी करा.
+
+> **मराठी:** उत्तर न पाहता प्रश्न सोडवा आणि तुमच्या निवडीचे कारण सांगा.
+
+1. Why is the search range restricted to indices after `i`?
+2. Why do `lower_bound` and `upper_bound` differ here?
+3. Why can the answer require 64-bit storage?

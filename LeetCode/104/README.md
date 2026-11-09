@@ -1,75 +1,90 @@
-# Maximum Depth of Binary Tree
+# Maximum Depth of Binary Tree — LeetCode 104
 
-**Problem ID:** 104  
-**Source:** `LastDepth.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+Binary tree root-to-leaf path मधील maximum number of nodes (depth) शोधा. Empty treeची depth 0.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `int LastDepth(TreeNode* node)`
-- `int maxDepth(TreeNode* root)`
-- `TreeNode* createTree1()`
-- `TreeNode* createTree2()`
-- `TreeNode* createTree3()`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- Root `1`, children `2,3`, and `2.left=4` → depth 3.
+- Single node → 1; `nullptr` → 0.
+- Skewed treeमध्ये depth = node count.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Return zero for null nodes and one plus the larger recursive child depth.
+| Clue                       | Pattern         | कारण                     |
+| -------------------------- | --------------- | ------------------------ |
+| Maximum root-to-leaf level | Tree DFS        | प्रत्येक subtreeची depth |
+| Left/right alternatives    | Max aggregation | मोठी depth निवडा         |
+| Empty subtree              | Base case       | depth 0                  |
 
-## Main flow
+## 4. Approaches
 
-Return zero for null nodes and one plus the larger recursive child depth.
+- Recursive DFS (`LastDepth`): O(n) time/O(h) stack; source method.
+- BFS level-order: O(n) time/O(w) queue; count levels.
+- Repeated traversal per node inefficient; tree एकदाच visit करा.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Return zero for null nodes and one plus the larger recursive child depth."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Call depth node]) --> B{Node null?}
+ B -- Yes --> C[Return 0]
+ B -- No --> D[Compute left subtree depth]
+ D --> E[Compute right subtree depth]
+ E --> F[Return 1 + max left and right]
 ```
 
-## Core logic and invariant
+Current nodeसाठी दोन्ही subtreesची माहिती आवश्यक.
 
-Return zero for null nodes and one plus the larger recursive child depth.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+Depth(node) = 0 if null; अन्यथा `1 + max(depth(left), depth(right))`. Leafला `1+max(0,0)=1`.
 
-- **Time:** O(N).
-- **Auxiliary space:** O(H) recursion.
+## 7. Code explanation
 
-## Compile and run
+`LastDepth(TreeNode*)` recursive helper आहे; `maxDepth(root)` त्याला call करतो. Source local `TreeNode` constructors, sample trees आणि demonstration `main()` पुरवतो.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\104\104.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> Tree `1` with left `2` → `2.left=4`, right `3`:
+> | Node | left depth | right depth | returned depth |
+> |---|---:|---:|---:|
+> | 4 | 0 | 0 | 1 |
+> | 2 | 1 | 0 | 2 |
+> | 3 | 0 | 0 | 1 |
+> | 1 | 2 | 1 | 3 |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> O(n) time, each node visited once; O(h) recursion stack (worst O(n), balanced O(log n)).
+
+## 10. Correctness
+
+प्रत्येक root-to-leaf path current nodeमधून जात असल्यास उर्वरित path left किंवा right subtreeमध्ये असतो. त्या दोन्ही maximum depthsमधील मोठी निवडून current nodeचा एक स्तर जोडल्यास exact maximum depth मिळते.
+
+## 11. Mistakes and interview traps
+
+- Depth nodes मोजते, edges नाही; single node answer 1.
+- Null base case 0.
+- `min` वापरू नका; deeper branch आवश्यक.
+- Deep skewed treeमध्ये recursive stack वाढतो.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> `nullptr→0`; otherwise `1+max(left,right)`.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Minimum Depth of Binary Tree, Diameter of Binary Tree, balanced tree check, level-order traversal.
+
+## 14. Self-assessment
+
+1. Single-node treeची depth?
+2. Recurrence काय?
+3. Balanced treeची recursion stack किती?
+4. BFSने depth कशी मोजाल?

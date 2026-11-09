@@ -1,63 +1,83 @@
-# Number of Ways to Arrive at Destination
+# Number of Ways to Arrive at Destination — LeetCode 1976
 
-**LeetCode ID:** 1976
-**Source file(s):** `1976.cpp` (originally `countPaths.cpp`)
-**Identification evidence:** The original filename, declared signature, and distinctive behavior described below uniquely identify this problem; no number was inferred from a filename alone.
+## Problem, constraints आणि examples
 
-## Expected input/output or judge interface
+Undirected weighted roads connect `n` cities; road times are positive. Find how many distinct paths from city `0` to city `n-1` have minimum total travel time; return modulo `1,000,000,007`.
+Example: two disjoint routes `0→1→3` and `0→2→3`, each total time `5`: shortest time `5`, answer `2`. A longer route is not counted.
 
-int countPaths(int n,vector<vector<int>>& roads) (free function). Inputs follow the problem constraints; the output is the documented scalar, sequence, or design-object behavior. The description below reflects the implementation actually present in the source.
+## Pattern clues
 
-## Main flow
+> **मराठी:** या clues मुळे योग्य pattern ओळखता येतो; constraints आणि relations नीट तपासा.
+> | Clue | Pattern |
+> |---|---|
+> | positive weighted shortest paths | Dijkstra |
+> | count all ways achieving best distance | shortest-distance + ways DP |
+> | equal candidate distance | add predecessor path counts |
+
+## Approaches
+
+> **मराठी:** सोप्या उपायापासून सुरुवात करा आणि constraints नुसार योग्य optimization निवडा.
+> | Method | Status | Cost |
+> |---|---|---|
+> | Dijkstra with `dist[]` and `ways[]` | Selected, `O((V+E)logV)` |
+> | Floyd-Warshall then count paths | Not enough by itself to count paths; cubic distances and separate counting needed |
+> | DFS enumerate every path | Correct for tiny graph but exponential |
+> | On shorter relaxation add counts instead of replace | Incorrect; older longer-distance paths are not shortest |
+
+## Flowchart
+
+> **मराठी:** Flowchart मधील decision, loop आणि termination condition क्रमाने समजून घ्या.
 
 ```mermaid
 flowchart TD
-    A([Start]) --> B[Read problem inputs]
-    B --> C[Initialize required algorithm state]
-    C --> D{More work?}
-    D -- No --> Z([Return result])
-    D -- Yes --> E{candidate distance is shorter or equal to known shortest distance?}
-    E -- Yes --> F[replace distance/ways, or add ways modulo MOD]
-    E -- No --> G[ignore stale or longer candidate]
-    F --> D
-    G --> D
+    A[Build undirected adjacency list] --> B[dist[0]=0; ways[0]=1; push 0]
+    B --> C[Pop minimum time node]
+    C --> D{Entry stale?}
+    D -- Yes --> C
+    D -- No --> E[Visit each neighbor v]
+    E --> F{newTime < dist[v]?}
+    F -- Yes --> G[Replace dist; ways[v]=ways[u]; push v]
+    F -- No --> H{newTime == dist[v]?}
+    H -- Yes --> I[Add ways[u] modulo MOD]
+    H -- No --> J[Ignore]
+    G --> K{Queue empty?}
+    I --> K
+    J --> K
+    K -- No --> C
+    K -- Yes --> L[Return ways[n-1]]
 ```
 
-## Important branch and loop flow
+Shorter path resets ways; equal shortest path contributes another route.
 
-```mermaid
-flowchart TD
-    A([Inspect next item]) --> B{candidate distance is shorter or equal to known shortest distance?}
-    B -- Yes --> C[replace distance/ways, or add ways modulo MOD]
-    B -- No --> D[ignore stale or longer candidate]
-    C --> E[Preserve the stated algorithm invariant]
-    D --> F[Keep prior state and advance]
-    E --> G{More work?}
-    F --> G
-    G -- Yes --> A
-    G -- No --> H([Produce output])
-```
+## Selected algorithm, source-specific explanation, dry run
 
-## Core logic and invariant
+> **मराठी:** मुख्य observation समजल्यावर algorithm चे steps लक्षात ठेवणे सोपे होते.
+> `countPaths` stores `{neighbor,time}` both directions, initializes `time[0]=0`, `ways[0]=1`, then priority-queue Dijkstra. Strict improvement replaces ways and pushes; equality adds modulo. Stale longer entries are skipped. The source also prints adjacency/debug traces to stdout, unlike a judge-only implementation.
+> Dry run (two equal routes to destination):
+> | Relaxation | New distance | Ways update |
+> |---|---:|---|
+> | `0→1` | 2 | `ways[1]=1` |
+> | `0→2` | 2 | `ways[2]=1` |
+> | `1→3` | 5 | `ways[3]=1` |
+> | `2→3` | 5 | equal: `ways[3]=2` |
 
-Builds a weighted undirected graph and runs Dijkstra while tracking shortest-path counts modulo 1e9+7.
-The key branch/loop rule above is applied once per relevant item; the algorithm relies on that rule to preserve its state and produce the required result.
+## Edge cases
 
-## Optimization / comparison
+> **मराठी:** Boundary, duplicate आणि off-by-one cases स्वतंत्रपणे तपासा.
+> A one-city graph has one zero-edge path; equal shortest routes add ways; positive road times are required by the method.
 
-A shorter route resets ways; equal shortest routes accumulate, without enumerating paths.
+## Complexity, correctness, traps
 
-## Complexity
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> `O((V+E)logV)` time, `O(V+E)` storage for adjacency, distance, ways and heap. Correctness: Dijkstra finalizes shortest distances for positive edge weights; each shortest predecessor either improves target (replace count) or ties it (add count), so ways matches all shortest paths.
+> Trap: use `long long` for distances; roads are undirected; modulo on each tie addition. Positive weights are important for processing path counts before destination pop. Remove debug printing in a strict submission environment.
 
-O((n+m) log n) time and O(n+m) space.
+## Quick revision, variations, self-check
 
-## Compile and run
+पुनरावलोकन: कमी distanceवर ways replace, tieवर add करा.
+Dijkstra relaxation has two branches: `<` replace, `==` add. Related: shortest path counts, DAG path DP, weighted graph traversal.
 
-The repository file includes a standalone demonstration `main()`; it is not a raw LeetCode submission unit. From the repository root, with a C++17 compiler:
-
-```powershell
-g++ -std=c++17 LeetCode\1976\1976.cpp -o solution.exe
-.\solution.exe
-```
-
-For LeetCode's class-method judge, copy the relevant class/method or design-class API and omit the demo `main()` and local harness. Adapt free-function implementations to the requested `Solution` class signature where necessary. See the source caveat above for any compile blocker.
+1. Why set ways to predecessor count on strict improvement?
+2. What happens on equal distance?
+3. Why is stale heap entry skipped?
+4. Why do positive weights matter to this counting approach?

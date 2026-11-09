@@ -1,71 +1,100 @@
-# Isomorphic Strings
+# Isomorphic Strings — LeetCode 205
 
-**Problem ID:** 205  
-**Source:** `isIsomorphic.cpp`  
-**Expected format:** C++ class-method solution with a local demonstration `main()`; see compile guidance below.
+## 1. Understanding
 
-## Expected input and output / judge signature
+`s` मधील प्रत्येक characterला `t` मधील unique character map करून दोन्ही stringsचे character pattern समान आहे का ते ठरवा. Mapping consistent आणि one-to-one असावी.
 
-Solution-facing declarations extracted from the source:
+## 2. Worked examples and edges
 
-- `bool isIsomorphic(string s, string t)`
-  The inputs and return value are described by these parameter and return types. The local `main()` runs test examples; it does not define a judge stdin/stdout protocol.
+- `"egg"` → `"add"` true (`e→a`, `g→d`).
+- `"foo"` → `"bar"` false (`o` एकदा दोन target charactersना map व्हायचा).
+- `"ab"` → `"aa"` false (दोन्ही source chars එක target share करू शकत नाहीत).
+- `""` आणि `""` true; lengths mismatch false.
 
-## Identification evidence
+## 3. Pattern identification + cheat sheet
 
-The filename, solution-facing signature, and implemented behavior support the mapping: Scan aligned positions while maintaining inverse character maps; reject inconsistent or reused partners.
+| Clue                           | Pattern                  | कारण                            |
+| ------------------------------ | ------------------------ | ------------------------------- |
+| Character substitution         | Bijective mapping        | Source→target आणि target→source |
+| Repeated character consistency | Hash maps / last-seen    | Same char same mapping          |
+| Pattern equality               | First-occurrence indices | Isomorphic pattern compare      |
 
-## Main flow
+## 4. Approaches
 
-Scan aligned positions while maintaining inverse character maps; reject inconsistent or reused partners.
+- Two maps: source code; expected O(n) time/O(Σ) space.
+- Fixed-size arrays for bounded charset: O(n) time/O(Σ) space, lower overhead.
+- First-seen index arrays: compare previous-occurrence positions, also O(n).
+- One-way map only चुकीचा; `"ab"`→`"aa"` injective condition तोडतो.
 
-```mermaid
-flowchart TD
-    S([Start]) --> I[Read the solution inputs]
-    I --> P["Scan aligned positions while maintaining inverse character maps; reject inconsistent or reused partners."]
-    P --> L{More input positions, candidates, or states?}
-    L -- Yes --> T{Does the current item satisfy the algorithm rule?}
-    T -- Yes --> U[Update the answer or maintained state]
-    T -- No --> N[Keep the invariant and continue]
-    U --> L
-    N --> L
-    L -- No --> R[Return or print the computed result]
-    R --> E([End])
-```
-
-## Important branch and loop flow
-
-The repeated step processes the next input item, candidate, or state. The branch either applies the algorithm's update or leaves the state unchanged, then continues until no work remains.
+## 5. Flowchart
 
 ```mermaid
 flowchart TD
-    A[Select the next input item or candidate] --> B{Does it satisfy the solution's condition?}
-    B -- Yes --> C[Apply the corresponding state or answer update]
-    B -- No --> D[Leave the answer unchanged]
-    C --> E[Advance to the next item or state]
-    D --> E
-    E --> F{Work remains?}
-    F -- Yes --> A
-    F -- No --> G[Finalize using the stated algorithm]
+ A([Start]) --> B{Lengths equal?}
+ B -- No --> C[Return false]
+ B -- Yes --> D[Create forward and reverse maps]
+ D --> E[Read paired characters]
+ E --> F{Source already mapped?}
+ F -- Yes --> G{Existing target matches?}
+ G -- No --> C
+ G -- Yes --> H[Continue]
+ F -- No --> I{Target already used by another source?}
+ I -- Yes --> C
+ I -- No --> J[Store both directions]
+ H --> K{More chars?}
+ J --> K
+ K -- Yes --> E
+ K -- No --> L[Return true]
 ```
 
-## Core logic and invariant
+दोन maps एकाच वेळी consistency आणि uniqueness सिद्ध करतात.
 
-Scan aligned positions while maintaining inverse character maps; reject inconsistent or reused partners.
-After each processed item or recursive state, the algorithm's maintained state represents the work accepted so far under the rule above; the final result is read from that accumulated state or returned by the terminal case.
+## 6. Algorithm / intuition
 
-## Complexity
+प्रत्येक `(s[i],t[i])` जोडीवर existing mapping असेल तर match असावी. नसल्यास target आधी इतर sourceने घेतलेला नसावा; मग दोन्ही दिशांचे mappings नोंदवा.
 
-- **Time:** O(n) expected.
-- **Auxiliary space:** O(alphabet).
+## 7. Code explanation
 
-## Compile and run
+`isIsomorphic` प्रथम size mismatch नाकारतो. `mapST` forward mapping, `mapTS` reverse mapping ठेवतात. `unordered_map<char,char>` sourceची character-domain assumptions जपतो.
 
-This source includes a demonstration `main()` and can be compiled with a C++17 compiler from the repository root:
+## 8. Dry run
 
-```powershell
-g++ -std=c++17 "LeetCode\205\205.cpp" -o solution.exe
-.\solution.exe
-```
+> **मराठी:** प्रत्येक महत्त्वाच्या step नंतर variable ची value trace करा.
+> `"ab"` → `"aa"`:
+> | i | pair | forward map | reverse check | result |
+> |---:|---|---|---|---|
+> | 0 | a→a | `{a:a}` | target a unused | continue |
+> | 1 | b→a | b not mapped | a already maps back to a | false |
 
-For LeetCode's class-method judge, use the relevant method signature above and adapt the local harness: remove the demonstration `main()` and reconcile locally declared node/helper types with judge-provided definitions. Source bytes were preserved exactly during the move.
+## 9. Complexity
+
+> **मराठी:** Input size आणि प्रत्येक operation कितीदा चालतो यावरून complexity ठरवा.
+> Expected O(n) time, O(min(n,Σ)) space for distinct characters; hash worst-case may degrade. Fixed alphabet version uses O(Σ) space.
+
+## 10. Correctness
+
+Forward map प्रत्येक source characterला एकच target देतो; reverse map प्रत्येक targetला एकच source देतो. प्रत्येक position तपासल्यामुळे mapping सर्व occurrencesशी consistent आहे; दोन्ही constraints मिळून bijection मिळते.
+
+## 11. Mistakes and interview traps
+
+- Same-length check आवश्यक.
+- Target reuse रोखण्यासाठी reverse map आवश्यक.
+- Repeated character mismatch लगेच false.
+- Character alphabet मर्यादा बदलल्यास map type/indexing पुन्हा विचारात घ्या.
+
+## 12. Quick revision
+
+> **मराठी:** दोन मिनिटांच्या revision साठी pattern, मुख्य कल्पना आणि complexity आठवा.
+> Length equal; each pair must satisfy existing forward map or create a fresh unused reverse mapping.
+
+## 13. Related problems / variations
+
+> **मराठी:** प्रश्नात काय दिले आहे आणि नेमके काय शोधायचे आहे, हे आधी स्पष्ट करा.
+> Word Pattern, bijection check, pattern matching by first-seen indices, minimum edits to make strings isomorphic.
+
+## 14. Self-assessment
+
+1. `"ab"`→`"aa"` का fail?
+2. Reverse map काय प्रतिबंधित करतो?
+3. Empty stringsचे उत्तर?
+4. Map ऐवजी index arrays कसे वापराल?
