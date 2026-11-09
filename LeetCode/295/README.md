@@ -6,38 +6,31 @@
 
 - `addNum(num)`: stream मध्ये नवीन number जोडा.
 - `findMedian()`: आतापर्यंतच्या numbers चा median परत करा.
-
-Numbers चा क्रम बदलत नाही; प्रत्येक वेळी नवीन number जोडला जातो. Median म्हणजे sorted क्रमातील मधला number. Numbers ची संख्या even असेल, तर मधल्या दोन numbers ची average median असते.
-
-उदाहरणार्थ, `[2, 5, 8]` चा median `5` आहे. `[2, 5, 8, 10]` चा median `(5 + 8) / 2 = 6.5` आहे.
-
-**महत्त्वाचे:** दिलेला C++ program प्रत्येक insertion नंतर median काढतो आणि brute-force व two-heaps approaches यांची तुलना करतो. LeetCode वरील API मध्ये `addNum` आणि `findMedian` methods अपेक्षित असतात.
+  Numbers चा क्रम बदलत नाही; प्रत्येक वेळी नवीन number जोडला जातो. Median म्हणजे sorted क्रमातील मधला number. Numbers ची संख्या even असेल, तर मधल्या दोन numbers ची average median असते.
+  उदाहरणार्थ, `[2, 5, 8]` चा median `5` आहे. `[2, 5, 8, 10]` चा median `(5 + 8) / 2 = 6.5` आहे.
+  **महत्त्वाचे:** दिलेला C++ program प्रत्येक insertion नंतर median काढतो आणि brute-force व two-heaps approaches यांची तुलना करतो. LeetCode वरील API मध्ये `addNum` आणि `findMedian` methods अपेक्षित असतात.
 
 ## 2. Example Understanding
 
 ### Example A: Odd count
 
 Stream: `[5, 2, 8]`
-
 | Insert केलेला number | Sorted numbers | Median |
 |---:|---|---:|
 | 5 | `[5]` | 5 |
 | 2 | `[2, 5]` | 3.5 |
 | 8 | `[2, 5, 8]` | 5 |
-
 तीन numbers असताना एकच middle number असतो.
 
 ### Example B: Even count
 
 Stream: `[5, 2, 8, 10]`
-
 | Insert केलेला number | Sorted numbers | Median |
 |---:|---|---:|
 | 5 | `[5]` | 5 |
 | 2 | `[2, 5]` | 3.5 |
 | 8 | `[2, 5, 8]` | 5 |
 | 10 | `[2, 5, 8, 10]` | 6.5 |
-
 चार numbers असताना मधले दोन `5` आणि `8` आहेत; त्यांची average `6.5` आहे.
 
 ### Edge cases
@@ -51,36 +44,32 @@ Stream: `[5, 2, 8, 10]`
 
 ### Pattern Recognition Cheat Sheet
 
-| Clue in Question | Possible Pattern | Why? |
-|---|---|---|
-| Numbers सतत येतात आणि प्रत्येक insertion नंतर median हवा | Two heaps | Sorted list पुन्हा पुन्हा बनवण्याऐवजी lower/upper halves सांभाळता येतात |
-| वारंवार middle किंवा extreme value विचारली जाते | Heap / order-statistics | Heap मधून संबंधित boundary value पटकन मिळते |
-| Data insert होत असताना प्रश्नाचे उत्तरही update करायचे आहे | Online algorithm | सर्व input येईपर्यंत थांबता येत नाही; प्रत्येक step ला state राखावी लागते |
+| Clue in Question                                           | Possible Pattern        | Why?                                                                      |
+| ---------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------- |
+| Numbers सतत येतात आणि प्रत्येक insertion नंतर median हवा   | Two heaps               | Sorted list पुन्हा पुन्हा बनवण्याऐवजी lower/upper halves सांभाळता येतात   |
+| वारंवार middle किंवा extreme value विचारली जाते            | Heap / order-statistics | Heap मधून संबंधित boundary value पटकन मिळते                               |
+| Data insert होत असताना प्रश्नाचे उत्तरही update करायचे आहे | Online algorithm        | सर्व input येईपर्यंत थांबता येत नाही; प्रत्येक step ला state राखावी लागते |
 
 स्वतःला विचारा:
 
 1. Median साठी sorted order मध्ये कोणते element(s) आवश्यक आहेत?
 2. पूर्ण array प्रत्येक वेळी sort करणे आवश्यक आहे का, की फक्त middle जवळचे elements पुरेसे आहेत?
 3. दोन भाग केले, तर त्यांच्या मधल्या boundary वर कोणती values ठेवणे उपयोगी ठरेल?
-
-**अनुभवी problem solver ची observation:** median साठी पूर्ण क्रमाची गरज नाही. Lower half मधला सर्वात मोठा आणि upper half मधला सर्वात लहान element मिळाला, तर median काढता येतो.
+   **अनुभवी problem solver ची observation:** median साठी पूर्ण क्रमाची गरज नाही. Lower half मधला सर्वात मोठा आणि upper half मधला सर्वात लहान element मिळाला, तर median काढता येतो.
 
 ## 4. Different Approaches
 
 ### Approach 1: प्रत्येक वेळी sort करणे (Brute force)
 
 **Intuition:** सर्व numbers vector मध्ये साठवा. Median विचारल्यावर vector ची copy sort करा आणि मधले element(s) घ्या. हे तुमच्या `addNumBrute` आणि `findMedianBrute` methods मध्ये आहे.
-
 **Steps:**
 
 1. नवीन number vector मध्ये जोडा.
 2. Median मागितल्यावर vector ची copy तयार करा.
 3. Copy sort करा.
 4. Odd count असेल तर middle element; even count असेल तर मधल्या दोनची average द्या.
-
-**का योग्य आहे?** प्रत्येक query वेळी संपूर्ण data sort केल्यामुळे answer बरोबर मिळतो. कमी operations किंवा लहान input साठी समजायला सोपा पर्याय आहे.
-
-**का पुरेसा वेगवान नसेल?** प्रत्येक median query ला पुन्हा sorting होते. मोठ्या stream मध्ये हा खर्च वाढतो.
+   **का योग्य आहे?** प्रत्येक query वेळी संपूर्ण data sort केल्यामुळे answer बरोबर मिळतो. कमी operations किंवा लहान input साठी समजायला सोपा पर्याय आहे.
+   **का पुरेसा वेगवान नसेल?** प्रत्येक median query ला पुन्हा sorting होते. मोठ्या stream मध्ये हा खर्च वाढतो.
 
 - फायदे: implementation सोपी, प्रत्येक वेळी values चा sorted क्रम उपलब्ध.
 - तोटे: वारंवार sort करावे लागते; query महाग.
@@ -92,35 +81,26 @@ Stream: `[5, 2, 8, 10]`
 
 - `topMax`: lower half साठी max-heap; lower half मधील सर्वात मोठा number वर असतो.
 - `topMin`: upper half साठी min-heap; upper half मधील सर्वात लहान number वर असतो.
-
-यामुळे दोन्ही halves च्या मधल्या boundary वरील values लगेच मिळतात. तुमच्या code मध्ये heaps `topMax` आणि `topMin` नावाने आहेत.
-
-**Heap invariants:**
+  यामुळे दोन्ही halves च्या मधल्या boundary वरील values लगेच मिळतात. तुमच्या code मध्ये heaps `topMax` आणि `topMin` नावाने आहेत.
+  **Heap invariants:**
 
 1. `topMax` मधील प्रत्येक value `topMin` मधील प्रत्येक value पेक्षा लहान किंवा समान असते.
 2. `topMax` चा size `topMin` च्या size इतका किंवा त्यापेक्षा फक्त एकाने मोठा असतो.
-
-**एका number ची भर:**
-
-1. Number `topMax` मध्ये push करा.
-2. `topMax` चा सर्वात मोठा number `topMin` मध्ये हलवा. त्यामुळे halves मधील ordering योग्य राहते.
-3. `topMin` मोठा झाला, तर त्याचा सर्वात लहान number परत `topMax` मध्ये हलवा. त्यामुळे size balance राखला जातो.
-
-**Median:**
+   **एका number ची भर:**
+3. Number `topMax` मध्ये push करा.
+4. `topMax` चा सर्वात मोठा number `topMin` मध्ये हलवा. त्यामुळे halves मधील ordering योग्य राहते.
+5. `topMin` मोठा झाला, तर त्याचा सर्वात लहान number परत `topMax` मध्ये हलवा. त्यामुळे size balance राखला जातो.
+   **Median:**
 
 - `topMax` मध्ये एक extra element असल्यास, `topMax.top()` median.
 - Sizes समान असल्यास, `(topMax.top() + topMin.top()) / 2.0`.
-
-**का योग्य आहे?** Heaps चे invariant प्रत्येक insertion नंतर दोन्ही halves चा क्रम आणि आकार सांभाळतात. त्यामुळे middle value(s) नेहमी heap tops वर असतात.
-
-**मर्यादा:** पूर्ण sorted sequence तयार होत नाही; फक्त median साठी लागणाऱ्या boundary values सहज मिळतात. या problem साठी ते पुरेसे आहे.
-
-| Approach | Add | Median query | Extra space | Pros | Cons |
-|---|---:|---:|---:|---|---|
-| Vector + sort-on-query | `O(1)` amortized | `O(n log n)` | `O(n)` | सोपा; समजायला आणि validate करायला उपयुक्त | प्रत्येक query ला sort |
-| Two heaps | `O(log n)` | `O(1)` | `O(n)` | Online median; query जलद | दोन heaps आणि balancing logic समजणे आवश्यक |
-
-`n` म्हणजे त्या वेळेपर्यंत stream मध्ये आलेल्या numbers ची संख्या. Vector approach मध्ये query करताना copy साठी `O(n)` अतिरिक्त memory देखील लागते.
+  **का योग्य आहे?** Heaps चे invariant प्रत्येक insertion नंतर दोन्ही halves चा क्रम आणि आकार सांभाळतात. त्यामुळे middle value(s) नेहमी heap tops वर असतात.
+  **मर्यादा:** पूर्ण sorted sequence तयार होत नाही; फक्त median साठी लागणाऱ्या boundary values सहज मिळतात. या problem साठी ते पुरेसे आहे.
+  | Approach | Add | Median query | Extra space | Pros | Cons |
+  |---|---:|---:|---:|---|---|
+  | Vector + sort-on-query | `O(1)` amortized | `O(n log n)` | `O(n)` | सोपा; समजायला आणि validate करायला उपयुक्त | प्रत्येक query ला sort |
+  | Two heaps | `O(log n)` | `O(1)` | `O(n)` | Online median; query जलद | दोन heaps आणि balancing logic समजणे आवश्यक |
+  `n` म्हणजे त्या वेळेपर्यंत stream मध्ये आलेल्या numbers ची संख्या. Vector approach मध्ये query करताना copy साठी `O(n)` अतिरिक्त memory देखील लागते.
 
 ## 5. Flowchart Using Mermaid
 
@@ -153,8 +133,7 @@ Final optimized approach म्हणजे two heaps. याची मुख्
 3. प्रत्येक insertion नंतर values ची ordering योग्य ठेवण्यासाठी `topMax` चा top `topMin` मध्ये हलवा.
 4. दोन्ही heaps चे sizes balance करा.
 5. Median मागितल्यावर size आणि heap tops वापरून उत्तर द्या.
-
-`topMax` आणि `topMin` हे दोन्ही heaps एकत्रितपणे सर्व inserted numbers ठेवतात; data discard होत नाही.
+   `topMax` आणि `topMin` हे दोन्ही heaps एकत्रितपणे सर्व inserted numbers ठेवतात; data discard होत नाही.
 
 ## 7. Code Explanation
 
@@ -184,14 +163,12 @@ Final optimized approach म्हणजे two heaps. याची मुख्
 ## 8. Dry Run
 
 Stream: `[5, 2, 8, 10]`
-
 | Step | Insert | `topMax` (lower half) | `topMin` (upper half) | Condition / action | Median |
 |---:|---:|---|---|---|---:|
 | 1 | 5 | `[5]` | `[]` | Size balance योग्य | 5 |
 | 2 | 2 | `[2]` | `[5]` | `topMax` मधून `5` हलवले; sizes समान असल्याने आणखी rebalance नाही | 3.5 |
 | 3 | 8 | `[5, 2]` | `[8]` | `8` upper half मध्ये; `topMax` एकाने मोठा | 5 |
 | 4 | 10 | `[5, 2]` | `[8, 10]` | Halves समान आकाराचे | 6.5 |
-
 `topMax`/`topMin` मधील bracket मधील क्रम heap चा internal storage क्रम दर्शवतो; महत्त्वाची values अनुक्रमे `top()` आहेत: `topMax.top()` आणि `topMin.top()`.
 
 ## 9. Complexity Analysis
@@ -208,8 +185,7 @@ Stream: `[5, 2, 8, 10]`
 - Add: `O(log n)`. Constant number of heap push/pop operations होतात; प्रत्येक `O(log n)`.
 - Median query: `O(1)`. फक्त heap sizes आणि top values वापरतो.
 - Stored space: `O(n)`, कारण सर्व values दोन्ही heaps मध्ये ठेवले जातात.
-
-Stream मध्ये अनेक median queries असतील, तर two heaps चा query फायदा महत्त्वाचा ठरतो. दोन्ही approaches सर्व values साठवत असल्यामुळे space `O(n)` आहे.
+  Stream मध्ये अनेक median queries असतील, तर two heaps चा query फायदा महत्त्वाचा ठरतो. दोन्ही approaches सर्व values साठवत असल्यामुळे space `O(n)` आहे.
 
 ## 10. Why This Solution Works
 
@@ -217,13 +193,11 @@ Two heaps चे दोन invariants कायम आहेत:
 
 1. **Ordering:** lower half मधील values upper half पेक्षा मोठ्या नसतात. Insertion नंतर `topMax` मधील सर्वात मोठी value `topMin` मध्ये हलवल्याने boundary योग्य राहते.
 2. **Balance:** `topMax` मध्ये `topMin` एवढे किंवा एकाने अधिक elements असतात. `topMin` मोठा झाल्यावर त्याचा top परत हलवल्याने balance restore होतो.
-
-म्हणून:
+   म्हणून:
 
 - Odd count मध्ये lower half मध्ये एक extra value असते; तिचा maximum म्हणजे संपूर्ण sorted क्रमातील middle value.
 - Even count मध्ये halves समान आकाराचे असतात; lower maximum आणि upper minimum हे दोन middle values असतात.
-
-प्रत्येक insertion मध्ये मर्यादित heap operations होतात, त्यामुळे algorithm संपतो. प्रत्येक value heap मध्ये योग्य भागात राहते आणि median साठी आवश्यक boundary हरवत नाही.
+  प्रत्येक insertion मध्ये मर्यादित heap operations होतात, त्यामुळे algorithm संपतो. प्रत्येक value heap मध्ये योग्य भागात राहते आणि median साठी आवश्यक boundary हरवत नाही.
 
 ## 11. Common Mistakes & Interview Traps
 
@@ -234,9 +208,7 @@ Two heaps चे दोन invariants कायम आहेत:
 - Duplicate values वेगवेगळे stream entries आहेत हे विसरणे.
 - Brute-force sorting ची query complexity `O(n log n)` आहे हे नोंदवायला विसरणे.
 - LeetCode API signatures आणि या file मधील demo method names गोंधळणे.
-
-**Interview follow-ups:**
-
+  **Interview follow-ups:**
 - Median शोधताना काही values काढून टाकायच्या असतील तर heaps कसे update कराल?
 - Sliding window median साठी outgoing elements कसे हाताळाल?
 - Data memory मध्ये ठेवता येत नसेल तर काय अडचणी येतील?
@@ -260,8 +232,7 @@ Two heaps चे दोन invariants कायम आहेत:
 - Sliding window मध्ये नवीन value insert करण्याबरोबर window मधून बाहेर पडलेली value remove करावी लागते; साधे heaps deletion साठी थेट पुरेसे नाहीत. Lazy deletion किंवा दुसरी योग्य ordered data structure आवश्यक होऊ शकते.
 - फक्त `k`-th smallest/largest हवा असल्यास, सर्व values दोन भागांत विभागण्याऐवजी `k` boundary राखणारा heap उपयोगी ठरू शकतो.
 - फक्त एकदाच median काढायचा असेल, तर sorting किंवा selection algorithm पुरेसा असू शकतो; streaming updates असतील तेव्हा दोन heaps अधिक योग्य pattern आहे.
-
-Similar problems पाहताना आधी विचारा: **डेटा online येतो का? प्रत्येक update नंतर middle/order statistic हवा का?** उत्तर हो असेल तर दोन heaps विचारात घ्या.
+  Similar problems पाहताना आधी विचारा: **डेटा online येतो का? प्रत्येक update नंतर middle/order statistic हवा का?** उत्तर हो असेल तर दोन heaps विचारात घ्या.
 
 ## 14. Final Self-Assessment
 
